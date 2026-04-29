@@ -461,6 +461,12 @@ async function safeJson(resp) {
   try { return JSON.parse(text); } catch { return { _raw: text }; }
 }
 
+function hostnameOf(s) {
+  try { return new URL(s).hostname; } catch {}
+  try { return new URL('https://' + s).hostname; } catch {}
+  return s;
+}
+
 // ─── Job Search ───────────────────────────────────────────────────────────
 function buildJobSearchBody() {
   const titles = csvCommaList(document.getElementById('js-titles').value);
@@ -674,7 +680,10 @@ document.getElementById('sl-run')?.addEventListener('click', async () => {
       const card = document.createElement('div');
       card.className = 'salary-result';
       const range = r.salaryRange ? `Range: ${escapeHtml(r.salaryRange.lower || '?')} – ${escapeHtml(r.salaryRange.upper || '?')}` : '';
-      const sources = (r.sources || []).slice(0, 3).map(s => `<a href="${escapeHtml(s)}" target="_blank" rel="noopener">${escapeHtml(new URL(s).hostname)}</a>`).join(', ');
+      const sources = (r.sources || []).slice(0, 3).map(s => {
+        const href = /^https?:\/\//i.test(s) ? s : 'https://' + s;
+        return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(hostnameOf(s))}</a>`;
+      }).join(', ');
       card.innerHTML = `
         <div class="header">
           <div class="designation">${escapeHtml(r.designation)} · ${escapeHtml(r.companyName)}</div>
