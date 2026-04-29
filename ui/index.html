@@ -392,6 +392,7 @@ const LS_KEYS = {
 
 function bindPersist(id, lsKey) {
   const el = document.getElementById(id);
+  if (!el) return;
   const stored = localStorage.getItem(lsKey);
   if (stored) el.value = stored;
   el.addEventListener('change', () => localStorage.setItem(lsKey, el.value));
@@ -518,7 +519,7 @@ function renderJobs(jobs, meta) {
   target.appendChild(details);
 }
 
-document.getElementById('js-run').addEventListener('click', async () => {
+document.getElementById('js-run')?.addEventListener('click', async () => {
   let body;
   try { body = buildJobSearchBody(); }
   catch (e) { return setStatus('js-results', 'error', e.message); }
@@ -537,7 +538,7 @@ document.getElementById('js-run').addEventListener('click', async () => {
   }
 });
 
-document.getElementById('js-csv').addEventListener('click', async () => {
+document.getElementById('js-csv')?.addEventListener('click', async () => {
   let body;
   try { body = buildJobSearchBody(); }
   catch (e) { return setStatus('js-results', 'error', e.message); }
@@ -566,7 +567,7 @@ document.getElementById('js-csv').addEventListener('click', async () => {
 });
 
 // ─── Suggest Titles ───────────────────────────────────────────────────────
-document.getElementById('st-run').addEventListener('click', async () => {
+document.getElementById('st-run')?.addEventListener('click', async () => {
   const name = document.getElementById('st-name').value.trim();
   const id = document.getElementById('st-id').value.trim();
   const linkedinUrl = document.getElementById('st-linkedin-url').value.trim();
@@ -638,15 +639,15 @@ function addSalaryJobRow(prefill) {
   row.querySelector('.sl-remove').addEventListener('click', () => row.remove());
   container.appendChild(row);
 }
-addSalaryJobRow();
-document.getElementById('sl-add').addEventListener('click', () => {
+if (document.getElementById('sl-jobs')) addSalaryJobRow();
+document.getElementById('sl-add')?.addEventListener('click', () => {
   if (document.getElementById('sl-jobs').children.length >= 10) {
     return setStatus('sl-results', 'error', 'Max 10 jobs per batch.');
   }
   addSalaryJobRow();
 });
 
-document.getElementById('sl-run').addEventListener('click', async () => {
+document.getElementById('sl-run')?.addEventListener('click', async () => {
   const rows = [...document.getElementById('sl-jobs').children];
   const jobs = rows.map(r => ({
     companyName: r.querySelector('.sl-company').value.trim(),
@@ -693,7 +694,7 @@ document.getElementById('sl-run').addEventListener('click', async () => {
 });
 
 // ─── Generate Comments ────────────────────────────────────────────────────
-document.getElementById('cg-run').addEventListener('click', async () => {
+document.getElementById('cg-run')?.addEventListener('click', async () => {
   const post = document.getElementById('cg-post').value.trim();
   if (!post) return setStatus('cg-results', 'error', 'Post text is required.');
   setStatus('cg-results', 'loading', 'Classifying & generating comments… (10–30s)');
