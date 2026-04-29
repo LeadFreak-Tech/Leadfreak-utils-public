@@ -85,3 +85,4 @@ Optional API keys can be entered in the collapsible "API keys" section at the to
 - The Railway backend has `CORSMiddleware` set to `allow_origins=["*"]`, so any origin (including GitHub Pages) can call it.
 - There's no auth layer in front — anyone who finds the Railway URL can hit the API. If that becomes a problem, add a simple shared-secret header check in `app/middleware/security.py`.
 - API keys typed into the UI live only in the user's browser (localStorage). They're never sent anywhere except as request headers to the Railway backend.
+
