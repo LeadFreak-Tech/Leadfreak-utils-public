@@ -207,6 +207,7 @@
     <!-- <button class="tab" data-target="suggest-titles">Suggest Titles</button> -->
     <button class="tab" data-target="estimate-salary">Estimate Salary</button>
     <button class="tab" data-target="generate-comments">LinkedIn Comments</button>
+    <button class="tab" data-target="generate-comments-advanced">LinkedIn Comments (RAG)</button>
   </div>
 
   <!-- ─── JOB SEARCH ───────────────────────────────────────────── -->
@@ -376,6 +377,49 @@
     </div>
 
     <div class="results" id="cg-results"></div>
+  </section>
+
+  <!-- ─── GENERATE COMMENTS (ADVANCED / RAG) ──────────────────── -->
+  <section class="panel" id="generate-comments-advanced">
+    <h2>LinkedIn Comment Generator — RAG (ghostwriter)</h2>
+    <p class="subtitle">Generates ONE comment in a specific ingested profile's voice using their fingerprint + retrieved past comments.</p>
+
+    <div class="row">
+      <div>
+        <label>
+          Profile
+          <span class="hint">(must be ingested under <code>RAG_workflow/vector_dbs/</code>)</span>
+        </label>
+        <select id="cga-profile">
+          <option value="">— click Refresh to load —</option>
+        </select>
+      </div>
+      <div>
+        <label>Top-K past comments <span class="hint">(1–20, only when RAG is on)</span></label>
+        <input id="cga-topk" type="number" min="1" max="20" value="3" />
+      </div>
+    </div>
+
+    <div class="row full">
+      <div class="checkbox-row">
+        <label><input id="cga-use-rag" type="checkbox" checked /> Use RAG (retrieve similar past comments)</label>
+        <button class="small-btn" id="cga-refresh">Refresh profiles</button>
+        <span id="cga-profile-meta" style="color:var(--muted); font-size:12px;"></span>
+      </div>
+    </div>
+
+    <div class="row full">
+      <div>
+        <label>Post text <span class="hint">(required)</span></label>
+        <textarea id="cga-post" style="min-height: 160px;" placeholder="Paste the LinkedIn post text here..."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="cga-run">Generate comment</button>
+    </div>
+
+    <div class="results" id="cga-results"></div>
   </section>
 
 </main>
@@ -740,6 +784,135 @@ document.getElementById('cg-run')?.addEventListener('click', async () => {
     });
   } catch (e) {
     setStatus('cg-results', 'error', e.message);
+  }
+});
+
+// ─── Generate Comments (Advanced / RAG) ───────────────────────────────────
+let cgaProfilesCache = null;
+
+function renderProfilesSelect(profiles) {
+  const sel = document.getElementById('cga-profile');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  if (!profiles.length) {
+    sel.innerHTML = '<option value="">(no ingested profiles found)</option>';
+    return;
+  }
+  profiles.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.name;
+    const fp = p.has_fingerprint ? '✓ fp' : '✗ no fp';
+    const dc = p.document_count != null ? `${p.document_count} docs` : '—';
+    opt.textContent = `${p.name} — ${fp}, ${dc}`;
+    opt.dataset.meta = JSON.stringify(p);
+    sel.appendChild(opt);
+  });
+  if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+  updateProfileMeta();
+}
+
+function updateProfileMeta() {
+  const sel = document.getElementById('cga-profile');
+  const meta = document.getElementById('cga-profile-meta');
+  const opt = sel.selectedOptions[0];
+  if (!opt || !opt.dataset.meta) { meta.textContent = ''; return; }
+  try {
+    const p = JSON.parse(opt.dataset.meta);
+    meta.textContent = p.identity_signal ? `identity: ${p.identity_signal}` : '';
+  } catch { meta.textContent = ''; }
+}
+
+async function loadProfiles(force = false) {
+  if (cgaProfilesCache && !force) {
+    renderProfilesSelect(cgaProfilesCache);
+    return;
+  }
+  setStatus('cga-results', 'loading', 'Loading profiles…');
+  try {
+    const resp = await fetch(`${apiBase()}/api/v1/comment-gen-advanced/profiles`, {
+      headers: authHeaders(),
+    });
+    const data = await safeJson(resp);
+    if (!resp.ok) return setStatus('cga-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Failed to load profiles'}`);
+    cgaProfilesCache = data.profiles || [];
+    renderProfilesSelect(cgaProfilesCache);
+    document.getElementById('cga-results').innerHTML = `<div class="status success">${cgaProfilesCache.length} profile(s) available.</div>`;
+  } catch (e) {
+    setStatus('cga-results', 'error', e.message);
+  }
+}
+
+document.getElementById('cga-refresh')?.addEventListener('click', () => loadProfiles(true));
+document.getElementById('cga-profile')?.addEventListener('change', updateProfileMeta);
+
+// Auto-load profiles the first time the user opens the RAG tab.
+document.querySelector('.tab[data-target="generate-comments-advanced"]')?.addEventListener('click', () => {
+  if (!cgaProfilesCache) loadProfiles();
+});
+
+document.getElementById('cga-run')?.addEventListener('click', async () => {
+  const post = document.getElementById('cga-post').value.trim();
+  const profile = document.getElementById('cga-profile').value;
+  const useRag = document.getElementById('cga-use-rag').checked;
+  const topK = Math.max(1, Math.min(20, parseInt(document.getElementById('cga-topk').value, 10) || 3));
+
+  if (!profile) return setStatus('cga-results', 'error', 'Pick a profile first (click Refresh if the list is empty).');
+  if (!post) return setStatus('cga-results', 'error', 'Post text is required.');
+
+  setStatus('cga-results', 'loading', `Generating comment as "${profile}"… (10–30s)`);
+  try {
+    const resp = await fetch(`${apiBase()}/api/v1/generate-comment-advanced`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({
+        post_text: post,
+        profile_name: profile,
+        use_rag: useRag,
+        top_k: topK,
+      }),
+    });
+    const data = await safeJson(resp);
+    if (!resp.ok) return setStatus('cga-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
+
+    const target = document.getElementById('cga-results');
+    const badges = [
+      `<span class="badge">profile: ${escapeHtml(data.profile)}</span>`,
+      data.fingerprint_loaded ? '<span class="badge salary">fingerprint ✓</span>' : '<span class="badge">no fingerprint</span>',
+      data.rag_enabled ? '<span class="badge remote">RAG on</span>' : '<span class="badge">RAG off</span>',
+    ].join(' ');
+
+    target.innerHTML = `<div class="status success">${badges}</div><h3>Comment</h3>`;
+    const card = document.createElement('div');
+    card.className = 'comment-result';
+    card.innerHTML = `
+      <div class="label">generated</div>
+      <div class="text">${escapeHtml(data.comment)}</div>
+      <div style="margin-top:10px;"><button class="small-btn">Copy</button></div>
+    `;
+    card.querySelector('button').addEventListener('click', e => {
+      navigator.clipboard.writeText(data.comment);
+      e.target.textContent = 'Copied!';
+      setTimeout(() => { e.target.textContent = 'Copy'; }, 1200);
+    });
+    target.appendChild(card);
+
+    const past = data.past_comments_used || [];
+    if (past.length) {
+      const h = document.createElement('h3');
+      h.textContent = `Past comments used (${past.length})`;
+      target.appendChild(h);
+      past.forEach(p => {
+        const c = document.createElement('div');
+        c.className = 'comment-result';
+        c.innerHTML = `
+          <div class="label">distance ${p.distance != null ? p.distance.toFixed(3) : '—'}</div>
+          <div class="text">${escapeHtml(p.text)}</div>
+        `;
+        target.appendChild(c);
+      });
+    }
+  } catch (e) {
+    setStatus('cga-results', 'error', e.message);
   }
 });
 </script>
