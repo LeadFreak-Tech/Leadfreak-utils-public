@@ -208,6 +208,7 @@
     <button class="tab" data-target="estimate-salary">Estimate Salary</button>
     <button class="tab" data-target="generate-comments">LinkedIn Comments</button>
     <button class="tab" data-target="generate-comments-advanced">LinkedIn Comments (RAG)</button>
+    <button class="tab" data-target="generate-outreach">Outreach Engine</button>
   </div>
 
   <!-- ─── JOB SEARCH ───────────────────────────────────────────── -->
@@ -420,6 +421,79 @@
     </div>
 
     <div class="results" id="cga-results"></div>
+  </section>
+
+  <!-- ─── OUTREACH ENGINE ─────────────────────────────────────── -->
+  <section class="panel" id="generate-outreach">
+    <h2>Outreach Engine</h2>
+    <p class="subtitle">Personalized cold/warm outreach anchored to a citeable fact in the prospect's LinkedIn JSON. All three text inputs are required (hard gate).</p>
+
+    <div class="row">
+      <div>
+        <label>Message type</label>
+        <select id="oe-type">
+          <option value="connection">connection (300-char cap)</option>
+          <option value="inmail">inmail</option>
+          <option value="dm">dm</option>
+          <option value="email">email (with P.S.)</option>
+          <option value="referral">referral (with P.S.)</option>
+        </select>
+      </div>
+      <div>
+        <label>Tone</label>
+        <select id="oe-tone">
+          <option value="both">both (2 variations)</option>
+          <option value="direct">direct (1)</option>
+          <option value="soft">soft (1)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Word limit <span class="hint">(30–200, ignored for connection)</span></label>
+        <input id="oe-wordlimit" type="number" min="30" max="200" value="75" />
+      </div>
+      <div>
+        <label>Referrer name <span class="hint">(required for referral)</span></label>
+        <input id="oe-referrer" type="text" placeholder="e.g. Saksham Jain" />
+      </div>
+    </div>
+
+    <div class="row full">
+      <div>
+        <label>Resume <span class="hint">(required)</span></label>
+        <textarea id="oe-resume" style="min-height: 120px;" placeholder="Paste full resume as plain text..."></textarea>
+      </div>
+    </div>
+
+    <div class="row full">
+      <div>
+        <label>Job details <span class="hint">(required)</span></label>
+        <textarea id="oe-jd" style="min-height: 120px;" placeholder="Paste job description / posting..."></textarea>
+      </div>
+    </div>
+
+    <div class="row full">
+      <div>
+        <label>Prospect LinkedIn JSON <span class="hint">(required, raw JSON)</span></label>
+        <textarea id="oe-li" style="min-height: 160px;" placeholder='{"fullname": "...", "headline": "...", "experience": [...]}'></textarea>
+      </div>
+    </div>
+
+    <div class="row full">
+      <div>
+        <label>Forbidden words <span class="hint">(comma-separated, optional — omit to use default list)</span></label>
+        <input id="oe-forbidden" type="text" placeholder="delve, tapestry, thrilled, ..." />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="oe-run">Generate outreach</button>
+      <span id="oe-gate" style="color:var(--danger); font-size:12px; align-self:center;"></span>
+    </div>
+
+    <div class="results" id="oe-results"></div>
   </section>
 
 </main>
@@ -913,6 +987,120 @@ document.getElementById('cga-run')?.addEventListener('click', async () => {
     }
   } catch (e) {
     setStatus('cga-results', 'error', e.message);
+  }
+});
+
+// ─── Outreach Engine ──────────────────────────────────────────────────────
+function oeMissingFields() {
+  const missing = [];
+  if (!document.getElementById('oe-resume').value.trim()) missing.push('resume');
+  if (!document.getElementById('oe-jd').value.trim()) missing.push('jobDetails');
+  if (!document.getElementById('oe-li').value.trim()) missing.push('linkedinJson');
+  const type = document.getElementById('oe-type').value;
+  if (type === 'referral' && !document.getElementById('oe-referrer').value.trim()) {
+    missing.push('referrer');
+  }
+  return missing;
+}
+
+function refreshOeGate() {
+  const gate = document.getElementById('oe-gate');
+  const missing = oeMissingFields();
+  if (missing.length) {
+    gate.textContent = `Missing: ${missing.join(', ')}`;
+    document.getElementById('oe-run')?.setAttribute('disabled', 'true');
+  } else {
+    gate.textContent = '';
+    document.getElementById('oe-run')?.removeAttribute('disabled');
+  }
+}
+
+['oe-resume', 'oe-jd', 'oe-li', 'oe-referrer', 'oe-type'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', refreshOeGate);
+  document.getElementById(id)?.addEventListener('change', refreshOeGate);
+});
+refreshOeGate();
+
+document.getElementById('oe-run')?.addEventListener('click', async () => {
+  const missing = oeMissingFields();
+  if (missing.length) return setStatus('oe-results', 'error', `Cannot generate — missing: ${missing.join(', ')}`);
+
+  const forbidden = csvCommaList(document.getElementById('oe-forbidden').value);
+  const body = {
+    resume: document.getElementById('oe-resume').value.trim(),
+    jobDetails: document.getElementById('oe-jd').value.trim(),
+    linkedinJson: document.getElementById('oe-li').value.trim(),
+    messageType: document.getElementById('oe-type').value,
+    tone: document.getElementById('oe-tone').value,
+    wordLimit: parseInt(document.getElementById('oe-wordlimit').value, 10) || 75,
+  };
+  const referrer = document.getElementById('oe-referrer').value.trim();
+  if (referrer) body.referrer = referrer;
+  if (forbidden.length) body.forbidden = forbidden;
+
+  setStatus('oe-results', 'loading', 'Generating outreach… (Gemini reasons before writing; 15–45s)');
+  try {
+    const resp = await fetch(`${apiBase()}/api/v1/generate-outreach`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(body),
+    });
+    const data = await safeJson(resp);
+    if (!resp.ok) return setStatus('oe-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
+
+    const target = document.getElementById('oe-results');
+    target.innerHTML = '';
+
+    if (data.needsHumanReview) {
+      const panel = document.createElement('div');
+      panel.className = 'status error';
+      panel.style.padding = '14px';
+      panel.innerHTML = `
+        <div style="font-weight:600; margin-bottom:6px;">Human review required</div>
+        <div style="margin-bottom:8px;">${escapeHtml(data.reviewReason || '(no reason given)')}</div>
+        ${data.painPoint ? `<div style="font-size:12px; opacity:0.85;">Inferred pain point: ${escapeHtml(data.painPoint)}</div>` : ''}
+      `;
+      target.appendChild(panel);
+      return;
+    }
+
+    const header = document.createElement('div');
+    header.className = 'status success';
+    header.innerHTML = `
+      <div>${data.variations.length} variation(s) · model: <code>${escapeHtml(data.model)}</code> · today: ${escapeHtml(data.today)}</div>
+      ${data.painPoint ? `<div style="margin-top:6px; font-size:12px;">Pain point: ${escapeHtml(data.painPoint)}</div>` : ''}
+    `;
+    target.appendChild(header);
+
+    const charCap = body.messageType === 'connection' ? 300 : null;
+    data.variations.forEach(v => {
+      const card = document.createElement('div');
+      card.className = 'comment-result';
+      const overCap = charCap && v.char_count > charCap;
+      const capWarn = overCap
+        ? `<span class="badge" style="background:#fef2f2; color:var(--danger);">OVER ${charCap}-char cap</span>`
+        : '';
+      card.innerHTML = `
+        <div class="label">${escapeHtml(v.label)}</div>
+        ${v.subject ? `<div style="font-weight:600; margin-bottom:8px;">Subject: ${escapeHtml(v.subject)}</div>` : ''}
+        <div class="text">${escapeHtml(v.message)}</div>
+        <div style="margin-top:10px; font-size:12px; color:var(--muted);">
+          ${v.char_count} chars · ${v.word_count} words ${capWarn}
+        </div>
+        <div style="margin-top:8px; font-size:12px;"><strong>Hook cites:</strong> <code>${escapeHtml(v.hookSource)}</code></div>
+        <div style="margin-top:4px; font-size:12px;"><strong>Anchored to:</strong> ${escapeHtml(v.proofUsed)}</div>
+        <div style="margin-top:10px;"><button class="small-btn">Copy subject + body</button></div>
+      `;
+      card.querySelector('button').addEventListener('click', e => {
+        const combined = (v.subject ? `Subject: ${v.subject}\n\n` : '') + v.message;
+        navigator.clipboard.writeText(combined);
+        e.target.textContent = 'Copied!';
+        setTimeout(() => { e.target.textContent = 'Copy subject + body'; }, 1200);
+      });
+      target.appendChild(card);
+    });
+  } catch (e) {
+    setStatus('oe-results', 'error', e.message);
   }
 });
 </script>
