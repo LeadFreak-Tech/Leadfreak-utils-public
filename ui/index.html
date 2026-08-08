@@ -1,1109 +1,1228 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Leadfreak Utils</title>
-<style>
-  :root {
-    --bg: #f7f8fa;
-    --panel: #ffffff;
-    --border: #e3e6eb;
-    --text: #1a1d23;
-    --muted: #6b7280;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
-    --danger: #dc2626;
-    --success: #059669;
-    --code-bg: #0f172a;
-    --code-text: #e2e8f0;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-  }
-  header {
-    background: var(--panel);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  header h1 { margin: 0; font-size: 18px; font-weight: 600; }
-  header .config {
-    display: flex; gap: 8px; align-items: center; font-size: 13px;
-  }
-  header input[type="text"] {
-    padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
-    font-size: 13px; min-width: 320px;
-  }
-  main { max-width: 1100px; margin: 0 auto; padding: 24px; }
-  .tabs {
-    display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
-    overflow-x: auto;
-  }
-  .tab {
-    padding: 10px 16px; cursor: pointer; border: none; background: transparent;
-    font-size: 14px; color: var(--muted); border-bottom: 2px solid transparent;
-    white-space: nowrap;
-  }
-  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
-  .tab:hover { color: var(--text); }
-  .panel {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
-    padding: 24px; display: none;
-  }
-  .panel.active { display: block; }
-  .panel h2 { margin: 0 0 4px 0; font-size: 17px; }
-  .panel .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .row.full { grid-template-columns: 1fr; }
-  label {
-    display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;
-  }
-  label .hint { color: var(--muted); font-weight: 400; }
-  input[type="text"], input[type="number"], input[type="url"], select, textarea {
-    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
-    font-size: 14px; font-family: inherit; background: white;
-  }
-  textarea { min-height: 80px; resize: vertical; font-family: ui-monospace, "SF Mono", monospace; }
-  input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-  }
-  .checkbox-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
-  .checkbox-row label { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 0; font-weight: 400; }
-  .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-  button.primary {
-    background: var(--accent); color: white; border: none; padding: 10px 18px;
-    border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;
-  }
-  button.primary:hover:not(:disabled) { background: var(--accent-hover); }
-  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
-  button.secondary {
-    background: white; color: var(--text); border: 1px solid var(--border);
-    padding: 10px 16px; border-radius: 6px; font-size: 14px; cursor: pointer;
-  }
-  button.secondary:hover { background: var(--bg); }
-  .small-btn {
-    background: white; border: 1px solid var(--border); padding: 4px 10px;
-    border-radius: 4px; cursor: pointer; font-size: 12px;
-  }
-  .results { margin-top: 24px; }
-  .results h3 {
-    margin: 0 0 12px 0; font-size: 14px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.5px; font-weight: 600;
-  }
-  .status { font-size: 13px; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; }
-  .status.loading { background: #eff6ff; color: #1e40af; }
-  .status.error { background: #fef2f2; color: var(--danger); }
-  .status.success { background: #ecfdf5; color: var(--success); }
-  pre.code {
-    background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px;
-    overflow-x: auto; font-size: 12px; font-family: ui-monospace, "SF Mono", monospace;
-    max-height: 500px; overflow-y: auto;
-  }
-  .job-card {
-    background: white; border: 1px solid var(--border); border-radius: 8px;
-    padding: 16px; margin-bottom: 10px;
-  }
-  .job-card .title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
-  .job-card .meta { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
-  .job-card .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-  .badge {
-    background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 4px;
-    font-size: 11px; font-weight: 500;
-  }
-  .badge.salary { background: #dcfce7; color: #166534; }
-  .badge.remote { background: #dbeafe; color: #1e40af; }
-  .job-card a { color: var(--accent); text-decoration: none; font-size: 13px; }
-  .job-card a:hover { text-decoration: underline; }
-  .salary-result {
-    background: white; border: 1px solid var(--border); border-radius: 8px;
-    padding: 14px; margin-bottom: 10px;
-  }
-  .salary-result .header { display: flex; justify-content: space-between; align-items: baseline; }
-  .salary-result .designation { font-weight: 600; }
-  .salary-result .estimate { font-size: 18px; color: var(--success); font-weight: 600; }
-  .salary-result .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
-  .salary-result .range { font-size: 13px; color: var(--muted); margin-top: 6px; }
-  .salary-result .confidence {
-    font-size: 12px; padding: 2px 8px; border-radius: 4px; background: #f1f5f9;
-    display: inline-block; margin-top: 6px;
-  }
-  .comment-result {
-    background: white; border: 1px solid var(--border); border-radius: 8px;
-    padding: 16px; margin-bottom: 10px;
-  }
-  .comment-result .label {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-    color: var(--muted); font-weight: 600; margin-bottom: 6px;
-  }
-  .comment-result .text { white-space: pre-wrap; font-size: 14px; }
-  .title-suggestion {
-    background: white; border: 1px solid var(--border); border-radius: 8px;
-    padding: 12px 14px; margin-bottom: 6px; display: flex; justify-content: space-between;
-  }
-  .title-suggestion .score { color: var(--muted); font-size: 13px; }
-  .keys-section {
-    background: #fef9c3; border: 1px solid #fde047; border-radius: 8px;
-    padding: 12px 16px; margin-bottom: 16px; font-size: 13px;
-  }
-  .keys-section summary { cursor: pointer; font-weight: 500; }
-  .keys-section .keys-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-  .keys-section input { font-size: 13px; }
-  details summary { cursor: pointer; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
-  @media (max-width: 700px) {
-    .row, .keys-section .keys-grid { grid-template-columns: 1fr; }
-    header input[type="text"] { min-width: 0; flex: 1; }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedIn Outreach Writer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Tokens ────────────────────────────────────────────── */
+    :root {
+      --bg:          #FAFAF9;
+      --surface:     #FFFFFF;
+      --border:      #E5E4E0;
+      --border-focus:#4F46E5;
+      --text-primary:#111110;
+      --text-secondary:#6B6B6B;
+      --text-muted:  #9B9B99;
+      --accent:      #4F46E5;
+      --accent-light:#EEF2FF;
+      --accent-hover:#4338CA;
+      --green:       #16A34A;
+      --green-light: #F0FDF4;
+      --green-border:#BBF7D0;
+      --amber:       #D97706;
+      --amber-light: #FFFBEB;
+      --amber-border:#FCD34D;
+      --amber-text:  #92400E;
+      --red:         #DC2626;
+      --red-light:   #FEF2F2;
+      --red-border:  #FECACA;
+      --radius-sm:   6px;
+      --radius:      10px;
+      --radius-lg:   14px;
+      --shadow:      0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:   0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    /* ── Base ──────────────────────────────────────────────── */
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0 1rem 5rem;
+    }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ────────────────────────────────────────────── */
+    .site-header {
+      padding: 3rem 0 2.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+    }
+
+    .header-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .header-sub {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 520px;
+    }
+
+    /* ── Section labels ────────────────────────────────────── */
+    .field-group {
+      margin-bottom: 1.75rem;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 0.55rem;
+      line-height: 1.5;
+    }
+
+    /* ── File upload ───────────────────────────────────────── */
+    .upload-zone {
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: center;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .upload-zone input[type="file"] {
+      display: none;
+    }
+
+    .upload-icon {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 0.6rem;
+      color: var(--text-muted);
+    }
+
+    .upload-text {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .upload-text strong {
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    .upload-text small {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .file-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid #C7D2FE;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      margin-top: 0.6rem;
+    }
+
+    .file-chip button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.9rem;
+      line-height: 1;
+      padding: 0;
+      margin-left: 2px;
+      opacity: 0.6;
+    }
+
+    .file-chip button:hover { opacity: 1; }
+
+    /* ── Text inputs ───────────────────────────────────────── */
+    textarea, input[type="text"], input[type="url"] {
+      width: 100%;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.75rem 0.875rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    textarea::placeholder,
+    input::placeholder {
+      color: var(--text-muted);
+    }
+
+    textarea:focus,
+    input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    textarea {
+      min-height: 220px;
+    }
+
+    /* ── Divider ───────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    /* ── Primary button ────────────────────────────────────── */
+    .btn-primary {
+      width: 100%;
+      background: var(--text-primary);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.85rem 1.5rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #1f2937;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ── Secondary button ──────────────────────────────────── */
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-secondary);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.6rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg);
+      border-color: #C9C8C3;
+    }
+
+    /* ── Progress tracker ──────────────────────────────────── */
+    /* Signature element: animated stage tracker */
+    #progress-wrap {
+      display: none;
+      margin: 1.5rem 0;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.4rem;
+      box-shadow: var(--shadow);
+    }
+
+    #progress-wrap.visible { display: block; }
+
+    .progress-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .progress-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .progress-stages {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .stage {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      transition: color 0.3s;
+    }
+
+    .stage.active { color: var(--text-primary); }
+    .stage.done   { color: var(--green); }
+
+    .stage-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      flex-shrink: 0;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .stage.active .stage-dot {
+      border-color: var(--accent);
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
+    }
+
+    .stage.done .stage-dot {
+      border-color: var(--green);
+      background: var(--green);
+    }
+
+    /* ── Validation errors ─────────────────────────────────── */
+    #validation-errors {
+      display: none;
+      background: var(--red-light);
+      border: 1.5px solid var(--red-border);
+      border-radius: var(--radius);
+      padding: 0.875rem 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    #validation-errors.visible { display: block; }
+
+    .validation-error-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--red);
+      margin-bottom: 0.35rem;
+    }
+
+    .validation-error-list {
+      list-style: none;
+      font-size: 0.8rem;
+      color: #B91C1C;
+      line-height: 1.7;
+    }
+
+    .validation-error-list li::before {
+      content: "→ ";
+      font-weight: 600;
+    }
+
+    /* ── Output section ────────────────────────────────────── */
+    #output-section { display: none; }
+    #output-section.visible { display: block; }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .output-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .badge-ready {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Output cards */
+    .out-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 0.875rem;
+      box-shadow: var(--shadow);
+    }
+
+    .out-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .out-card-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    .copy-btn.copied {
+      color: var(--green);
+      border-color: var(--green-border);
+    }
+
+    .out-card-body {
+      padding: 1rem 1.1rem;
+    }
+
+    .subject-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .message-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.825rem;
+      color: var(--text-primary);
+      line-height: 1.9;
+      white-space: pre-wrap;
+    }
+
+    /* ── Audit trail ───────────────────────────────────────── */
+    .audit-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.875rem;
+    }
+
+    #audit-toggle {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+
+    #audit-toggle:hover,
+    #audit-toggle.open {
+      background: var(--accent-light);
+      border-color: #C7D2FE;
+      color: var(--accent);
+    }
+
+    #audit-panel {
+      display: none;
+      margin-bottom: 1rem;
+    }
+
+    #audit-panel.open { display: block; }
+
+    .audit-section {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.875rem 1rem;
+      margin-bottom: 0.6rem;
+      box-shadow: var(--shadow);
+    }
+
+    .audit-section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .audit-text {
+      font-size: 0.845rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .context-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .context-tag {
+      display: inline-flex;
+      align-items: center;
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid #C7D2FE;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .proof-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      font-size: 0.835rem;
+      color: #166534;
+      line-height: 1.6;
+      background: var(--green-light);
+      border-left: 3px solid var(--green);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .proof-check {
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Action row ────────────────────────────────────────── */
+    .action-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 0.25rem;
+    }
+
+    /* ── Human review ──────────────────────────────────────── */
+    #human-review-section { display: none; }
+    #human-review-section.visible { display: block; }
+
+    .human-review-card {
+      background: var(--amber-light);
+      border: 1.5px solid var(--amber-border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .hr-icon-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.6rem;
+    }
+
+    .hr-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--amber-text);
+    }
+
+    .hr-desc {
+      font-size: 0.855rem;
+      color: #78350F;
+      line-height: 1.7;
+      margin-bottom: 0.875rem;
+    }
+
+    .hr-reason-box {
+      background: #FEF3C7;
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.875rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--amber-text);
+      margin-bottom: 1rem;
+    }
+
+    .hr-section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--amber-text);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .hr-list {
+      list-style: none;
+      font-size: 0.825rem;
+      color: #78350F;
+      line-height: 1.85;
+      margin-bottom: 1rem;
+    }
+
+    .hr-list li::before { content: "• "; font-weight: 700; }
+
+    .hr-action-list {
+      list-style: none;
+      font-size: 0.825rem;
+      color: #78350F;
+      line-height: 1.85;
+      padding-top: 0.875rem;
+      border-top: 1px solid var(--amber-border);
+    }
+
+    .hr-action-list li::before { content: "→ "; font-weight: 600; }
+
+    /* ── Error card ────────────────────────────────────────── */
+    #error-section { display: none; }
+    #error-section.visible { display: block; }
+
+    .error-card {
+      background: var(--red-light);
+      border: 1.5px solid var(--red-border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .error-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 0.3rem;
+    }
+
+    .error-body {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.775rem;
+      color: #B91C1C;
+      line-height: 1.6;
+    }
+
+    /* ── Toast ─────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--text-primary);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 999;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      h1 { font-size: 1.4rem; }
+      body { padding: 0 0.75rem 4rem; }
+      .site-header { padding: 2rem 0 1.75rem; }
+      .action-row { flex-direction: column; }
+      .action-row .btn-secondary { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .progress-spinner { animation: none; }
+      * { transition: none !important; }
+    }
+  </style>
 </head>
+
 <body>
-
-<header>
-  <h1>Leadfreak Utils</h1>
-  <div class="config">
-    <label for="api-base" style="margin: 0;">API:</label>
-    <input id="api-base" type="text" value="https://leadfreak-utils-backend-production.up.railway.app" />
-  </div>
-</header>
-
-<main>
-
-  <details class="keys-section">
-    <summary>Optional: API keys (only needed if Railway env vars are not set)</summary>
-    <div style="margin-top: 8px; color: #713f12;">
-      Sent as request headers. Leave blank to use Railway's environment defaults.
-    </div>
-    <div class="keys-grid">
-      <div>
-        <label>X-RapidAPI-Key</label>
-        <input id="key-rapidapi" type="text" placeholder="(optional)" />
-      </div>
-      <div>
-        <label>X-Groq-Api-Key</label>
-        <input id="key-groq" type="text" placeholder="(optional)" />
-      </div>
-      <div>
-        <label>X-Serp-Api-Key</label>
-        <input id="key-serp" type="text" placeholder="(optional)" />
-      </div>
-      <div>
-        <label>X-HF-Api-Token</label>
-        <input id="key-hf" type="text" placeholder="(optional)" />
-      </div>
-    </div>
-  </details>
-
-  <div class="tabs">
-    <!-- <button class="tab active" data-target="job-search">Job Search</button> -->
-    <!-- <button class="tab" data-target="suggest-titles">Suggest Titles</button> -->
-    <button class="tab" data-target="estimate-salary">Estimate Salary</button>
-    <button class="tab" data-target="generate-comments">LinkedIn Comments</button>
-    <button class="tab" data-target="generate-comments-advanced">LinkedIn Comments (RAG)</button>
-    <button class="tab" data-target="generate-outreach">Outreach Engine</button>
-  </div>
-
-  <!-- ─── JOB SEARCH ───────────────────────────────────────────── -->
-  <!-- <section class="panel active" id="job-search">
-    <h2>Job Search</h2>
-    <p class="subtitle">Search LinkedIn or ATS career sites by job titles, with optional filters.</p>
-
-    <div class="row">
-      <div>
-        <label>Source</label>
-        <select id="js-type">
-          <option value="LINKEDIN">LinkedIn</option>
-          <option value="ATS_CAREER_SITES">ATS Career Sites</option>
-        </select>
-      </div>
-      <div>
-        <label>Limit <span class="hint">(1–100)</span></label>
-        <input id="js-limit" type="number" min="1" max="100" value="10" />
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Job titles <span class="hint">(comma-separated, required)</span></label>
-        <input id="js-titles" type="text" placeholder="Program Manager, Salesforce Consultant, Business Architect" />
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Locations <span class="hint">(comma-separated, optional)</span></label>
-        <input id="js-locations" type="text" placeholder="Atlanta, Seattle, Dallas" />
-      </div>
-      <div>
-        <label>Employment type</label>
-        <select id="js-type-filter">
-          <option value="">Any</option>
-          <option value="FULL_TIME">Full-time</option>
-          <option value="PART_TIME">Part-time</option>
-          <option value="CONTRACTOR">Contractor</option>
-          <option value="INTERN">Intern</option>
-          <option value="TEMPORARY">Temporary</option>
-          <option value="VOLUNTEER">Volunteer</option>
-          <option value="OTHER">Other</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Industry filter <span class="hint">(LinkedIn only)</span></label>
-        <input id="js-industry" type="text" placeholder="e.g. Software" />
-      </div>
-      <div>
-        <label>Date filter <span class="hint">YYYY-MM-DD</span></label>
-        <input id="js-date" type="text" placeholder="2025-01-01" />
-      </div>
-    </div>
-
-    <div class="row full">
-      <div class="checkbox-row">
-        <label><input id="js-remote" type="checkbox" /> Remote only</label>
-        <label><input id="js-agency" type="checkbox" /> Agency jobs</label>
-        <label><input id="js-exclude-dup" type="checkbox" /> Exclude ATS duplicates (LinkedIn)</label>
-        <label><input id="js-include-ai" type="checkbox" checked /> Include AI enrichment</label>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="primary" id="js-run">Search</button>
-      <button class="secondary" id="js-csv">Download CSV</button>
-    </div>
-
-    <div class="results" id="js-results"></div>
-  </section> -->
-
-  <!-- ─── SUGGEST TITLES ──────────────────────────────────────── -->
-  <!-- <section class="panel" id="suggest-titles">
-    <h2>AI Job Title Suggestions</h2>
-    <p class="subtitle">Upload a resume + profile data; Groq LLM returns ranked job title suggestions.</p>
-
-    <div class="row">
-      <div>
-        <label>Candidate name <span class="hint">(required)</span></label>
-        <input id="st-name" type="text" placeholder="Jane Doe" />
-      </div>
-      <div>
-        <label>Candidate ID <span class="hint">(required)</span></label>
-        <input id="st-id" type="text" placeholder="cand-123" />
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>LinkedIn profile URL <span class="hint">(required)</span></label>
-        <input id="st-linkedin-url" type="url" placeholder="https://linkedin.com/in/janedoe" />
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Questionnaire <span class="hint">(JSON or plain text, required)</span></label>
-        <textarea id="st-questionnaire" placeholder='{"interests": "data engineering", "years": 5}'></textarea>
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>LinkedIn profile data <span class="hint">(JSON or text, optional)</span></label>
-        <textarea id="st-linkedin" placeholder="(optional)"></textarea>
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Additional info <span class="hint">(optional)</span></label>
-        <textarea id="st-additional" placeholder="(optional)"></textarea>
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Resume <span class="hint">(PDF or DOCX, required)</span></label>
-        <input id="st-resume" type="file" accept=".pdf,.docx,.doc" />
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="primary" id="st-run">Suggest titles</button>
-    </div>
-
-    <div class="results" id="st-results"></div>
-  </section> -->
-
-  <!-- ─── ESTIMATE SALARY ─────────────────────────────────────── -->
-  <section class="panel" id="estimate-salary">
-    <h2>Salary Estimation</h2>
-    <p class="subtitle">Up to 10 jobs per request. Estimates use SerpAPI search + LLM extraction.</p>
-
-    <div id="sl-jobs"></div>
-
-    <div class="actions" style="margin-bottom: 16px;">
-      <button class="secondary" id="sl-add">+ Add job</button>
-    </div>
-
-    <div class="actions">
-      <button class="primary" id="sl-run">Estimate</button>
-    </div>
-
-    <div class="results" id="sl-results"></div>
-  </section>
-
-  <!-- ─── GENERATE COMMENTS ───────────────────────────────────── -->
-  <section class="panel active" id="generate-comments">
-    <h2>LinkedIn Comment Generator</h2>
-    <p class="subtitle">Paste a LinkedIn post; the service classifies it and generates AI comments.</p>
-
-    <div class="row full">
-      <div>
-        <label>Post text <span class="hint">(required)</span></label>
-        <textarea id="cg-post" style="min-height: 160px;" placeholder="Paste the LinkedIn post text here..."></textarea>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="primary" id="cg-run">Generate comments</button>
-    </div>
-
-    <div class="results" id="cg-results"></div>
-  </section>
-
-  <!-- ─── GENERATE COMMENTS (ADVANCED / RAG) ──────────────────── -->
-  <section class="panel" id="generate-comments-advanced">
-    <h2>LinkedIn Comment Generator — RAG (ghostwriter)</h2>
-    <p class="subtitle">Generates ONE comment in a specific ingested profile's voice using their fingerprint + retrieved past comments.</p>
-
-    <div class="row">
-      <div>
-        <label>
-          Profile
-          <span class="hint">(must be ingested under <code>RAG_workflow/vector_dbs/</code>)</span>
-        </label>
-        <select id="cga-profile">
-          <option value="">— click Refresh to load —</option>
-        </select>
-      </div>
-      <div>
-        <label>Top-K past comments <span class="hint">(1–20, only when RAG is on)</span></label>
-        <input id="cga-topk" type="number" min="1" max="20" value="3" />
-      </div>
-    </div>
-
-    <div class="row full">
-      <div class="checkbox-row">
-        <label><input id="cga-use-rag" type="checkbox" checked /> Use RAG (retrieve similar past comments)</label>
-        <button class="small-btn" id="cga-refresh">Refresh profiles</button>
-        <span id="cga-profile-meta" style="color:var(--muted); font-size:12px;"></span>
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Post text <span class="hint">(required)</span></label>
-        <textarea id="cga-post" style="min-height: 160px;" placeholder="Paste the LinkedIn post text here..."></textarea>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="primary" id="cga-run">Generate comment</button>
-    </div>
-
-    <div class="results" id="cga-results"></div>
-  </section>
-
-  <!-- ─── OUTREACH ENGINE ─────────────────────────────────────── -->
-  <section class="panel" id="generate-outreach">
-    <h2>Outreach Engine</h2>
-    <p class="subtitle">Personalized cold/warm outreach anchored to a citeable fact in the prospect's LinkedIn JSON. All three text inputs are required (hard gate).</p>
-
-    <div class="row">
-      <div>
-        <label>Message type</label>
-        <select id="oe-type">
-          <option value="connection">connection (300-char cap)</option>
-          <option value="inmail">inmail</option>
-          <option value="dm">dm</option>
-          <option value="email">email (with P.S.)</option>
-          <option value="referral">referral (with P.S.)</option>
-        </select>
-      </div>
-      <div>
-        <label>Tone</label>
-        <select id="oe-tone">
-          <option value="both">both (2 variations)</option>
-          <option value="direct">direct (1)</option>
-          <option value="soft">soft (1)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Word limit <span class="hint">(30–200, ignored for connection)</span></label>
-        <input id="oe-wordlimit" type="number" min="30" max="200" value="75" />
-      </div>
-      <div>
-        <label>Referrer name <span class="hint">(required for referral)</span></label>
-        <input id="oe-referrer" type="text" placeholder="e.g. Saksham Jain" />
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Resume <span class="hint">(required)</span></label>
-        <textarea id="oe-resume" style="min-height: 120px;" placeholder="Paste full resume as plain text..."></textarea>
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Job details <span class="hint">(required)</span></label>
-        <textarea id="oe-jd" style="min-height: 120px;" placeholder="Paste job description / posting..."></textarea>
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Prospect LinkedIn JSON <span class="hint">(required, raw JSON)</span></label>
-        <textarea id="oe-li" style="min-height: 160px;" placeholder='{"fullname": "...", "headline": "...", "experience": [...]}'></textarea>
-      </div>
-    </div>
-
-    <div class="row full">
-      <div>
-        <label>Forbidden words <span class="hint">(comma-separated, optional — omit to use default list)</span></label>
-        <input id="oe-forbidden" type="text" placeholder="delve, tapestry, thrilled, ..." />
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="primary" id="oe-run">Generate outreach</button>
-      <span id="oe-gate" style="color:var(--danger); font-size:12px; align-self:center;"></span>
-    </div>
-
-    <div class="results" id="oe-results"></div>
-  </section>
-
-</main>
-
-<script>
-// ─── Persistent settings (localStorage) ────────────────────────────────────
-const LS_KEYS = {
-  apiBase: 'lf-api-base',
-  rapidapi: 'lf-key-rapidapi',
-  groq: 'lf-key-groq',
-  serp: 'lf-key-serp',
-  hf: 'lf-key-hf',
-};
-
-function bindPersist(id, lsKey) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const stored = localStorage.getItem(lsKey);
-  if (stored) el.value = stored;
-  el.addEventListener('change', () => localStorage.setItem(lsKey, el.value));
-  el.addEventListener('blur', () => localStorage.setItem(lsKey, el.value));
-}
-bindPersist('api-base', LS_KEYS.apiBase);
-bindPersist('key-rapidapi', LS_KEYS.rapidapi);
-bindPersist('key-groq', LS_KEYS.groq);
-bindPersist('key-serp', LS_KEYS.serp);
-bindPersist('key-hf', LS_KEYS.hf);
-
-function apiBase() {
-  return document.getElementById('api-base').value.replace(/\/+$/, '');
-}
-
-function authHeaders() {
-  const h = {};
-  const r = document.getElementById('key-rapidapi').value.trim();
-  const g = document.getElementById('key-groq').value.trim();
-  const s = document.getElementById('key-serp').value.trim();
-  const f = document.getElementById('key-hf').value.trim();
-  if (r) h['X-RapidAPI-Key'] = r;
-  if (g) h['X-Groq-Api-Key'] = g;
-  if (s) h['X-Serp-Api-Key'] = s;
-  if (f) h['X-HF-Api-Token'] = f;
-  return h;
-}
-
-// ─── Tabs ─────────────────────────────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.target).classList.add('active');
-  });
-});
-
-// ─── Helpers ──────────────────────────────────────────────────────────────
-function setStatus(targetId, kind, msg) {
-  const el = document.getElementById(targetId);
-  el.innerHTML = `<div class="status ${kind}">${msg}</div>`;
-}
-
-function appendStatus(targetId, kind, msg) {
-  const el = document.getElementById(targetId);
-  const div = document.createElement('div');
-  div.className = `status ${kind}`;
-  div.textContent = msg;
-  el.appendChild(div);
-}
-
-function escapeHtml(s) {
-  if (s == null) return '';
-  return String(s)
-    .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
-}
-
-function csvCommaList(s) {
-  return s.split(',').map(t => t.trim()).filter(Boolean);
-}
-
-async function safeJson(resp) {
-  const text = await resp.text();
-  try { return JSON.parse(text); } catch { return { _raw: text }; }
-}
-
-function hostnameOf(s) {
-  try { return new URL(s).hostname; } catch {}
-  try { return new URL('https://' + s).hostname; } catch {}
-  return s;
-}
-
-// ─── Job Search ───────────────────────────────────────────────────────────
-function buildJobSearchBody() {
-  const titles = csvCommaList(document.getElementById('js-titles').value);
-  if (!titles.length) throw new Error('At least one job title is required.');
-  const body = {
-    type: document.getElementById('js-type').value,
-    advanced_title_filter: titles,
-    limit: parseInt(document.getElementById('js-limit').value, 10) || 10,
-    include_ai: document.getElementById('js-include-ai').checked,
-  };
-  const locs = csvCommaList(document.getElementById('js-locations').value);
-  if (locs.length) body.location_filter = locs;
-  const tf = document.getElementById('js-type-filter').value;
-  if (tf) body.type_filter = tf;
-  const ind = document.getElementById('js-industry').value.trim();
-  if (ind) body.industry_filter = ind;
-  const date = document.getElementById('js-date').value.trim();
-  if (date) body.date_filter = date;
-  if (document.getElementById('js-remote').checked) body.remote = true;
-  if (document.getElementById('js-agency').checked) body.agency = true;
-  if (document.getElementById('js-exclude-dup').checked) body.exclude_ats_duplicate = true;
-  return body;
-}
-
-function renderJobs(jobs, meta) {
-  const target = document.getElementById('js-results');
-  target.innerHTML = `<div class="status success">Returned ${jobs.length} job(s) in ${meta?.elapsed_seconds ?? '?'}s</div>`;
-  const h3 = document.createElement('h3');
-  h3.textContent = 'Results';
-  target.appendChild(h3);
-  if (!jobs.length) {
-    target.appendChild(Object.assign(document.createElement('div'), { textContent: 'No jobs matched.', style: 'color:var(--muted)' }));
-    return;
-  }
-  jobs.forEach(j => {
-    const card = document.createElement('div');
-    card.className = 'job-card';
-    const salaryBadge = (j.ai_salary_min || j.ai_salary_max)
-      ? `<span class="badge salary">${escapeHtml(j.ai_salary_currency || '')} ${escapeHtml(j.ai_salary_min || '')}${j.ai_salary_max ? '–' + escapeHtml(j.ai_salary_max) : ''}${j.ai_salary_period ? ' / ' + escapeHtml(j.ai_salary_period) : ''}</span>` : '';
-    const remoteBadge = j.is_remote ? '<span class="badge remote">Remote</span>' : '';
-    const empType = j.ai_employment_type ? `<span class="badge">${escapeHtml(Array.isArray(j.ai_employment_type) ? j.ai_employment_type.join(', ') : j.ai_employment_type)}</span>` : '';
-    card.innerHTML = `
-      <div class="title">${escapeHtml(j.title)}</div>
-      <div class="meta">${escapeHtml(j.organization || '')}${j.location ? ' · ' + escapeHtml(j.location) : ''}${j.date_posted ? ' · ' + escapeHtml(j.date_posted) : ''}</div>
-      ${j.url ? `<a href="${escapeHtml(j.url)}" target="_blank" rel="noopener">View posting →</a>` : ''}
-      <div class="badges">
-        <span class="badge">${escapeHtml(j.source_api || '')}</span>
-        ${remoteBadge}${empType}${salaryBadge}
-      </div>
-    `;
-    target.appendChild(card);
-  });
-  const details = document.createElement('details');
-  details.style.marginTop = '16px';
-  details.innerHTML = `<summary>Raw JSON</summary><pre class="code">${escapeHtml(JSON.stringify({ jobs, meta }, null, 2))}</pre>`;
-  target.appendChild(details);
-}
-
-document.getElementById('js-run')?.addEventListener('click', async () => {
-  let body;
-  try { body = buildJobSearchBody(); }
-  catch (e) { return setStatus('js-results', 'error', e.message); }
-  setStatus('js-results', 'loading', 'Searching…');
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/job-search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(body),
-    });
-    const data = await safeJson(resp);
-    if (!resp.ok) return setStatus('js-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
-    renderJobs(data.jobs || [], data.metadata);
-  } catch (e) {
-    setStatus('js-results', 'error', e.message);
-  }
-});
-
-document.getElementById('js-csv')?.addEventListener('click', async () => {
-  let body;
-  try { body = buildJobSearchBody(); }
-  catch (e) { return setStatus('js-results', 'error', e.message); }
-  setStatus('js-results', 'loading', 'Generating CSV…');
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/job-search/csv`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(body),
-    });
-    if (!resp.ok) {
-      const data = await safeJson(resp);
-      return setStatus('js-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
-    }
-    const blob = await resp.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `job_search_${body.type.toLowerCase()}.csv`;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-    setStatus('js-results', 'success', 'CSV downloaded.');
-  } catch (e) {
-    setStatus('js-results', 'error', e.message);
-  }
-});
-
-// ─── Suggest Titles ───────────────────────────────────────────────────────
-document.getElementById('st-run')?.addEventListener('click', async () => {
-  const name = document.getElementById('st-name').value.trim();
-  const id = document.getElementById('st-id').value.trim();
-  const linkedinUrl = document.getElementById('st-linkedin-url').value.trim();
-  const questionnaire = document.getElementById('st-questionnaire').value.trim();
-  const linkedin = document.getElementById('st-linkedin').value.trim();
-  const additional = document.getElementById('st-additional').value.trim();
-  const resumeFile = document.getElementById('st-resume').files[0];
-
-  if (!name || !id || !linkedinUrl || !questionnaire || !resumeFile) {
-    return setStatus('st-results', 'error', 'Name, ID, LinkedIn URL, questionnaire, and resume file are all required.');
-  }
-  const fd = new FormData();
-  fd.append('name', name);
-  fd.append('id', id);
-  fd.append('linkedinProfileUrl', linkedinUrl);
-  fd.append('questionnaire', questionnaire);
-  if (linkedin) fd.append('linkedinProfile', linkedin);
-  if (additional) fd.append('additionalInfo', additional);
-  fd.append('resume', resumeFile);
-
-  setStatus('st-results', 'loading', 'Generating title suggestions… (this can take 10–30s)');
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/suggest-titles`, {
-      method: 'POST',
-      headers: authHeaders(), // no Content-Type — browser sets multipart boundary
-      body: fd,
-    });
-    const data = await safeJson(resp);
-    if (!resp.ok) return setStatus('st-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
-
-    const target = document.getElementById('st-results');
-    target.innerHTML = `<div class="status success">${data.titles?.length || 0} titles for ${escapeHtml(data.name)}</div><h3>Suggestions</h3>`;
-    (data.titles || []).forEach(t => {
-      const div = document.createElement('div');
-      div.className = 'title-suggestion';
-      const titleText = typeof t === 'string' ? t : (t.title || JSON.stringify(t));
-      const score = (typeof t === 'object' && t.score != null) ? `<span class="score">${t.score}</span>` : '';
-      div.innerHTML = `<span>${escapeHtml(titleText)}</span>${score}`;
-      target.appendChild(div);
-    });
-    const details = document.createElement('details');
-    details.style.marginTop = '16px';
-    details.innerHTML = `<summary>Raw JSON</summary><pre class="code">${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
-    target.appendChild(details);
-  } catch (e) {
-    setStatus('st-results', 'error', e.message);
-  }
-});
-
-// ─── Estimate Salary ──────────────────────────────────────────────────────
-function addSalaryJobRow(prefill) {
-  const container = document.getElementById('sl-jobs');
-  const idx = container.children.length;
-  const row = document.createElement('div');
-  row.className = 'job-card';
-  row.innerHTML = `
-    <div class="row">
-      <div><label>Company</label><input class="sl-company" type="text" placeholder="Acme Corp" value="${escapeHtml(prefill?.companyName || '')}" /></div>
-      <div><label>Designation</label><input class="sl-designation" type="text" placeholder="Senior Engineer" value="${escapeHtml(prefill?.designation || '')}" /></div>
-    </div>
-    <div class="row">
-      <div><label>Location</label><input class="sl-location" type="text" placeholder="San Francisco" value="${escapeHtml(prefill?.location || '')}" /></div>
-      <div><label>Years of experience <span class="hint">(optional)</span></label><input class="sl-yoe" type="text" placeholder="5" value="${escapeHtml(prefill?.yearsOfExperience || '')}" /></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;">
-      <button class="small-btn sl-remove">Remove</button>
-    </div>
-  `;
-  row.querySelector('.sl-remove').addEventListener('click', () => row.remove());
-  container.appendChild(row);
-}
-if (document.getElementById('sl-jobs')) addSalaryJobRow();
-document.getElementById('sl-add')?.addEventListener('click', () => {
-  if (document.getElementById('sl-jobs').children.length >= 10) {
-    return setStatus('sl-results', 'error', 'Max 10 jobs per batch.');
-  }
-  addSalaryJobRow();
-});
-
-document.getElementById('sl-run')?.addEventListener('click', async () => {
-  const rows = [...document.getElementById('sl-jobs').children];
-  const jobs = rows.map(r => ({
-    companyName: r.querySelector('.sl-company').value.trim(),
-    designation: r.querySelector('.sl-designation').value.trim(),
-    location: r.querySelector('.sl-location').value.trim(),
-    yearsOfExperience: r.querySelector('.sl-yoe').value.trim() || null,
-  })).filter(j => j.companyName && j.designation && j.location);
-
-  if (!jobs.length) return setStatus('sl-results', 'error', 'Add at least one job with company, designation, and location.');
-
-  setStatus('sl-results', 'loading', `Estimating ${jobs.length} salary(ies)… (can take 10–60s)`);
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/estimate-salary`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ jobs }),
-    });
-    const data = await safeJson(resp);
-    if (!resp.ok) return setStatus('sl-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
-
-    const target = document.getElementById('sl-results');
-    target.innerHTML = `<div class="status success">${data.count || 0} result(s)</div><h3>Estimates</h3>`;
-    (data.results || []).forEach(r => {
-      const card = document.createElement('div');
-      card.className = 'salary-result';
-      const range = r.salaryRange ? `Range: ${escapeHtml(r.salaryRange.lower || '?')} – ${escapeHtml(r.salaryRange.upper || '?')}` : '';
-      const sources = (r.sources || []).slice(0, 3).map(s => {
-        const href = /^https?:\/\//i.test(s) ? s : 'https://' + s;
-        return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener">${escapeHtml(hostnameOf(s))}</a>`;
-      }).join(', ');
-      card.innerHTML = `
-        <div class="header">
-          <div class="designation">${escapeHtml(r.designation)} · ${escapeHtml(r.companyName)}</div>
-          <div class="estimate">${escapeHtml(r.estimatedSalary || (r.error ? '—' : 'n/a'))}</div>
+  <div class="wrap">
+
+    <!-- ── Header ───────────────────────────────────────────── -->
+    <header class="site-header">
+      <p class="header-eyebrow">Deterministic Workflow · v4</p>
+      <h1>LinkedIn Outreach Writer</h1>
+      <p class="header-sub">
+        Generate pain-led InMails grounded in your résumé, the job description,
+        and the prospect's LinkedIn profile — automatically matched and written.
+      </p>
+    </header>
+
+    <!-- ── Form ─────────────────────────────────────────────── -->
+    <form id="outreach-form" novalidate>
+
+      <!-- 1. Resume -->
+      <div class="field-group">
+        <label class="field-label">Résumé</label>
+        <p class="field-hint">PDF only — the backend extracts achievements and metrics automatically.</p>
+
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="resume-input" accept=".pdf" />
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+          </svg>
+          <p class="upload-text">
+            <strong onclick="document.getElementById('resume-input').click()">Click to upload</strong>
+            or drag and drop
+            <small>PDF · max 10 MB</small>
+          </p>
         </div>
-        <div class="meta">${escapeHtml(r.location)}${r.yearsOfExperience ? ' · ' + escapeHtml(r.yearsOfExperience) + ' yrs' : ''}</div>
-        ${range ? `<div class="range">${range}</div>` : ''}
-        ${r.error ? `<div class="range" style="color:var(--danger)">Error: ${escapeHtml(r.error)}</div>` : ''}
-        ${r.confidenceScore != null ? `<div class="confidence">Confidence: ${(r.confidenceScore * 100).toFixed(0)}%</div>` : ''}
-        ${sources ? `<div class="range">Sources: ${sources}</div>` : ''}
-      `;
-      target.appendChild(card);
-    });
-  } catch (e) {
-    setStatus('sl-results', 'error', e.message);
-  }
-});
 
-// ─── Generate Comments ────────────────────────────────────────────────────
-document.getElementById('cg-run')?.addEventListener('click', async () => {
-  const post = document.getElementById('cg-post').value.trim();
-  if (!post) return setStatus('cg-results', 'error', 'Post text is required.');
-  setStatus('cg-results', 'loading', 'Classifying & generating comments… (10–30s)');
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/generate-comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ post }),
-    });
-    const data = await safeJson(resp);
-    if (!resp.ok) return setStatus('cg-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
+        <div id="file-chip-wrap"></div>
+      </div>
 
-    const target = document.getElementById('cg-results');
-    target.innerHTML = `
-      <div class="status success">Theme: <strong>${escapeHtml(data.theme)}</strong> · Tone: ${escapeHtml(data.tone)} · Audience: ${escapeHtml(data.audience)}</div>
-      <h3>Comments</h3>
-    `;
-    (data.comments || []).forEach(c => {
-      const card = document.createElement('div');
-      card.className = 'comment-result';
-      card.innerHTML = `
-        <div class="label">${escapeHtml(c.type)}</div>
-        <div class="text">${escapeHtml(c.text)}</div>
-        <div style="margin-top:10px;">
-          <button class="small-btn">Copy</button>
+      <!-- 2. Job Description -->
+      <div class="field-group">
+        <label class="field-label" for="jd-input">Job Description</label>
+        <p class="field-hint">Paste the complete posting — requirements, responsibilities, and context all matter.</p>
+        <textarea id="jd-input" placeholder="Paste the full job description here…"></textarea>
+      </div>
+
+      <!-- 3. LinkedIn URL -->
+      <div class="field-group">
+        <label class="field-label" for="linkedin-input">Prospect LinkedIn URL</label>
+        <p class="field-hint">The recruiter or hiring manager you're reaching out to. The backend scrapes this profile.</p>
+        <input type="url" id="linkedin-input" placeholder="https://www.linkedin.com/in/…" />
+      </div>
+
+      <!-- Validation errors -->
+      <div id="validation-errors" role="alert">
+        <p class="validation-error-title">Please fix the following before generating:</p>
+        <ul class="validation-error-list" id="error-list"></ul>
+      </div>
+
+      <hr class="divider" />
+
+      <button type="submit" class="btn-primary" id="generate-btn">
+        Generate Outreach Message
+      </button>
+    </form>
+
+    <!-- ── Progress tracker ──────────────────────────────────── -->
+    <div id="progress-wrap">
+      <div class="progress-header">
+        <div class="progress-spinner"></div>
+        <span class="progress-title">Generating your message…</span>
+      </div>
+      <div class="progress-stages" id="progress-stages">
+        <div class="stage" data-stage="0"><div class="stage-dot"></div><span>Extracting résumé achievements</span></div>
+        <div class="stage" data-stage="1"><div class="stage-dot"></div><span>Scraping LinkedIn profile</span></div>
+        <div class="stage" data-stage="2"><div class="stage-dot"></div><span>Parsing JD requirements &amp; pain points</span></div>
+        <div class="stage" data-stage="3"><div class="stage-dot"></div><span>Matching evidence via cosine similarity</span></div>
+        <div class="stage" data-stage="4"><div class="stage-dot"></div><span>Writing executive InMail</span></div>
+        <div class="stage" data-stage="5"><div class="stage-dot"></div><span>Humanizing message</span></div>
+      </div>
+    </div>
+
+    <!-- ── Error card ────────────────────────────────────────── -->
+    <div id="error-section" role="alert">
+      <div class="error-card">
+        <p class="error-title" id="error-title">Request failed</p>
+        <p class="error-body" id="error-body"></p>
+      </div>
+      <button class="btn-secondary" onclick="resetAll()">← Try again</button>
+    </div>
+
+    <!-- ── Human review ──────────────────────────────────────── -->
+    <div id="human-review-section">
+      <div class="human-review-card">
+        <div class="hr-icon-row">
+          <span style="font-size:1.1rem">⚠️</span>
+          <span class="hr-title">Sent for Human Review</span>
         </div>
-      `;
-      card.querySelector('button').addEventListener('click', e => {
-        navigator.clipboard.writeText(c.text);
-        e.target.textContent = 'Copied!';
-        setTimeout(() => { e.target.textContent = 'Copy'; }, 1200);
-      });
-      target.appendChild(card);
+        <p class="hr-desc">
+          Your résumé and the job description did not have enough matching evidence
+          to generate a message automatically.
+        </p>
+        <div class="hr-reason-box" id="hr-reason-box">
+          Similarity below automatic approval threshold (0.7).
+        </div>
+        <p class="hr-section-title">What this means</p>
+        <ul class="hr-list">
+          <li>The backend compared your résumé achievements against JD requirements using cosine similarity</li>
+          <li>No match scored above the <strong>0.7 threshold</strong> needed for automatic generation</li>
+          <li>This usually means the résumé and job description are in different industries or domains</li>
+        </ul>
+        <p class="hr-section-title">What you can do</p>
+        <ul class="hr-action-list">
+          <li>Try a job description closer to your professional background</li>
+          <li>Ensure your résumé highlights specific, measurable achievements</li>
+          <li>Make sure the uploaded PDF is text-based — not a scanned image</li>
+        </ul>
+      </div>
+      <button class="btn-secondary" onclick="resetAll()">← Try again</button>
+    </div>
+
+    <!-- ── Output ────────────────────────────────────────────── -->
+    <div id="output-section">
+
+      <div class="output-header">
+        <span class="output-title">Generated Outreach</span>
+        <span class="badge-ready">✓ Ready to send</span>
+      </div>
+
+      <!-- Subject card -->
+      <div class="out-card" id="subject-card">
+        <div class="out-card-header">
+          <span class="out-card-label">Subject Line</span>
+          <button class="copy-btn" onclick="copyText('subject-body', this)">Copy</button>
+        </div>
+        <div class="out-card-body">
+          <p class="subject-text" id="subject-body"></p>
+        </div>
+      </div>
+
+      <!-- Message card -->
+      <div class="out-card">
+        <div class="out-card-header">
+          <span class="out-card-label">Message</span>
+          <button class="copy-btn" onclick="copyText('message-body', this)">Copy</button>
+        </div>
+        <div class="out-card-body">
+          <p class="message-text" id="message-body"></p>
+        </div>
+      </div>
+
+      <!-- Action row -->
+      <div class="action-row">
+        <button class="btn-secondary" id="audit-toggle" onclick="toggleAudit()">🔍 Show Audit Trail</button>
+        <button class="btn-secondary" onclick="resetAll()">🔄 Generate Again</button>
+      </div>
+
+      <!-- Audit panel -->
+      <div id="audit-panel">
+
+        <div style="margin-top:1rem; margin-bottom:0.6rem;">
+          <span style="font-size:0.85rem;font-weight:700;color:var(--text-primary);">Audit Trail</span>
+          <span style="font-size:0.75rem;color:var(--text-muted);margin-left:8px;">How the message was constructed</span>
+        </div>
+
+        <!-- Hook used -->
+        <div class="audit-section" id="audit-hook-wrap">
+          <p class="audit-section-label">Hook Used</p>
+          <p class="audit-text" id="audit-hook"></p>
+        </div>
+
+        <!-- Inferred pain -->
+        <div class="audit-section" id="audit-pain-wrap">
+          <p class="audit-section-label">Inferred Pain (from Job Description)</p>
+          <p class="audit-text" id="audit-pain"></p>
+        </div>
+
+        <!-- LinkedIn context -->
+        <div class="audit-section" id="audit-context-wrap">
+          <p class="audit-section-label">LinkedIn Context Used</p>
+          <div class="context-tags" id="audit-context-tags"></div>
+        </div>
+
+        <!-- Resume proof -->
+        <div class="audit-section" id="audit-proof-wrap">
+          <p class="audit-section-label">Résumé Evidence Used</p>
+          <div id="audit-proof-items"></div>
+        </div>
+
+      </div><!-- /audit-panel -->
+    </div><!-- /output-section -->
+
+  </div><!-- /wrap -->
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script>
+    // ── Config ────────────────────────────────────────────────
+    const WEBHOOK_URL = 'https://primary-production-37efc.up.railway.app/webhook/generate-message';
+
+    // ── State ─────────────────────────────────────────────────
+    let resumeFile = null;
+    let progressInterval = null;
+    let currentStage = 0;
+
+    // ── DOM refs ──────────────────────────────────────────────
+    const form           = document.getElementById('outreach-form');
+    const generateBtn    = document.getElementById('generate-btn');
+    const resumeInput    = document.getElementById('resume-input');
+    const uploadZone     = document.getElementById('upload-zone');
+    const fileChipWrap   = document.getElementById('file-chip-wrap');
+    const jdInput        = document.getElementById('jd-input');
+    const linkedinInput  = document.getElementById('linkedin-input');
+    const progressWrap   = document.getElementById('progress-wrap');
+    const outputSection  = document.getElementById('output-section');
+    const humanReview    = document.getElementById('human-review-section');
+    const errorSection   = document.getElementById('error-section');
+    const validationBox  = document.getElementById('validation-errors');
+    const errorList      = document.getElementById('error-list');
+
+    // ── File upload ───────────────────────────────────────────
+    resumeInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+      const f = e.dataTransfer.files[0];
+      if (f) handleFile(f);
     });
-  } catch (e) {
-    setStatus('cg-results', 'error', e.message);
-  }
-});
 
-// ─── Generate Comments (Advanced / RAG) ───────────────────────────────────
-let cgaProfilesCache = null;
-
-function renderProfilesSelect(profiles) {
-  const sel = document.getElementById('cga-profile');
-  const prev = sel.value;
-  sel.innerHTML = '';
-  if (!profiles.length) {
-    sel.innerHTML = '<option value="">(no ingested profiles found)</option>';
-    return;
-  }
-  profiles.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.name;
-    const fp = p.has_fingerprint ? '✓ fp' : '✗ no fp';
-    const dc = p.document_count != null ? `${p.document_count} docs` : '—';
-    opt.textContent = `${p.name} — ${fp}, ${dc}`;
-    opt.dataset.meta = JSON.stringify(p);
-    sel.appendChild(opt);
-  });
-  if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
-  updateProfileMeta();
-}
-
-function updateProfileMeta() {
-  const sel = document.getElementById('cga-profile');
-  const meta = document.getElementById('cga-profile-meta');
-  const opt = sel.selectedOptions[0];
-  if (!opt || !opt.dataset.meta) { meta.textContent = ''; return; }
-  try {
-    const p = JSON.parse(opt.dataset.meta);
-    meta.textContent = p.identity_signal ? `identity: ${p.identity_signal}` : '';
-  } catch { meta.textContent = ''; }
-}
-
-async function loadProfiles(force = false) {
-  if (cgaProfilesCache && !force) {
-    renderProfilesSelect(cgaProfilesCache);
-    return;
-  }
-  setStatus('cga-results', 'loading', 'Loading profiles…');
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/comment-gen-advanced/profiles`, {
-      headers: authHeaders(),
+    uploadZone.addEventListener('click', e => {
+      if (e.target.tagName !== 'STRONG') resumeInput.click();
     });
-    const data = await safeJson(resp);
-    if (!resp.ok) return setStatus('cga-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Failed to load profiles'}`);
-    cgaProfilesCache = data.profiles || [];
-    renderProfilesSelect(cgaProfilesCache);
-    document.getElementById('cga-results').innerHTML = `<div class="status success">${cgaProfilesCache.length} profile(s) available.</div>`;
-  } catch (e) {
-    setStatus('cga-results', 'error', e.message);
-  }
-}
 
-document.getElementById('cga-refresh')?.addEventListener('click', () => loadProfiles(true));
-document.getElementById('cga-profile')?.addEventListener('change', updateProfileMeta);
-
-// Auto-load profiles the first time the user opens the RAG tab.
-document.querySelector('.tab[data-target="generate-comments-advanced"]')?.addEventListener('click', () => {
-  if (!cgaProfilesCache) loadProfiles();
-});
-
-document.getElementById('cga-run')?.addEventListener('click', async () => {
-  const post = document.getElementById('cga-post').value.trim();
-  const profile = document.getElementById('cga-profile').value;
-  const useRag = document.getElementById('cga-use-rag').checked;
-  const topK = Math.max(1, Math.min(20, parseInt(document.getElementById('cga-topk').value, 10) || 3));
-
-  if (!profile) return setStatus('cga-results', 'error', 'Pick a profile first (click Refresh if the list is empty).');
-  if (!post) return setStatus('cga-results', 'error', 'Post text is required.');
-
-  setStatus('cga-results', 'loading', `Generating comment as "${profile}"… (10–30s)`);
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/generate-comment-advanced`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({
-        post_text: post,
-        profile_name: profile,
-        use_rag: useRag,
-        top_k: topK,
-      }),
-    });
-    const data = await safeJson(resp);
-    if (!resp.ok) return setStatus('cga-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
-
-    const target = document.getElementById('cga-results');
-    const badges = [
-      `<span class="badge">profile: ${escapeHtml(data.profile)}</span>`,
-      data.fingerprint_loaded ? '<span class="badge salary">fingerprint ✓</span>' : '<span class="badge">no fingerprint</span>',
-      data.rag_enabled ? '<span class="badge remote">RAG on</span>' : '<span class="badge">RAG off</span>',
-    ].join(' ');
-
-    target.innerHTML = `<div class="status success">${badges}</div><h3>Comment</h3>`;
-    const card = document.createElement('div');
-    card.className = 'comment-result';
-    card.innerHTML = `
-      <div class="label">generated</div>
-      <div class="text">${escapeHtml(data.comment)}</div>
-      <div style="margin-top:10px;"><button class="small-btn">Copy</button></div>
-    `;
-    card.querySelector('button').addEventListener('click', e => {
-      navigator.clipboard.writeText(data.comment);
-      e.target.textContent = 'Copied!';
-      setTimeout(() => { e.target.textContent = 'Copy'; }, 1200);
-    });
-    target.appendChild(card);
-
-    const past = data.past_comments_used || [];
-    if (past.length) {
-      const h = document.createElement('h3');
-      h.textContent = `Past comments used (${past.length})`;
-      target.appendChild(h);
-      past.forEach(p => {
-        const c = document.createElement('div');
-        c.className = 'comment-result';
-        c.innerHTML = `
-          <div class="label">distance ${p.distance != null ? p.distance.toFixed(3) : '—'}</div>
-          <div class="text">${escapeHtml(p.text)}</div>
-        `;
-        target.appendChild(c);
-      });
-    }
-  } catch (e) {
-    setStatus('cga-results', 'error', e.message);
-  }
-});
-
-// ─── Outreach Engine ──────────────────────────────────────────────────────
-function oeMissingFields() {
-  const missing = [];
-  if (!document.getElementById('oe-resume').value.trim()) missing.push('resume');
-  if (!document.getElementById('oe-jd').value.trim()) missing.push('jobDetails');
-  if (!document.getElementById('oe-li').value.trim()) missing.push('linkedinJson');
-  const type = document.getElementById('oe-type').value;
-  if (type === 'referral' && !document.getElementById('oe-referrer').value.trim()) {
-    missing.push('referrer');
-  }
-  return missing;
-}
-
-function refreshOeGate() {
-  const gate = document.getElementById('oe-gate');
-  const missing = oeMissingFields();
-  if (missing.length) {
-    gate.textContent = `Missing: ${missing.join(', ')}`;
-    document.getElementById('oe-run')?.setAttribute('disabled', 'true');
-  } else {
-    gate.textContent = '';
-    document.getElementById('oe-run')?.removeAttribute('disabled');
-  }
-}
-
-['oe-resume', 'oe-jd', 'oe-li', 'oe-referrer', 'oe-type'].forEach(id => {
-  document.getElementById(id)?.addEventListener('input', refreshOeGate);
-  document.getElementById(id)?.addEventListener('change', refreshOeGate);
-});
-refreshOeGate();
-
-document.getElementById('oe-run')?.addEventListener('click', async () => {
-  const missing = oeMissingFields();
-  if (missing.length) return setStatus('oe-results', 'error', `Cannot generate — missing: ${missing.join(', ')}`);
-
-  const forbidden = csvCommaList(document.getElementById('oe-forbidden').value);
-  const body = {
-    resume: document.getElementById('oe-resume').value.trim(),
-    jobDetails: document.getElementById('oe-jd').value.trim(),
-    linkedinJson: document.getElementById('oe-li').value.trim(),
-    messageType: document.getElementById('oe-type').value,
-    tone: document.getElementById('oe-tone').value,
-    wordLimit: parseInt(document.getElementById('oe-wordlimit').value, 10) || 75,
-  };
-  const referrer = document.getElementById('oe-referrer').value.trim();
-  if (referrer) body.referrer = referrer;
-  if (forbidden.length) body.forbidden = forbidden;
-
-  setStatus('oe-results', 'loading', 'Generating outreach… (Gemini reasons before writing; 15–45s)');
-  try {
-    const resp = await fetch(`${apiBase()}/api/v1/generate-outreach`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(body),
-    });
-    const data = await safeJson(resp);
-    if (!resp.ok) return setStatus('oe-results', 'error', `${resp.status}: ${data.detail || data._raw || 'Request failed'}`);
-
-    const target = document.getElementById('oe-results');
-    target.innerHTML = '';
-
-    if (data.needsHumanReview) {
-      const panel = document.createElement('div');
-      panel.className = 'status error';
-      panel.style.padding = '14px';
-      panel.innerHTML = `
-        <div style="font-weight:600; margin-bottom:6px;">Human review required</div>
-        <div style="margin-bottom:8px;">${escapeHtml(data.reviewReason || '(no reason given)')}</div>
-        ${data.painPoint ? `<div style="font-size:12px; opacity:0.85;">Inferred pain point: ${escapeHtml(data.painPoint)}</div>` : ''}
-      `;
-      target.appendChild(panel);
-      return;
+    function handleFile(file) {
+      if (!file) return;
+      if (file.type !== 'application/pdf') {
+        showToast('Only PDF files are accepted.');
+        return;
+      }
+      resumeFile = file;
+      fileChipWrap.innerHTML = `
+        <div class="file-chip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          ${file.name} &nbsp;·&nbsp; ${(file.size / 1024).toFixed(1)} KB
+          <button onclick="clearFile()" title="Remove">✕</button>
+        </div>`;
     }
 
-    const header = document.createElement('div');
-    header.className = 'status success';
-    header.innerHTML = `
-      <div>${data.variations.length} variation(s) · model: <code>${escapeHtml(data.model)}</code> · today: ${escapeHtml(data.today)}</div>
-      ${data.painPoint ? `<div style="margin-top:6px; font-size:12px;">Pain point: ${escapeHtml(data.painPoint)}</div>` : ''}
-    `;
-    target.appendChild(header);
+    function clearFile() {
+      resumeFile = null;
+      resumeInput.value = '';
+      fileChipWrap.innerHTML = '';
+    }
 
-    const charCap = body.messageType === 'connection' ? 300 : null;
-    data.variations.forEach(v => {
-      const card = document.createElement('div');
-      card.className = 'comment-result';
-      const overCap = charCap && v.char_count > charCap;
-      const capWarn = overCap
-        ? `<span class="badge" style="background:#fef2f2; color:var(--danger);">OVER ${charCap}-char cap</span>`
-        : '';
-      card.innerHTML = `
-        <div class="label">${escapeHtml(v.label)}</div>
-        ${v.subject ? `<div style="font-weight:600; margin-bottom:8px;">Subject: ${escapeHtml(v.subject)}</div>` : ''}
-        <div class="text">${escapeHtml(v.message)}</div>
-        <div style="margin-top:10px; font-size:12px; color:var(--muted);">
-          ${v.char_count} chars · ${v.word_count} words ${capWarn}
-        </div>
-        <div style="margin-top:8px; font-size:12px;"><strong>Hook cites:</strong> <code>${escapeHtml(v.hookSource)}</code></div>
-        <div style="margin-top:4px; font-size:12px;"><strong>Anchored to:</strong> ${escapeHtml(v.proofUsed)}</div>
-        <div style="margin-top:10px;"><button class="small-btn">Copy subject + body</button></div>
-      `;
-      card.querySelector('button').addEventListener('click', e => {
-        const combined = (v.subject ? `Subject: ${v.subject}\n\n` : '') + v.message;
-        navigator.clipboard.writeText(combined);
-        e.target.textContent = 'Copied!';
-        setTimeout(() => { e.target.textContent = 'Copy subject + body'; }, 1200);
+    // ── Progress tracker ──────────────────────────────────────
+    // Simulates stage progression while the backend runs
+    // Timings calibrated against the real workflow duration (~45s)
+    const STAGE_DELAYS = [0, 4000, 10000, 18000, 28000, 38000];
+
+    function startProgress() {
+      progressWrap.classList.add('visible');
+      currentStage = 0;
+      const stages = document.querySelectorAll('.stage');
+      stages.forEach(s => { s.classList.remove('active', 'done'); });
+      STAGE_DELAYS.forEach((delay, i) => {
+        setTimeout(() => {
+          stages.forEach((s, si) => {
+            if (si < i)  s.classList.replace('active', 'done') || s.classList.add('done');
+            if (si === i) { s.classList.remove('done'); s.classList.add('active'); }
+          });
+        }, delay);
       });
-      target.appendChild(card);
-    });
-  } catch (e) {
-    setStatus('oe-results', 'error', e.message);
-  }
-});
-</script>
+    }
 
+    function stopProgress() {
+      // Mark all stages done
+      document.querySelectorAll('.stage').forEach(s => {
+        s.classList.remove('active');
+        s.classList.add('done');
+      });
+      setTimeout(() => { progressWrap.classList.remove('visible'); }, 400);
+    }
+
+    // ── Form submit ───────────────────────────────────────────
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      hideAll();
+
+      // Validate
+      const errs = [];
+      if (!resumeFile)               errs.push('Upload your résumé (PDF).');
+      if (!jdInput.value.trim())     errs.push('Paste the job description.');
+      if (!linkedinInput.value.trim()) errs.push('Enter the prospect\'s LinkedIn URL.');
+
+      if (errs.length) {
+        errorList.innerHTML = errs.map(e => `<li>${e}</li>`).join('');
+        validationBox.classList.add('visible');
+        return;
+      }
+
+      // Lock UI
+      generateBtn.disabled = true;
+      generateBtn.textContent = 'Generating…';
+      startProgress();
+
+      try {
+        const fd = new FormData();
+        fd.append('resume', resumeFile, resumeFile.name);
+        fd.append('job_description', jdInput.value.trim());
+        fd.append('prospect_linkedin_url', linkedinInput.value.trim());
+
+        const res = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+
+        stopProgress();
+
+        // ── 500 = Human Review (no Respond node on that branch)
+        if (res.status === 500) {
+          let msg = 'Similarity below automatic approval threshold (0.7).';
+          try {
+            const j = await res.json();
+            if (j.message && j.message.includes('No item to return')) {
+              msg = 'Similarity below automatic approval threshold (0.7).';
+            } else {
+              // Real 500 — show error
+              showError('Backend error (500)', j.message || res.statusText);
+              return;
+            }
+          } catch(_) {
+            showError('Backend error (500)', res.statusText);
+            return;
+          }
+          showHumanReview(msg);
+          return;
+        }
+
+        if (!res.ok) {
+          const body = await res.text();
+          showError(`Request failed — ${res.status}`, body.slice(0, 400));
+          return;
+        }
+
+        // ── 200 — parse output
+        let raw = await res.json();
+        if (Array.isArray(raw)) raw = raw[0];
+        if (raw.output) raw = raw.output;
+
+        // Fallback: if response body itself signals human review
+        if (raw.status === 'HUMAN_REVIEW') {
+          showHumanReview(raw.reason || 'Similarity below automatic approval threshold (0.7).');
+          return;
+        }
+
+        const subject = (raw.subject || '').trim();
+        const message = (raw.message || '').trim();
+        const audit   = raw.audit || {};
+
+        if (!message) {
+          showError('Empty response', 'The backend returned no message. Check your n8n execution logs.');
+          return;
+        }
+
+        showOutput(subject, message, audit);
+
+      } catch (err) {
+        stopProgress();
+        if (err.name === 'AbortError' || err.message.includes('fetch')) {
+          showError('Connection error', 'Could not reach the backend. Check the webhook URL and your n8n instance.');
+        } else {
+          showError('Unexpected error', err.message);
+        }
+      } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = 'Generate Outreach Message';
+      }
+    });
+
+    // ── Show output ───────────────────────────────────────────
+    function showOutput(subject, message, audit) {
+      // Subject
+      const subjectCard = document.getElementById('subject-card');
+      if (subject) {
+        document.getElementById('subject-body').textContent = subject;
+        subjectCard.style.display = '';
+      } else {
+        subjectCard.style.display = 'none';
+      }
+
+      // Message
+      document.getElementById('message-body').textContent = message;
+
+      // Audit
+      fillAudit(audit);
+
+      outputSection.classList.add('visible');
+      outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function fillAudit(audit) {
+      const hookEl    = document.getElementById('audit-hook');
+      const painEl    = document.getElementById('audit-pain');
+      const ctxEl     = document.getElementById('audit-context-tags');
+      const proofEl   = document.getElementById('audit-proof-items');
+
+      const hook  = audit.hook_used || '';
+      const pain  = audit.inferred_pain_used || '';
+      const ctx   = audit.business_context_used || [];
+      const proof = audit.proof_used || [];
+
+      hookEl.textContent = hook;
+      document.getElementById('audit-hook-wrap').style.display = hook ? '' : 'none';
+
+      painEl.textContent = pain;
+      document.getElementById('audit-pain-wrap').style.display = pain ? '' : 'none';
+
+      ctxEl.innerHTML = ctx.map(c => `<span class="context-tag">${esc(c)}</span>`).join('');
+      document.getElementById('audit-context-wrap').style.display = ctx.length ? '' : 'none';
+
+      proofEl.innerHTML = proof.map(p =>
+        `<div class="proof-item"><span class="proof-check">✓</span><span>${esc(p)}</span></div>`
+      ).join('');
+      document.getElementById('audit-proof-wrap').style.display = proof.length ? '' : 'none';
+    }
+
+    // ── Show human review ─────────────────────────────────────
+    function showHumanReview(reason) {
+      document.getElementById('hr-reason-box').textContent = reason;
+      humanReview.classList.add('visible');
+      humanReview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── Show error ────────────────────────────────────────────
+    function showError(title, body) {
+      document.getElementById('error-title').textContent = title;
+      document.getElementById('error-body').textContent = body;
+      errorSection.classList.add('visible');
+      errorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── Audit toggle ──────────────────────────────────────────
+    function toggleAudit() {
+      const panel  = document.getElementById('audit-panel');
+      const toggle = document.getElementById('audit-toggle');
+      const open   = panel.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+      toggle.textContent = open ? '🔍 Hide Audit Trail' : '🔍 Show Audit Trail';
+    }
+
+    // ── Copy ──────────────────────────────────────────────────
+    function copyText(elId, btn) {
+      const text = document.getElementById(elId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+      });
+    }
+
+    // ── Reset ─────────────────────────────────────────────────
+    function resetAll() {
+      hideAll();
+      // Collapse audit if open
+      document.getElementById('audit-panel').classList.remove('open');
+      document.getElementById('audit-toggle').classList.remove('open');
+      document.getElementById('audit-toggle').textContent = '🔍 Show Audit Trail';
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function hideAll() {
+      outputSection.classList.remove('visible');
+      humanReview.classList.remove('visible');
+      errorSection.classList.remove('visible');
+      validationBox.classList.remove('visible');
+      errorList.innerHTML = '';
+    }
+
+    // ── Toast ─────────────────────────────────────────────────
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    // ── Escape HTML ───────────────────────────────────────────
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
 </body>
 </html>
