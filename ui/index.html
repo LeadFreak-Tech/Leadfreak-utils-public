@@ -7,1222 +7,832 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
   <style>
-    /* ── Reset ─────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    /* ── Tokens ────────────────────────────────────────────── */
     :root {
-      --bg:          #FAFAF9;
-      --surface:     #FFFFFF;
-      --border:      #E5E4E0;
-      --border-focus:#4F46E5;
-      --text-primary:#111110;
-      --text-secondary:#6B6B6B;
-      --text-muted:  #9B9B99;
-      --accent:      #4F46E5;
-      --accent-light:#EEF2FF;
-      --accent-hover:#4338CA;
-      --green:       #16A34A;
-      --green-light: #F0FDF4;
-      --green-border:#BBF7D0;
-      --amber:       #D97706;
-      --amber-light: #FFFBEB;
-      --amber-border:#FCD34D;
-      --amber-text:  #92400E;
-      --red:         #DC2626;
-      --red-light:   #FEF2F2;
-      --red-border:  #FECACA;
-      --radius-sm:   6px;
-      --radius:      10px;
-      --radius-lg:   14px;
-      --shadow:      0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md:   0 4px 16px rgba(0,0,0,0.08);
+      --bg:           #FAFAF9;
+      --surface:      #FFFFFF;
+      --border:       #E5E4E0;
+      --border-focus: #4F46E5;
+      --text:         #111110;
+      --text-2:       #6B6B6B;
+      --text-3:       #9B9B99;
+      --accent:       #4F46E5;
+      --accent-lt:    #EEF2FF;
+      --accent-h:     #4338CA;
+      --green:        #16A34A;
+      --green-lt:     #F0FDF4;
+      --green-bd:     #BBF7D0;
+      --amber:        #D97706;
+      --amber-lt:     #FFFBEB;
+      --amber-bd:     #FCD34D;
+      --amber-tx:     #92400E;
+      --red:          #DC2626;
+      --red-lt:       #FEF2F2;
+      --red-bd:       #FECACA;
+      --r:            10px;
+      --r-lg:         14px;
+      --r-sm:         6px;
+      --sh:           0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
     }
+    html { font-size:16px; -webkit-font-smoothing:antialiased; }
+    body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:0 1rem 5rem; }
+    .wrap { max-width:720px; margin:0 auto; }
 
-    /* ── Base ──────────────────────────────────────────────── */
-    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+    /* ── Header ── */
+    .site-header { padding:3rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:2rem; }
+    .eyebrow { font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
+    h1 { font-size:1.7rem; font-weight:700; letter-spacing:-.03em; line-height:1.2; margin-bottom:.4rem; }
+    .header-sub { font-size:.88rem; color:var(--text-2); line-height:1.6; }
 
-    body {
-      font-family: 'DM Sans', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text-primary);
-      min-height: 100vh;
-      padding: 0 1rem 5rem;
+    /* ── Tabs ── */
+    .tab-bar { display:flex; gap:.25rem; margin-bottom:2rem; border-bottom:1px solid var(--border); padding-bottom:0; }
+    .tab-btn {
+      padding:.6rem 1.1rem; font-family:'DM Sans',sans-serif; font-size:.83rem; font-weight:600;
+      border:none; background:none; cursor:pointer; color:var(--text-2);
+      border-bottom:2px solid transparent; margin-bottom:-1px;
+      transition:color .15s,border-color .15s;
     }
+    .tab-btn:hover { color:var(--text); }
+    .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+    .tab-pane { display:none; }
+    .tab-pane.active { display:block; }
 
-    /* ── Layout ────────────────────────────────────────────── */
-    .wrap {
-      max-width: 680px;
-      margin: 0 auto;
-    }
+    /* ── Field groups ── */
+    .field-group { margin-bottom:1.6rem; }
+    .field-label { display:block; font-size:.8rem; font-weight:600; letter-spacing:.02em; margin-bottom:.3rem; }
+    .field-hint  { font-size:.77rem; color:var(--text-3); margin-bottom:.5rem; line-height:1.5; }
+    .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    @media(max-width:520px){ .row-2 { grid-template-columns:1fr; } }
 
-    /* ── Header ────────────────────────────────────────────── */
-    .site-header {
-      padding: 3rem 0 2.5rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2.5rem;
-    }
-
-    .header-eyebrow {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.6rem;
-    }
-
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      letter-spacing: -0.03em;
-      line-height: 1.2;
-      margin-bottom: 0.5rem;
-    }
-
-    .header-sub {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      max-width: 520px;
-    }
-
-    /* ── Section labels ────────────────────────────────────── */
-    .field-group {
-      margin-bottom: 1.75rem;
-    }
-
-    .field-label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      letter-spacing: 0.02em;
-      margin-bottom: 0.3rem;
-    }
-
-    .field-hint {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-bottom: 0.55rem;
-      line-height: 1.5;
-    }
-
-    /* ── File upload ───────────────────────────────────────── */
+    /* ── Upload zone ── */
     .upload-zone {
-      border: 1.5px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 1.4rem;
-      background: var(--surface);
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      text-align: center;
+      border:1.5px dashed var(--border); border-radius:var(--r); padding:1.25rem;
+      background:var(--surface); cursor:pointer; text-align:center;
+      transition:border-color .15s,background .15s;
     }
-
-    .upload-zone:hover,
-    .upload-zone.drag-over {
-      border-color: var(--accent);
-      background: var(--accent-light);
-    }
-
-    .upload-zone input[type="file"] {
-      display: none;
-    }
-
-    .upload-icon {
-      width: 32px;
-      height: 32px;
-      margin: 0 auto 0.6rem;
-      color: var(--text-muted);
-    }
-
-    .upload-text {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-    }
-
-    .upload-text strong {
-      color: var(--accent);
-      cursor: pointer;
-    }
-
-    .upload-text small {
-      display: block;
-      margin-top: 0.2rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
+    .upload-zone:hover,.upload-zone.drag-over { border-color:var(--accent); background:var(--accent-lt); }
+    .upload-zone input { display:none; }
+    .upload-icon { width:28px; height:28px; margin:0 auto .5rem; color:var(--text-3); }
+    .upload-text { font-size:.82rem; color:var(--text-2); }
+    .upload-text strong { color:var(--accent); }
+    .upload-text small { display:block; margin-top:.15rem; font-size:.72rem; color:var(--text-3); }
     .file-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--accent-light);
-      color: var(--accent);
-      border: 1px solid #C7D2FE;
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      margin-top: 0.6rem;
+      display:inline-flex; align-items:center; gap:5px;
+      background:var(--accent-lt); color:var(--accent); border:1px solid #C7D2FE;
+      border-radius:20px; padding:3px 10px; font-size:.75rem; font-weight:500; margin-top:.5rem;
     }
+    .file-chip button { background:none; border:none; color:var(--accent); cursor:pointer; opacity:.6; font-size:.85rem; padding:0; }
+    .file-chip button:hover { opacity:1; }
 
-    .file-chip button {
-      background: none;
-      border: none;
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 0.9rem;
-      line-height: 1;
-      padding: 0;
-      margin-left: 2px;
-      opacity: 0.6;
+    /* ── Inputs ── */
+    textarea,input[type=text],input[type=url] {
+      width:100%; font-family:'DM Sans',sans-serif; font-size:.875rem; color:var(--text);
+      background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r);
+      padding:.7rem .875rem; outline:none; resize:vertical; line-height:1.6;
+      transition:border-color .15s,box-shadow .15s;
     }
+    textarea::placeholder,input::placeholder { color:var(--text-3); }
+    textarea:focus,input:focus { border-color:var(--border-focus); box-shadow:0 0 0 3px rgba(79,70,229,.1); }
+    textarea { min-height:200px; }
 
-    .file-chip button:hover { opacity: 1; }
+    /* ── Divider ── */
+    .divider { border:none; border-top:1px solid var(--border); margin:1.75rem 0; }
 
-    /* ── Text inputs ───────────────────────────────────────── */
-    textarea, input[type="text"], input[type="url"] {
-      width: 100%;
-      font-family: 'DM Sans', system-ui, sans-serif;
-      font-size: 0.875rem;
-      color: var(--text-primary);
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.75rem 0.875rem;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      outline: none;
-      resize: vertical;
-      line-height: 1.6;
-    }
-
-    textarea::placeholder,
-    input::placeholder {
-      color: var(--text-muted);
-    }
-
-    textarea:focus,
-    input:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    textarea {
-      min-height: 220px;
-    }
-
-    /* ── Divider ───────────────────────────────────────────── */
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 2rem 0;
-    }
-
-    /* ── Primary button ────────────────────────────────────── */
+    /* ── Buttons ── */
     .btn-primary {
-      width: 100%;
-      background: var(--text-primary);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
-      padding: 0.85rem 1.5rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-      letter-spacing: 0.01em;
+      width:100%; background:var(--text); color:#fff; border:none; border-radius:var(--r);
+      padding:.8rem 1.5rem; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600;
+      cursor:pointer; letter-spacing:.01em; transition:background .15s,transform .1s,box-shadow .15s;
     }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #1f2937;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-    }
-
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* ── Secondary button ──────────────────────────────────── */
+    .btn-primary:hover:not(:disabled) { background:#1f2937; transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.18); }
+    .btn-primary:active:not(:disabled) { transform:translateY(0); }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
     .btn-secondary {
-      background: var(--surface);
-      color: var(--text-secondary);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.6rem 1rem;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.12s, border-color 0.12s;
+      background:var(--surface); color:var(--text-2); border:1.5px solid var(--border);
+      border-radius:var(--r-sm); padding:.5rem .9rem; font-family:'DM Sans',sans-serif;
+      font-size:.8rem; font-weight:500; cursor:pointer; transition:background .12s,border-color .12s;
     }
+    .btn-secondary:hover { background:var(--bg); border-color:#C9C8C3; }
 
-    .btn-secondary:hover {
-      background: var(--bg);
-      border-color: #C9C8C3;
+    /* ── Progress ── */
+    .progress-wrap {
+      display:none; margin:1.25rem 0; background:var(--surface); border:1.5px solid var(--border);
+      border-radius:var(--r-lg); padding:1.1rem 1.3rem; box-shadow:var(--sh);
     }
+    .progress-wrap.visible { display:block; }
+    .prog-header { display:flex; align-items:center; gap:8px; margin-bottom:.875rem; }
+    .spinner { width:13px; height:13px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .prog-title { font-size:.8rem; font-weight:600; }
+    .prog-stages { display:flex; flex-direction:column; gap:.45rem; }
+    .stage { display:flex; align-items:center; gap:9px; font-size:.78rem; color:var(--text-3); transition:color .3s; }
+    .stage.active { color:var(--text); }
+    .stage.done   { color:var(--green); }
+    .stage-dot { width:7px; height:7px; border-radius:50%; border:1.5px solid var(--border); background:transparent; flex-shrink:0; transition:background .3s,border-color .3s; }
+    .stage.active .stage-dot { border-color:var(--accent); background:var(--accent); box-shadow:0 0 0 3px rgba(79,70,229,.15); }
+    .stage.done   .stage-dot { border-color:var(--green); background:var(--green); }
 
-    /* ── Progress tracker ──────────────────────────────────── */
-    /* Signature element: animated stage tracker */
-    #progress-wrap {
-      display: none;
-      margin: 1.5rem 0;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.25rem 1.4rem;
-      box-shadow: var(--shadow);
-    }
+    /* ── Validation ── */
+    .val-box { display:none; background:var(--red-lt); border:1.5px solid var(--red-bd); border-radius:var(--r); padding:.8rem 1rem; margin-bottom:1.1rem; }
+    .val-box.visible { display:block; }
+    .val-title { font-size:.8rem; font-weight:600; color:var(--red); margin-bottom:.3rem; }
+    .val-list { list-style:none; font-size:.78rem; color:#B91C1C; line-height:1.7; }
+    .val-list li::before { content:"→ "; font-weight:600; }
 
-    #progress-wrap.visible { display: block; }
+    /* ── Out cards ── */
+    .out-section { display:none; }
+    .out-section.visible { display:block; }
+    .out-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+    .out-title { font-size:1rem; font-weight:700; letter-spacing:-.01em; }
+    .badge { display:inline-flex; align-items:center; gap:4px; border-radius:20px; padding:3px 10px; font-size:.73rem; font-weight:600; }
+    .badge-green { background:var(--green-lt); color:var(--green); border:1px solid var(--green-bd); }
+    .badge-amber { background:var(--amber-lt); color:var(--amber); border:1px solid var(--amber-bd); }
+    .badge-accent { background:var(--accent-lt); color:var(--accent); border:1px solid #C7D2FE; }
+    .out-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-lg); overflow:hidden; margin-bottom:.875rem; box-shadow:var(--sh); }
+    .out-card-hd { display:flex; align-items:center; justify-content:space-between; padding:.6rem 1rem; border-bottom:1px solid var(--border); background:var(--bg); }
+    .out-card-lbl { font-size:.69rem; font-weight:700; color:var(--text-3); letter-spacing:.08em; text-transform:uppercase; }
+    .copy-btn { font-size:.71rem; font-weight:500; color:var(--text-2); background:none; border:1px solid var(--border); border-radius:var(--r-sm); padding:3px 8px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background .12s; }
+    .copy-btn:hover { background:var(--bg); color:var(--text); }
+    .copy-btn.copied { color:var(--green); border-color:var(--green-bd); }
+    .out-card-body { padding:.9rem 1.1rem; }
+    .subject-text { font-size:.975rem; font-weight:600; line-height:1.4; }
+    .message-text { font-family:'DM Mono',monospace; font-size:.81rem; color:var(--text); line-height:1.9; white-space:pre-wrap; }
 
-    .progress-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 1rem;
-    }
+    /* ── Audit trail ── */
+    .audit-toggle { font-size:.78rem; font-weight:500; color:var(--text-2); background:none; border:1.5px solid var(--border); border-radius:var(--r-sm); padding:5px 10px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background .12s,border-color .12s,color .12s; }
+    .audit-toggle:hover,.audit-toggle.open { background:var(--accent-lt); border-color:#C7D2FE; color:var(--accent); }
+    .audit-panel { display:none; margin-top:.875rem; }
+    .audit-panel.open { display:block; }
+    .audit-sec { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:.8rem 1rem; margin-bottom:.55rem; box-shadow:var(--sh); }
+    .audit-lbl { font-size:.67rem; font-weight:700; color:var(--text-3); letter-spacing:.09em; text-transform:uppercase; margin-bottom:.4rem; }
+    .audit-txt { font-size:.84rem; color:var(--text-2); line-height:1.7; }
+    .ctx-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:3px; }
+    .ctx-tag { background:var(--accent-lt); color:var(--accent); border:1px solid #C7D2FE; border-radius:20px; padding:2px 9px; font-size:.73rem; font-weight:500; }
+    .proof-item { display:flex; gap:7px; font-size:.82rem; color:#166534; line-height:1.6; background:var(--green-lt); border-left:3px solid var(--green); border-radius:0 var(--r-sm) var(--r-sm) 0; padding:.45rem .7rem; margin-bottom:.35rem; }
+    .proof-check { color:var(--green); font-weight:700; flex-shrink:0; }
 
-    .progress-spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
-    }
+    /* ── Action row ── */
+    .action-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.25rem; }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* ── Human review ── */
+    .hr-card { background:var(--amber-lt); border:1.5px solid var(--amber-bd); border-radius:var(--r-lg); padding:1.4rem 1.5rem; margin-bottom:.875rem; }
+    .hr-title { font-size:.92rem; font-weight:700; color:var(--amber-tx); margin-bottom:.45rem; }
+    .hr-desc  { font-size:.84rem; color:#78350F; line-height:1.7; margin-bottom:.8rem; }
+    .hr-mono  { background:#FEF3C7; border-radius:var(--r-sm); padding:.55rem .85rem; font-family:'DM Mono',monospace; font-size:.77rem; color:var(--amber-tx); margin-bottom:.9rem; }
+    .hr-sec   { font-size:.73rem; font-weight:700; color:var(--amber-tx); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+    .hr-list  { list-style:none; font-size:.81rem; color:#78350F; line-height:1.85; margin-bottom:.9rem; }
+    .hr-list li::before { content:"• "; font-weight:700; }
+    .hr-action { list-style:none; font-size:.81rem; color:#78350F; line-height:1.85; padding-top:.8rem; border-top:1px solid var(--amber-bd); }
+    .hr-action li::before { content:"→ "; font-weight:600; }
 
-    .progress-title {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
+    /* ── Error ── */
+    .err-section { display:none; }
+    .err-section.visible { display:block; }
+    .err-card { background:var(--red-lt); border:1.5px solid var(--red-bd); border-radius:var(--r); padding:.9rem 1rem; margin-bottom:.875rem; }
+    .err-title { font-size:.83rem; font-weight:700; color:var(--red); margin-bottom:.25rem; }
+    .err-body  { font-family:'DM Mono',monospace; font-size:.76rem; color:#B91C1C; line-height:1.6; }
 
-    .progress-stages {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
+    /* ── Workflow 2 results ── */
+    .summary-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:.6rem; margin-bottom:1.5rem; }
+    .stat-chip { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:.7rem .875rem; box-shadow:var(--sh); }
+    .stat-val  { font-size:1.3rem; font-weight:700; color:var(--text); line-height:1; }
+    .stat-lbl  { font-size:.7rem; color:var(--text-3); margin-top:.2rem; font-weight:500; }
+    .prospect-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-lg); overflow:hidden; margin-bottom:1rem; box-shadow:var(--sh); }
+    .prospect-hd { padding:.8rem 1.1rem; background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:.5rem; flex-wrap:wrap; }
+    .prospect-name { font-size:.9rem; font-weight:700; }
+    .prospect-meta { font-size:.75rem; color:var(--text-2); margin-top:.1rem; }
+    .prospect-body { padding:1rem 1.1rem; }
+    .score-row { display:flex; align-items:center; gap:.6rem; margin-bottom:.75rem; flex-wrap:wrap; }
+    .score-pill { display:inline-flex; align-items:center; gap:4px; border-radius:20px; padding:3px 9px; font-size:.73rem; font-weight:600; border:1px solid; }
+    .score-pill.prime    { background:#F0FDF4; color:#166534; border-color:#BBF7D0; }
+    .score-pill.strong   { background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE; }
+    .score-pill.moderate { background:#FFFBEB; color:#92400E; border-color:#FCD34D; }
+    .score-pill.weak,.score-pill.skip { background:#FEF2F2; color:#991B1B; border-color:#FECACA; }
+    .subscore-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.4rem; margin-bottom:.75rem; }
+    .subscore-item { background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); padding:.4rem .6rem; }
+    .subscore-lbl { font-size:.67rem; color:var(--text-3); text-transform:uppercase; letter-spacing:.05em; }
+    .subscore-val { font-size:.85rem; font-weight:600; color:var(--text); }
+    .draft-section { margin-top:.75rem; border-top:1px solid var(--border); padding-top:.75rem; }
+    .draft-label  { font-size:.7rem; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem; }
+    .channel-badge { display:inline-flex; align-items:center; gap:4px; border-radius:20px; padding:2px 8px; font-size:.7rem; font-weight:600; background:var(--bg); color:var(--text-2); border:1px solid var(--border); margin-bottom:.4rem; }
+    .draft-body { font-family:'DM Mono',monospace; font-size:.79rem; color:var(--text); line-height:1.85; white-space:pre-wrap; }
+    .draft-subject { font-size:.85rem; font-weight:600; color:var(--text); margin-bottom:.4rem; }
+    .judge-row { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.6rem; }
+    .judge-chip { font-size:.68rem; color:var(--text-2); background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); padding:2px 7px; }
+    .section-header { font-size:.82rem; font-weight:700; color:var(--text); margin:1.25rem 0 .75rem; display:flex; align-items:center; gap:.5rem; }
+    .failed-list { font-size:.8rem; color:var(--text-2); line-height:1.8; }
+    .failed-list li { padding:.2rem 0; }
 
-    .stage {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      transition: color 0.3s;
-    }
+    /* ── Toast ── */
+    #toast { position:fixed; bottom:1.5rem; right:1.5rem; background:var(--text); color:#fff; font-size:.8rem; font-weight:500; padding:.55rem 1rem; border-radius:var(--r); opacity:0; transform:translateY(8px); transition:opacity .2s,transform .2s; pointer-events:none; z-index:999; font-family:'DM Sans',sans-serif; }
+    #toast.show { opacity:1; transform:translateY(0); }
 
-    .stage.active { color: var(--text-primary); }
-    .stage.done   { color: var(--green); }
-
-    .stage-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border);
-      background: transparent;
-      flex-shrink: 0;
-      transition: background 0.3s, border-color 0.3s;
-    }
-
-    .stage.active .stage-dot {
-      border-color: var(--accent);
-      background: var(--accent);
-      box-shadow: 0 0 0 3px rgba(79,70,229,0.15);
-    }
-
-    .stage.done .stage-dot {
-      border-color: var(--green);
-      background: var(--green);
-    }
-
-    /* ── Validation errors ─────────────────────────────────── */
-    #validation-errors {
-      display: none;
-      background: var(--red-light);
-      border: 1.5px solid var(--red-border);
-      border-radius: var(--radius);
-      padding: 0.875rem 1rem;
-      margin-bottom: 1.25rem;
-    }
-
-    #validation-errors.visible { display: block; }
-
-    .validation-error-title {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--red);
-      margin-bottom: 0.35rem;
-    }
-
-    .validation-error-list {
-      list-style: none;
-      font-size: 0.8rem;
-      color: #B91C1C;
-      line-height: 1.7;
-    }
-
-    .validation-error-list li::before {
-      content: "→ ";
-      font-weight: 600;
-    }
-
-    /* ── Output section ────────────────────────────────────── */
-    #output-section { display: none; }
-    #output-section.visible { display: block; }
-
-    .output-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-
-    .output-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      letter-spacing: -0.01em;
-    }
-
-    .badge-ready {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--green-light);
-      color: var(--green);
-      border: 1px solid var(--green-border);
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    /* Output cards */
-    .out-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      margin-bottom: 0.875rem;
-      box-shadow: var(--shadow);
-    }
-
-    .out-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.65rem 1rem;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-    }
-
-    .out-card-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .copy-btn {
-      font-size: 0.72rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 3px 8px;
-      cursor: pointer;
-      transition: background 0.12s, color 0.12s;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    .copy-btn:hover {
-      background: var(--bg);
-      color: var(--text-primary);
-    }
-
-    .copy-btn.copied {
-      color: var(--green);
-      border-color: var(--green-border);
-    }
-
-    .out-card-body {
-      padding: 1rem 1.1rem;
-    }
-
-    .subject-text {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      line-height: 1.4;
-    }
-
-    .message-text {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.825rem;
-      color: var(--text-primary);
-      line-height: 1.9;
-      white-space: pre-wrap;
-    }
-
-    /* ── Audit trail ───────────────────────────────────────── */
-    .audit-toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 0.875rem;
-    }
-
-    #audit-toggle {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      background: none;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 5px 10px;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: background 0.12s, border-color 0.12s, color 0.12s;
-    }
-
-    #audit-toggle:hover,
-    #audit-toggle.open {
-      background: var(--accent-light);
-      border-color: #C7D2FE;
-      color: var(--accent);
-    }
-
-    #audit-panel {
-      display: none;
-      margin-bottom: 1rem;
-    }
-
-    #audit-panel.open { display: block; }
-
-    .audit-section {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 0.875rem 1rem;
-      margin-bottom: 0.6rem;
-      box-shadow: var(--shadow);
-    }
-
-    .audit-section-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-
-    .audit-text {
-      font-size: 0.845rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    .context-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .context-tag {
-      display: inline-flex;
-      align-items: center;
-      background: var(--accent-light);
-      color: var(--accent);
-      border: 1px solid #C7D2FE;
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    .proof-item {
-      display: flex;
-      gap: 8px;
-      align-items: flex-start;
-      font-size: 0.835rem;
-      color: #166534;
-      line-height: 1.6;
-      background: var(--green-light);
-      border-left: 3px solid var(--green);
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      padding: 0.5rem 0.75rem;
-      margin-bottom: 0.4rem;
-    }
-
-    .proof-check {
-      color: var(--green);
-      font-weight: 700;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    /* ── Action row ────────────────────────────────────────── */
-    .action-row {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-      margin-top: 0.25rem;
-    }
-
-    /* ── Human review ──────────────────────────────────────── */
-    #human-review-section { display: none; }
-    #human-review-section.visible { display: block; }
-
-    .human-review-card {
-      background: var(--amber-light);
-      border: 1.5px solid var(--amber-border);
-      border-radius: var(--radius-lg);
-      padding: 1.5rem 1.6rem;
-      margin-bottom: 1rem;
-    }
-
-    .hr-icon-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 0.6rem;
-    }
-
-    .hr-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--amber-text);
-    }
-
-    .hr-desc {
-      font-size: 0.855rem;
-      color: #78350F;
-      line-height: 1.7;
-      margin-bottom: 0.875rem;
-    }
-
-    .hr-reason-box {
-      background: #FEF3C7;
-      border-radius: var(--radius-sm);
-      padding: 0.6rem 0.875rem;
-      font-family: 'DM Mono', monospace;
-      font-size: 0.78rem;
-      color: var(--amber-text);
-      margin-bottom: 1rem;
-    }
-
-    .hr-section-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--amber-text);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 0.4rem;
-    }
-
-    .hr-list {
-      list-style: none;
-      font-size: 0.825rem;
-      color: #78350F;
-      line-height: 1.85;
-      margin-bottom: 1rem;
-    }
-
-    .hr-list li::before { content: "• "; font-weight: 700; }
-
-    .hr-action-list {
-      list-style: none;
-      font-size: 0.825rem;
-      color: #78350F;
-      line-height: 1.85;
-      padding-top: 0.875rem;
-      border-top: 1px solid var(--amber-border);
-    }
-
-    .hr-action-list li::before { content: "→ "; font-weight: 600; }
-
-    /* ── Error card ────────────────────────────────────────── */
-    #error-section { display: none; }
-    #error-section.visible { display: block; }
-
-    .error-card {
-      background: var(--red-light);
-      border: 1.5px solid var(--red-border);
-      border-radius: var(--radius);
-      padding: 1rem 1.1rem;
-      margin-bottom: 1rem;
-    }
-
-    .error-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--red);
-      margin-bottom: 0.3rem;
-    }
-
-    .error-body {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.775rem;
-      color: #B91C1C;
-      line-height: 1.6;
-    }
-
-    /* ── Toast ─────────────────────────────────────────────── */
-    #toast {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      background: var(--text-primary);
-      color: #fff;
-      font-size: 0.82rem;
-      font-weight: 500;
-      padding: 0.6rem 1rem;
-      border-radius: var(--radius);
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 0.2s, transform 0.2s;
-      pointer-events: none;
-      z-index: 999;
-      font-family: 'DM Sans', sans-serif;
-    }
-
-    #toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── Responsive ────────────────────────────────────────── */
-    @media (max-width: 600px) {
-      h1 { font-size: 1.4rem; }
-      body { padding: 0 0.75rem 4rem; }
-      .site-header { padding: 2rem 0 1.75rem; }
-      .action-row { flex-direction: column; }
-      .action-row .btn-secondary { width: 100%; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .progress-spinner { animation: none; }
-      * { transition: none !important; }
-    }
+    @media(max-width:600px){ h1{font-size:1.35rem;} body{padding:0 .75rem 4rem;} .site-header{padding:2rem 0 1.5rem;} .action-row{flex-direction:column;} }
+    @media(prefers-reduced-motion:reduce){ .spinner{animation:none;} *{transition:none!important;} }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
+<div class="wrap">
 
-    <!-- ── Header ───────────────────────────────────────────── -->
-    <header class="site-header">
-      <p class="header-eyebrow">Deterministic Workflow · v4</p>
-      <h1>LinkedIn Outreach Writer</h1>
-      <p class="header-sub">
-        Generate pain-led InMails grounded in your résumé, the job description,
-        and the prospect's LinkedIn profile — automatically matched and written.
-      </p>
-    </header>
+  <!-- Header -->
+  <header class="site-header">
+    <p class="eyebrow">Deterministic Outreach Suite</p>
+    <h1>LinkedIn Outreach Writer</h1>
+    <p class="header-sub">Two workflows — write a single targeted InMail, or rank and draft outreach for an entire prospect list.</p>
+  </header>
 
-    <!-- ── Form ─────────────────────────────────────────────── -->
-    <form id="outreach-form" novalidate>
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('w1',this)">Single Outreach</button>
+    <button class="tab-btn" onclick="switchTab('w2',this)">Prospect Ranking &amp; Writer</button>
+  </div>
 
-      <!-- 1. Resume -->
+  <!-- ══════════════════════════════════════════════════════
+       WORKFLOW 1 — Single outreach
+  ═══════════════════════════════════════════════════════ -->
+  <div id="tab-w1" class="tab-pane active">
+
+    <form id="form-w1" novalidate>
+
+      <!-- Resume -->
       <div class="field-group">
         <label class="field-label">Résumé</label>
-        <p class="field-hint">PDF only — the backend extracts achievements and metrics automatically.</p>
-
-        <div class="upload-zone" id="upload-zone">
-          <input type="file" id="resume-input" accept=".pdf" />
-          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-          </svg>
-          <p class="upload-text">
-            <strong onclick="document.getElementById('resume-input').click()">Click to upload</strong>
-            or drag and drop
-            <small>PDF · max 10 MB</small>
-          </p>
+        <p class="field-hint">PDF only — achievements and metrics are extracted automatically.</p>
+        <div class="upload-zone" id="uz1">
+          <input type="file" id="resume1" accept=".pdf" />
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+          <p class="upload-text"><strong onclick="document.getElementById('resume1').click()">Click to upload</strong> or drag and drop<small>PDF · max 10 MB</small></p>
         </div>
-
-        <div id="file-chip-wrap"></div>
+        <div id="chip1"></div>
       </div>
 
-      <!-- 2. Job Description -->
+      <!-- JD -->
       <div class="field-group">
-        <label class="field-label" for="jd-input">Job Description</label>
-        <p class="field-hint">Paste the complete posting — requirements, responsibilities, and context all matter.</p>
-        <textarea id="jd-input" placeholder="Paste the full job description here…"></textarea>
+        <label class="field-label" for="jd1">Job Description</label>
+        <p class="field-hint">Paste the full posting — requirements and responsibilities all matter.</p>
+        <textarea id="jd1" placeholder="Paste the complete job description here…"></textarea>
       </div>
 
-      <!-- 3. LinkedIn URL -->
+      <!-- LinkedIn URL -->
       <div class="field-group">
-        <label class="field-label" for="linkedin-input">Prospect LinkedIn URL</label>
-        <p class="field-hint">The recruiter or hiring manager you're reaching out to. The backend scrapes this profile.</p>
-        <input type="url" id="linkedin-input" placeholder="https://www.linkedin.com/in/…" />
+        <label class="field-label" for="li1">Prospect LinkedIn URL</label>
+        <p class="field-hint">The recruiter or hiring manager you're reaching out to.</p>
+        <input type="url" id="li1" placeholder="https://www.linkedin.com/in/…" />
       </div>
 
-      <!-- Validation errors -->
-      <div id="validation-errors" role="alert">
-        <p class="validation-error-title">Please fix the following before generating:</p>
-        <ul class="validation-error-list" id="error-list"></ul>
-      </div>
-
+      <div class="val-box" id="val1"><p class="val-title">Please fix the following:</p><ul class="val-list" id="val1-list"></ul></div>
       <hr class="divider" />
-
-      <button type="submit" class="btn-primary" id="generate-btn">
-        Generate Outreach Message
-      </button>
+      <button type="submit" class="btn-primary" id="btn1">Generate Outreach Message</button>
     </form>
 
-    <!-- ── Progress tracker ──────────────────────────────────── -->
-    <div id="progress-wrap">
-      <div class="progress-header">
-        <div class="progress-spinner"></div>
-        <span class="progress-title">Generating your message…</span>
-      </div>
-      <div class="progress-stages" id="progress-stages">
-        <div class="stage" data-stage="0"><div class="stage-dot"></div><span>Extracting résumé achievements</span></div>
-        <div class="stage" data-stage="1"><div class="stage-dot"></div><span>Scraping LinkedIn profile</span></div>
-        <div class="stage" data-stage="2"><div class="stage-dot"></div><span>Parsing JD requirements &amp; pain points</span></div>
-        <div class="stage" data-stage="3"><div class="stage-dot"></div><span>Matching evidence via cosine similarity</span></div>
-        <div class="stage" data-stage="4"><div class="stage-dot"></div><span>Writing executive InMail</span></div>
-        <div class="stage" data-stage="5"><div class="stage-dot"></div><span>Humanizing message</span></div>
+    <!-- Progress W1 -->
+    <div class="progress-wrap" id="prog1">
+      <div class="prog-header"><div class="spinner"></div><span class="prog-title">Generating your message…</span></div>
+      <div class="prog-stages" id="stages1">
+        <div class="stage"><div class="stage-dot"></div><span>Extracting résumé achievements</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Scraping LinkedIn profile</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Parsing JD requirements &amp; pain points</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Matching evidence via cosine similarity</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Writing executive InMail</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Humanizing message</span></div>
       </div>
     </div>
 
-    <!-- ── Error card ────────────────────────────────────────── -->
-    <div id="error-section" role="alert">
-      <div class="error-card">
-        <p class="error-title" id="error-title">Request failed</p>
-        <p class="error-body" id="error-body"></p>
-      </div>
-      <button class="btn-secondary" onclick="resetAll()">← Try again</button>
+    <!-- Error W1 -->
+    <div class="err-section" id="err1">
+      <div class="err-card"><p class="err-title" id="err1-title"></p><p class="err-body" id="err1-body"></p></div>
+      <button class="btn-secondary" onclick="resetW1()">← Try again</button>
     </div>
 
-    <!-- ── Human review ──────────────────────────────────────── -->
-    <div id="human-review-section">
-      <div class="human-review-card">
-        <div class="hr-icon-row">
-          <span style="font-size:1.1rem">⚠️</span>
-          <span class="hr-title">Sent for Human Review</span>
-        </div>
-        <p class="hr-desc">
-          Your résumé and the job description did not have enough matching evidence
-          to generate a message automatically.
-        </p>
-        <div class="hr-reason-box" id="hr-reason-box">
-          Similarity below automatic approval threshold (0.7).
-        </div>
-        <p class="hr-section-title">What this means</p>
+    <!-- Human review W1 -->
+    <div class="out-section" id="hr1">
+      <div class="hr-card">
+        <p class="hr-title">⚠️ Sent for Human Review</p>
+        <p class="hr-desc">Your résumé and the job description did not have enough matching evidence to generate a message automatically.</p>
+        <div class="hr-mono" id="hr1-reason">Similarity below automatic approval threshold (0.7).</div>
+        <p class="hr-sec">What this means</p>
         <ul class="hr-list">
-          <li>The backend compared your résumé achievements against JD requirements using cosine similarity</li>
-          <li>No match scored above the <strong>0.7 threshold</strong> needed for automatic generation</li>
-          <li>This usually means the résumé and job description are in different industries or domains</li>
+          <li>No résumé–JD match scored above the 0.7 cosine similarity threshold</li>
+          <li>This usually means the résumé and JD are in different industries or domains</li>
         </ul>
-        <p class="hr-section-title">What you can do</p>
-        <ul class="hr-action-list">
+        <p class="hr-sec">What you can do</p>
+        <ul class="hr-action">
           <li>Try a job description closer to your professional background</li>
           <li>Ensure your résumé highlights specific, measurable achievements</li>
-          <li>Make sure the uploaded PDF is text-based — not a scanned image</li>
+          <li>Make sure the PDF is text-based, not a scanned image</li>
         </ul>
       </div>
-      <button class="btn-secondary" onclick="resetAll()">← Try again</button>
+      <button class="btn-secondary" onclick="resetW1()">← Try again</button>
     </div>
 
-    <!-- ── Output ────────────────────────────────────────────── -->
-    <div id="output-section">
-
-      <div class="output-header">
-        <span class="output-title">Generated Outreach</span>
-        <span class="badge-ready">✓ Ready to send</span>
+    <!-- Output W1 -->
+    <div class="out-section" id="out1">
+      <div class="out-header">
+        <span class="out-title">Generated Outreach</span>
+        <span class="badge badge-green">✓ Ready to send</span>
       </div>
-
-      <!-- Subject card -->
-      <div class="out-card" id="subject-card">
-        <div class="out-card-header">
-          <span class="out-card-label">Subject Line</span>
-          <button class="copy-btn" onclick="copyText('subject-body', this)">Copy</button>
-        </div>
-        <div class="out-card-body">
-          <p class="subject-text" id="subject-body"></p>
-        </div>
+      <div class="out-card" id="subj1-card">
+        <div class="out-card-hd"><span class="out-card-lbl">Subject Line</span><button class="copy-btn" onclick="copyEl('subj1-body',this)">Copy</button></div>
+        <div class="out-card-body"><p class="subject-text" id="subj1-body"></p></div>
       </div>
-
-      <!-- Message card -->
       <div class="out-card">
-        <div class="out-card-header">
-          <span class="out-card-label">Message</span>
-          <button class="copy-btn" onclick="copyText('message-body', this)">Copy</button>
-        </div>
-        <div class="out-card-body">
-          <p class="message-text" id="message-body"></p>
-        </div>
+        <div class="out-card-hd"><span class="out-card-lbl">Message</span><button class="copy-btn" onclick="copyEl('msg1-body',this)">Copy</button></div>
+        <div class="out-card-body"><p class="message-text" id="msg1-body"></p></div>
       </div>
-
-      <!-- Action row -->
       <div class="action-row">
-        <button class="btn-secondary" id="audit-toggle" onclick="toggleAudit()">🔍 Show Audit Trail</button>
-        <button class="btn-secondary" onclick="resetAll()">🔄 Generate Again</button>
+        <button class="audit-toggle" id="audit1-toggle" onclick="toggleAudit('audit1-panel','audit1-toggle')">🔍 Show Audit Trail</button>
+        <button class="btn-secondary" onclick="resetW1()">🔄 Generate Again</button>
+      </div>
+      <div class="audit-panel" id="audit1-panel">
+        <div style="margin:.9rem 0 .6rem"><span style="font-size:.84rem;font-weight:700">Audit Trail</span><span style="font-size:.73rem;color:var(--text-3);margin-left:7px">How the message was constructed</span></div>
+        <div class="audit-sec" id="a1-hook-wrap"><p class="audit-lbl">Hook Used</p><p class="audit-txt" id="a1-hook"></p></div>
+        <div class="audit-sec" id="a1-pain-wrap"><p class="audit-lbl">Inferred Pain (from JD)</p><p class="audit-txt" id="a1-pain"></p></div>
+        <div class="audit-sec" id="a1-ctx-wrap"><p class="audit-lbl">LinkedIn Context Used</p><div class="ctx-tags" id="a1-ctx"></div></div>
+        <div class="audit-sec" id="a1-proof-wrap"><p class="audit-lbl">Résumé Evidence Used</p><div id="a1-proof"></div></div>
+      </div>
+    </div>
+  </div><!-- /tab-w1 -->
+
+
+  <!-- ══════════════════════════════════════════════════════
+       WORKFLOW 2 — Prospect ranking + writer
+  ═══════════════════════════════════════════════════════ -->
+  <div id="tab-w2" class="tab-pane">
+
+    <form id="form-w2" novalidate>
+
+      <!-- Resume -->
+      <div class="field-group">
+        <label class="field-label">Résumé</label>
+        <p class="field-hint">PDF — the backend extracts your proof points and maps them to each prospect.</p>
+        <div class="upload-zone" id="uz2">
+          <input type="file" id="resume2" accept=".pdf" />
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+          <p class="upload-text"><strong onclick="document.getElementById('resume2').click()">Click to upload</strong> or drag and drop<small>PDF · max 10 MB</small></p>
+        </div>
+        <div id="chip2"></div>
       </div>
 
-      <!-- Audit panel -->
-      <div id="audit-panel">
-
-        <div style="margin-top:1rem; margin-bottom:0.6rem;">
-          <span style="font-size:0.85rem;font-weight:700;color:var(--text-primary);">Audit Trail</span>
-          <span style="font-size:0.75rem;color:var(--text-muted);margin-left:8px;">How the message was constructed</span>
+      <!-- CSV -->
+      <div class="field-group">
+        <label class="field-label">Prospect List (CSV)</label>
+        <p class="field-hint">CSV with a column of LinkedIn profile URLs — one per row.</p>
+        <div class="upload-zone" id="uz3">
+          <input type="file" id="csv2" accept=".csv,text/csv" />
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0c0 .621.504 1.125 1.125 1.125h2.25"/></svg>
+          <p class="upload-text"><strong onclick="document.getElementById('csv2').click()">Click to upload</strong> or drag and drop<small>CSV · LinkedIn URLs</small></p>
         </div>
+        <div id="chip3"></div>
+      </div>
 
-        <!-- Hook used -->
-        <div class="audit-section" id="audit-hook-wrap">
-          <p class="audit-section-label">Hook Used</p>
-          <p class="audit-text" id="audit-hook"></p>
+      <!-- JD + Company -->
+      <div class="row-2">
+        <div class="field-group">
+          <label class="field-label" for="jd2">Job Description</label>
+          <p class="field-hint">The role you're applying for.</p>
+          <textarea id="jd2" style="min-height:140px" placeholder="Paste the job description here…"></textarea>
         </div>
-
-        <!-- Inferred pain -->
-        <div class="audit-section" id="audit-pain-wrap">
-          <p class="audit-section-label">Inferred Pain (from Job Description)</p>
-          <p class="audit-text" id="audit-pain"></p>
+        <div class="field-group">
+          <label class="field-label" for="company2">Company Name</label>
+          <p class="field-hint">The hiring company.</p>
+          <input type="text" id="company2" placeholder="e.g. Acme Corp" style="height:52px;min-height:unset;resize:none;" />
         </div>
+      </div>
 
-        <!-- LinkedIn context -->
-        <div class="audit-section" id="audit-context-wrap">
-          <p class="audit-section-label">LinkedIn Context Used</p>
-          <div class="context-tags" id="audit-context-tags"></div>
-        </div>
+      <div class="val-box" id="val2"><p class="val-title">Please fix the following:</p><ul class="val-list" id="val2-list"></ul></div>
+      <hr class="divider" />
+      <button type="submit" class="btn-primary" id="btn2">Rank Prospects &amp; Generate Drafts</button>
+    </form>
 
-        <!-- Resume proof -->
-        <div class="audit-section" id="audit-proof-wrap">
-          <p class="audit-section-label">Résumé Evidence Used</p>
-          <div id="audit-proof-items"></div>
-        </div>
+    <!-- Progress W2 -->
+    <div class="progress-wrap" id="prog2">
+      <div class="prog-header"><div class="spinner"></div><span class="prog-title" id="prog2-title">Processing prospects…</span></div>
+      <div class="prog-stages" id="stages2">
+        <div class="stage"><div class="stage-dot"></div><span>Extracting résumé proof points</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Scraping LinkedIn profiles</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Analysing &amp; scoring each prospect</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Selecting top candidates per bucket</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Writing &amp; linting outreach drafts</span></div>
+        <div class="stage"><div class="stage-dot"></div><span>Judge review &amp; routing</span></div>
+      </div>
+    </div>
 
-      </div><!-- /audit-panel -->
-    </div><!-- /output-section -->
+    <!-- Error W2 -->
+    <div class="err-section" id="err2">
+      <div class="err-card"><p class="err-title" id="err2-title"></p><p class="err-body" id="err2-body"></p></div>
+      <button class="btn-secondary" onclick="resetW2()">← Try again</button>
+    </div>
 
-  </div><!-- /wrap -->
+    <!-- Output W2 -->
+    <div class="out-section" id="out2">
+      <div class="out-header">
+        <span class="out-title">Results</span>
+        <button class="btn-secondary" onclick="resetW2()">🔄 Run Again</button>
+      </div>
 
-  <!-- Toast -->
-  <div id="toast"></div>
+      <!-- Summary stats -->
+      <div class="summary-bar" id="w2-summary"></div>
 
-  <script>
-    // ── Config ────────────────────────────────────────────────
-    const WEBHOOK_URL = 'https://primary-production-37efc.up.railway.app/webhook/generate-message';
+      <!-- Approved drafts -->
+      <div id="w2-approved-wrap">
+        <div class="section-header"><span class="badge badge-green">✓ Approved</span><span id="w2-approved-count"></span></div>
+        <div id="w2-approved"></div>
+      </div>
 
-    // ── State ─────────────────────────────────────────────────
-    let resumeFile = null;
-    let progressInterval = null;
-    let currentStage = 0;
+      <!-- Human review drafts -->
+      <div id="w2-review-wrap">
+        <div class="section-header"><span class="badge badge-amber">⚠ Human Review</span><span id="w2-review-count"></span></div>
+        <div id="w2-review"></div>
+      </div>
 
-    // ── DOM refs ──────────────────────────────────────────────
-    const form           = document.getElementById('outreach-form');
-    const generateBtn    = document.getElementById('generate-btn');
-    const resumeInput    = document.getElementById('resume-input');
-    const uploadZone     = document.getElementById('upload-zone');
-    const fileChipWrap   = document.getElementById('file-chip-wrap');
-    const jdInput        = document.getElementById('jd-input');
-    const linkedinInput  = document.getElementById('linkedin-input');
-    const progressWrap   = document.getElementById('progress-wrap');
-    const outputSection  = document.getElementById('output-section');
-    const humanReview    = document.getElementById('human-review-section');
-    const errorSection   = document.getElementById('error-section');
-    const validationBox  = document.getElementById('validation-errors');
-    const errorList      = document.getElementById('error-list');
+      <!-- Failed scrapes -->
+      <div id="w2-failed-wrap" style="display:none">
+        <div class="section-header"><span class="badge" style="background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd)">✕ Failed Scrapes</span></div>
+        <ul class="failed-list" id="w2-failed"></ul>
+      </div>
+    </div>
+  </div><!-- /tab-w2 -->
 
-    // ── File upload ───────────────────────────────────────────
-    resumeInput.addEventListener('change', e => handleFile(e.target.files[0]));
+</div><!-- /wrap -->
 
-    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-    uploadZone.addEventListener('drop', e => {
-      e.preventDefault();
-      uploadZone.classList.remove('drag-over');
-      const f = e.dataTransfer.files[0];
-      if (f) handleFile(f);
-    });
+<div id="toast"></div>
 
-    uploadZone.addEventListener('click', e => {
-      if (e.target.tagName !== 'STRONG') resumeInput.click();
-    });
+<script>
+// ── Webhook URLs ────────────────────────────────────────────────────────────
+const W1_URL = 'https://primary-production-37efc.up.railway.app/webhook/generate-message';
+const W2_URL = 'https://primary-production-37efc.up.railway.app/webhook/outreach-targeting';
 
-    function handleFile(file) {
-      if (!file) return;
-      if (file.type !== 'application/pdf') {
-        showToast('Only PDF files are accepted.');
-        return;
-      }
-      resumeFile = file;
-      fileChipWrap.innerHTML = `
-        <div class="file-chip">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-          </svg>
-          ${file.name} &nbsp;·&nbsp; ${(file.size / 1024).toFixed(1)} KB
-          <button onclick="clearFile()" title="Remove">✕</button>
-        </div>`;
-    }
+// ── Tab switching ───────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
 
-    function clearFile() {
-      resumeFile = null;
-      resumeInput.value = '';
-      fileChipWrap.innerHTML = '';
-    }
+// ── File state ──────────────────────────────────────────────────────────────
+const files = { resume1: null, resume2: null, csv2: null };
 
-    // ── Progress tracker ──────────────────────────────────────
-    // Simulates stage progression while the backend runs
-    // Timings calibrated against the real workflow duration (~45s)
-    const STAGE_DELAYS = [0, 4000, 10000, 18000, 28000, 38000];
+function setupUpload(inputId, zoneId, chipId, stateKey, accept) {
+  const inp  = document.getElementById(inputId);
+  const zone = document.getElementById(zoneId);
+  const chip = document.getElementById(chipId);
 
-    function startProgress() {
-      progressWrap.classList.add('visible');
-      currentStage = 0;
-      const stages = document.querySelectorAll('.stage');
-      stages.forEach(s => { s.classList.remove('active', 'done'); });
-      STAGE_DELAYS.forEach((delay, i) => {
-        setTimeout(() => {
-          stages.forEach((s, si) => {
-            if (si < i)  s.classList.replace('active', 'done') || s.classList.add('done');
-            if (si === i) { s.classList.remove('done'); s.classList.add('active'); }
-          });
-        }, delay);
+  inp.addEventListener('change', e => handleFile(e.target.files[0], stateKey, chip, accept));
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], stateKey, chip, accept);
+  });
+  zone.addEventListener('click', e => { if (e.target.tagName !== 'STRONG') inp.click(); });
+}
+
+function handleFile(file, key, chipEl, accept) {
+  if (!file) return;
+  if (accept === 'pdf' && file.type !== 'application/pdf') { toast('Only PDF files are accepted.'); return; }
+  if (accept === 'csv' && !file.name.endsWith('.csv'))     { toast('Only CSV files are accepted.'); return; }
+  files[key] = file;
+  chipEl.innerHTML = `<div class="file-chip">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    ${esc(file.name)} · ${(file.size/1024).toFixed(1)} KB
+    <button onclick="clearFile('${key}','${chipEl.id}','${document.getElementById(key)?.id || key}')">✕</button>
+  </div>`;
+}
+
+function clearFile(key, chipId, inputId) {
+  files[key] = null;
+  document.getElementById(chipId).innerHTML = '';
+  const inp = document.getElementById(inputId);
+  if (inp) inp.value = '';
+}
+
+setupUpload('resume1','uz1','chip1','resume1','pdf');
+setupUpload('resume2','uz2','chip2','resume2','pdf');
+setupUpload('csv2','uz3','chip3','csv2','csv');
+
+// ── Progress helpers ─────────────────────────────────────────────────────────
+const DELAYS_W1 = [0, 4000, 10000, 18000, 28000, 38000];
+const DELAYS_W2 = [0, 5000, 15000, 35000, 55000, 80000];
+
+function startProgress(wrapperId, stageParentId, delays) {
+  const wrap = document.getElementById(wrapperId);
+  wrap.classList.add('visible');
+  const stages = document.querySelectorAll('#' + stageParentId + ' .stage');
+  stages.forEach(s => s.classList.remove('active','done'));
+  delays.forEach((delay, i) => {
+    setTimeout(() => {
+      stages.forEach((s, si) => {
+        if (si < i)  { s.classList.remove('active'); s.classList.add('done'); }
+        if (si === i){ s.classList.remove('done'); s.classList.add('active'); }
       });
+    }, delay);
+  });
+}
+
+function stopProgress(wrapperId, stageParentId) {
+  document.querySelectorAll('#' + stageParentId + ' .stage').forEach(s => {
+    s.classList.remove('active'); s.classList.add('done');
+  });
+  setTimeout(() => document.getElementById(wrapperId).classList.remove('visible'), 400);
+}
+
+// ── Workflow 1 submit ────────────────────────────────────────────────────────
+document.getElementById('form-w1').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideW1();
+
+  const errs = [];
+  if (!files.resume1)                                  errs.push('Upload your résumé (PDF).');
+  if (!document.getElementById('jd1').value.trim())    errs.push('Paste the job description.');
+  if (!document.getElementById('li1').value.trim())    errs.push('Enter the prospect\'s LinkedIn URL.');
+  if (errs.length) { showVal('val1','val1-list',errs); return; }
+
+  const btn = document.getElementById('btn1');
+  btn.disabled = true; btn.textContent = 'Generating…';
+  startProgress('prog1','stages1', DELAYS_W1);
+
+  try {
+    const fd = new FormData();
+    fd.append('resume', files.resume1, files.resume1.name);
+    fd.append('job_description', document.getElementById('jd1').value.trim());
+    fd.append('prospect_linkedin_url', document.getElementById('li1').value.trim());
+
+    const res = await fetch(W1_URL, { method:'POST', body:fd });
+    stopProgress('prog1','stages1');
+
+    if (res.status === 500) {
+      let msg = 'Similarity below automatic approval threshold (0.7).';
+      try { const j = await res.json(); if (!j.message?.includes('No item to return')) { showErrW1('Backend error (500)', j.message||res.statusText); return; } } catch(_) { showErrW1('Backend error (500)', res.statusText); return; }
+      showHR1(msg); return;
     }
+    if (!res.ok) { showErrW1('Request failed — ' + res.status, (await res.text()).slice(0,400)); return; }
 
-    function stopProgress() {
-      // Mark all stages done
-      document.querySelectorAll('.stage').forEach(s => {
-        s.classList.remove('active');
-        s.classList.add('done');
-      });
-      setTimeout(() => { progressWrap.classList.remove('visible'); }, 400);
-    }
+    let raw = await res.json();
+    if (Array.isArray(raw)) raw = raw[0];
+    if (raw.output) raw = raw.output;
+    if (raw.status === 'HUMAN_REVIEW') { showHR1(raw.reason || 'Similarity below automatic approval threshold (0.7).'); return; }
 
-    // ── Form submit ───────────────────────────────────────────
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      hideAll();
+    const subject = (raw.subject||'').trim();
+    const message = (raw.message||'').trim();
+    const audit   = raw.audit || {};
+    if (!message) { showErrW1('Empty response', 'The backend returned no message. Check your n8n execution logs.'); return; }
+    renderW1(subject, message, audit);
 
-      // Validate
-      const errs = [];
-      if (!resumeFile)               errs.push('Upload your résumé (PDF).');
-      if (!jdInput.value.trim())     errs.push('Paste the job description.');
-      if (!linkedinInput.value.trim()) errs.push('Enter the prospect\'s LinkedIn URL.');
+  } catch(err) {
+    stopProgress('prog1','stages1');
+    showErrW1('Connection error', err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Generate Outreach Message';
+  }
+});
 
-      if (errs.length) {
-        errorList.innerHTML = errs.map(e => `<li>${e}</li>`).join('');
-        validationBox.classList.add('visible');
-        return;
-      }
+function renderW1(subject, message, audit) {
+  const sc = document.getElementById('subj1-card');
+  if (subject) { document.getElementById('subj1-body').textContent = subject; sc.style.display=''; }
+  else sc.style.display='none';
+  document.getElementById('msg1-body').textContent = message;
 
-      // Lock UI
-      generateBtn.disabled = true;
-      generateBtn.textContent = 'Generating…';
-      startProgress();
+  const hook  = audit.hook_used || '';
+  const pain  = audit.inferred_pain_used || '';
+  const ctx   = audit.business_context_used || [];
+  const proof = audit.proof_used || [];
 
-      try {
-        const fd = new FormData();
-        fd.append('resume', resumeFile, resumeFile.name);
-        fd.append('job_description', jdInput.value.trim());
-        fd.append('prospect_linkedin_url', linkedinInput.value.trim());
+  setAuditText('a1-hook','a1-hook-wrap', hook);
+  setAuditText('a1-pain','a1-pain-wrap', pain);
+  setAuditTags('a1-ctx','a1-ctx-wrap', ctx);
+  setAuditProof('a1-proof','a1-proof-wrap', proof);
 
-        const res = await fetch(WEBHOOK_URL, { method: 'POST', body: fd });
+  document.getElementById('out1').classList.add('visible');
+  document.getElementById('out1').scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
-        stopProgress();
+function showHR1(reason) {
+  document.getElementById('hr1-reason').textContent = reason;
+  document.getElementById('hr1').classList.add('visible');
+  document.getElementById('hr1').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function showErrW1(title, body) {
+  document.getElementById('err1-title').textContent = title;
+  document.getElementById('err1-body').textContent  = body;
+  document.getElementById('err1').classList.add('visible');
+  document.getElementById('err1').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function hideW1() {
+  ['out1','hr1','err1'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  document.getElementById('val1').classList.remove('visible');
+}
+function resetW1() {
+  hideW1();
+  closeAudit('audit1-panel','audit1-toggle');
+  document.getElementById('form-w1').scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
-        // ── 500 = Human Review (no Respond node on that branch)
-        if (res.status === 500) {
-          let msg = 'Similarity below automatic approval threshold (0.7).';
-          try {
-            const j = await res.json();
-            if (j.message && j.message.includes('No item to return')) {
-              msg = 'Similarity below automatic approval threshold (0.7).';
-            } else {
-              // Real 500 — show error
-              showError('Backend error (500)', j.message || res.statusText);
-              return;
-            }
-          } catch(_) {
-            showError('Backend error (500)', res.statusText);
-            return;
-          }
-          showHumanReview(msg);
-          return;
-        }
+// ── Workflow 2 submit ────────────────────────────────────────────────────────
+document.getElementById('form-w2').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideW2();
 
-        if (!res.ok) {
-          const body = await res.text();
-          showError(`Request failed — ${res.status}`, body.slice(0, 400));
-          return;
-        }
+  const errs = [];
+  if (!files.resume2)                                  errs.push('Upload your résumé (PDF).');
+  if (!files.csv2)                                     errs.push('Upload the prospect list (CSV).');
+  if (!document.getElementById('jd2').value.trim())    errs.push('Paste the job description.');
+  if (!document.getElementById('company2').value.trim()) errs.push('Enter the company name.');
+  if (errs.length) { showVal('val2','val2-list',errs); return; }
 
-        // ── 200 — parse output
-        let raw = await res.json();
-        if (Array.isArray(raw)) raw = raw[0];
-        if (raw.output) raw = raw.output;
+  const btn = document.getElementById('btn2');
+  btn.disabled = true; btn.textContent = 'Processing…';
+  startProgress('prog2','stages2', DELAYS_W2);
 
-        // Fallback: if response body itself signals human review
-        if (raw.status === 'HUMAN_REVIEW') {
-          showHumanReview(raw.reason || 'Similarity below automatic approval threshold (0.7).');
-          return;
-        }
+  try {
+    const fd = new FormData();
+    fd.append('resume', files.resume2, files.resume2.name);
+    fd.append('csv',    files.csv2,    files.csv2.name);
+    fd.append('jd',     document.getElementById('jd2').value.trim());
+    fd.append('company',document.getElementById('company2').value.trim());
 
-        const subject = (raw.subject || '').trim();
-        const message = (raw.message || '').trim();
-        const audit   = raw.audit || {};
+    const res = await fetch(W2_URL, { method:'POST', body:fd });
+    stopProgress('prog2','stages2');
 
-        if (!message) {
-          showError('Empty response', 'The backend returned no message. Check your n8n execution logs.');
-          return;
-        }
+    if (!res.ok) { showErrW2('Request failed — ' + res.status, (await res.text()).slice(0,400)); return; }
 
-        showOutput(subject, message, audit);
+    let raw = await res.json();
+    if (Array.isArray(raw)) raw = raw[0];
+    if (raw.json) raw = raw.json; // n8n sometimes wraps in {json:{...}}
 
-      } catch (err) {
-        stopProgress();
-        if (err.name === 'AbortError' || err.message.includes('fetch')) {
-          showError('Connection error', 'Could not reach the backend. Check the webhook URL and your n8n instance.');
-        } else {
-          showError('Unexpected error', err.message);
-        }
-      } finally {
-        generateBtn.disabled = false;
-        generateBtn.textContent = 'Generate Outreach Message';
-      }
-    });
+    renderW2(raw);
 
-    // ── Show output ───────────────────────────────────────────
-    function showOutput(subject, message, audit) {
-      // Subject
-      const subjectCard = document.getElementById('subject-card');
-      if (subject) {
-        document.getElementById('subject-body').textContent = subject;
-        subjectCard.style.display = '';
-      } else {
-        subjectCard.style.display = 'none';
-      }
+  } catch(err) {
+    stopProgress('prog2','stages2');
+    showErrW2('Connection error', err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+  }
+});
 
-      // Message
-      document.getElementById('message-body').textContent = message;
+function renderW2(data) {
+  const summary   = data.summary || {};
+  const approved  = data.approved_drafts || [];
+  const review    = data.human_review_drafts || [];
+  const failed    = data.failed_scrapes || [];
 
-      // Audit
-      fillAudit(audit);
+  // Summary bar
+  const sumEl = document.getElementById('w2-summary');
+  sumEl.innerHTML = [
+    ['Scored',    summary.scored           || 0],
+    ['Selected',  summary.total_selected   || 0],
+    ['Approved',  summary.drafts_approved  || 0],
+    ['Review',    summary.drafts_review    || 0],
+    ['Failed',    summary.failed_scrapes   || 0],
+  ].map(([l,v]) => `<div class="stat-chip"><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`).join('');
 
-      outputSection.classList.add('visible');
-      outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  // Approved drafts
+  document.getElementById('w2-approved-count').textContent = approved.length + ' draft' + (approved.length !== 1 ? 's' : '');
+  document.getElementById('w2-approved').innerHTML = approved.map(d => prospectCard(d, true)).join('') || '<p style="font-size:.82rem;color:var(--text-3)">No approved drafts.</p>';
 
-    function fillAudit(audit) {
-      const hookEl    = document.getElementById('audit-hook');
-      const painEl    = document.getElementById('audit-pain');
-      const ctxEl     = document.getElementById('audit-context-tags');
-      const proofEl   = document.getElementById('audit-proof-items');
+  // Review drafts
+  document.getElementById('w2-review-count').textContent = review.length + ' draft' + (review.length !== 1 ? 's' : '');
+  document.getElementById('w2-review').innerHTML = review.map(d => prospectCard(d, false)).join('') || '<p style="font-size:.82rem;color:var(--text-3)">None.</p>';
 
-      const hook  = audit.hook_used || '';
-      const pain  = audit.inferred_pain_used || '';
-      const ctx   = audit.business_context_used || [];
-      const proof = audit.proof_used || [];
+  // Failed scrapes
+  const failedWrap = document.getElementById('w2-failed-wrap');
+  if (failed.length) {
+    failedWrap.style.display = '';
+    document.getElementById('w2-failed').innerHTML = failed.map(f => `<li>↳ ${esc(typeof f === 'string' ? f : (f.url || JSON.stringify(f)))}</li>`).join('');
+  } else {
+    failedWrap.style.display = 'none';
+  }
 
-      hookEl.textContent = hook;
-      document.getElementById('audit-hook-wrap').style.display = hook ? '' : 'none';
+  document.getElementById('out2').classList.add('visible');
+  document.getElementById('out2').scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
-      painEl.textContent = pain;
-      document.getElementById('audit-pain-wrap').style.display = pain ? '' : 'none';
+function prospectCard(d, isApproved) {
+  const name    = esc(d.name || 'Unknown Prospect');
+  const channel = esc(d.channel || '');
+  const rank    = d.rank != null ? '#' + d.rank : '';
+  const msg     = d.message || {};
+  const subject = (msg.subject || '').trim();
+  const body    = (msg.body || '').trim();
+  const scores  = d.judge_scores || {};
+  const band    = (d.band || 'WEAK').toLowerCase();
+  const overall = d.overall_score != null ? d.overall_score : '';
+  const routerReasons = (d.router && d.router.reasons) ? d.router.reasons : [];
 
-      ctxEl.innerHTML = ctx.map(c => `<span class="context-tag">${esc(c)}</span>`).join('');
-      document.getElementById('audit-context-wrap').style.display = ctx.length ? '' : 'none';
+  const scoreChip = overall !== ''
+    ? `<span class="score-pill ${band}">${overall}/100 ${(d.band||'').toUpperCase()}</span>` : '';
 
-      proofEl.innerHTML = proof.map(p =>
-        `<div class="proof-item"><span class="proof-check">✓</span><span>${esc(p)}</span></div>`
-      ).join('');
-      document.getElementById('audit-proof-wrap').style.display = proof.length ? '' : 'none';
-    }
+  const judgeChips = Object.entries(scores).map(([k,v]) =>
+    `<span class="judge-chip">${k.replace(/_/g,' ')}: ${v}</span>`).join('');
 
-    // ── Show human review ─────────────────────────────────────
-    function showHumanReview(reason) {
-      document.getElementById('hr-reason-box').textContent = reason;
-      humanReview.classList.add('visible');
-      humanReview.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const subjectHtml = subject
+    ? `<p class="draft-subject">Subject: ${esc(subject)}</p>` : '';
 
-    // ── Show error ────────────────────────────────────────────
-    function showError(title, body) {
-      document.getElementById('error-title').textContent = title;
-      document.getElementById('error-body').textContent = body;
-      errorSection.classList.add('visible');
-      errorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const copyId = 'copy-' + Math.random().toString(36).slice(2);
 
-    // ── Audit toggle ──────────────────────────────────────────
-    function toggleAudit() {
-      const panel  = document.getElementById('audit-panel');
-      const toggle = document.getElementById('audit-toggle');
-      const open   = panel.classList.toggle('open');
-      toggle.classList.toggle('open', open);
-      toggle.textContent = open ? '🔍 Hide Audit Trail' : '🔍 Show Audit Trail';
-    }
+  const reviewNote = !isApproved && routerReasons.length
+    ? `<p style="font-size:.75rem;color:var(--amber);margin-top:.5rem">Flagged: ${esc(routerReasons.slice(0,2).join(' · '))}</p>` : '';
 
-    // ── Copy ──────────────────────────────────────────────────
-    function copyText(elId, btn) {
-      const text = document.getElementById(elId).textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
-      });
-    }
+  return `
+  <div class="prospect-card">
+    <div class="prospect-hd">
+      <div>
+        <p class="prospect-name">${name}</p>
+        <p class="prospect-meta">${rank ? rank + ' · ' : ''}${channel ? channel.toUpperCase() : ''}</p>
+      </div>
+      <div style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap">
+        ${scoreChip}
+        <span class="badge ${isApproved ? 'badge-green' : 'badge-amber'}">${isApproved ? '✓ Approved' : '⚠ Review'}</span>
+      </div>
+    </div>
+    <div class="prospect-body">
+      ${body ? `
+      <div class="draft-section">
+        <p class="draft-label">Draft Message <span class="channel-badge">${esc(channel)}</span></p>
+        <div id="${copyId}">
+          ${subjectHtml}
+          <p class="draft-body">${esc(body)}</p>
+        </div>
+        <div style="display:flex;gap:.4rem;margin-top:.6rem">
+          <button class="copy-btn" onclick="copyEl('${copyId}',this)">Copy</button>
+        </div>
+        ${judgeChips ? `<div class="judge-row">${judgeChips}</div>` : ''}
+        ${reviewNote}
+      </div>` : '<p style="font-size:.8rem;color:var(--text-3)">No draft generated.</p>'}
+    </div>
+  </div>`;
+}
 
-    // ── Reset ─────────────────────────────────────────────────
-    function resetAll() {
-      hideAll();
-      // Collapse audit if open
-      document.getElementById('audit-panel').classList.remove('open');
-      document.getElementById('audit-toggle').classList.remove('open');
-      document.getElementById('audit-toggle').textContent = '🔍 Show Audit Trail';
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+function showErrW2(title, body) {
+  document.getElementById('err2-title').textContent = title;
+  document.getElementById('err2-body').textContent  = body;
+  document.getElementById('err2').classList.add('visible');
+  document.getElementById('err2').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function hideW2() {
+  ['out2','err2'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  document.getElementById('val2').classList.remove('visible');
+}
+function resetW2() {
+  hideW2();
+  document.getElementById('form-w2').scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
-    function hideAll() {
-      outputSection.classList.remove('visible');
-      humanReview.classList.remove('visible');
-      errorSection.classList.remove('visible');
-      validationBox.classList.remove('visible');
-      errorList.innerHTML = '';
-    }
+// ── Shared helpers ────────────────────────────────────────────────────────────
+function showVal(boxId, listId, errs) {
+  document.getElementById(listId).innerHTML = errs.map(e => `<li>${e}</li>`).join('');
+  document.getElementById(boxId).classList.add('visible');
+}
 
-    // ── Toast ─────────────────────────────────────────────────
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2400);
-    }
+function setAuditText(elId, wrapId, text) {
+  document.getElementById(elId).textContent = text;
+  document.getElementById(wrapId).style.display = text ? '' : 'none';
+}
+function setAuditTags(elId, wrapId, items) {
+  document.getElementById(elId).innerHTML = items.map(c => `<span class="ctx-tag">${esc(c)}</span>`).join('');
+  document.getElementById(wrapId).style.display = items.length ? '' : 'none';
+}
+function setAuditProof(elId, wrapId, items) {
+  document.getElementById(elId).innerHTML = items.map(p =>
+    `<div class="proof-item"><span class="proof-check">✓</span><span>${esc(p)}</span></div>`).join('');
+  document.getElementById(wrapId).style.display = items.length ? '' : 'none';
+}
 
-    // ── Escape HTML ───────────────────────────────────────────
-    function esc(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-  </script>
+function toggleAudit(panelId, toggleId) {
+  const panel  = document.getElementById(panelId);
+  const toggle = document.getElementById(toggleId);
+  const open   = panel.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+  toggle.textContent = open ? '🔍 Hide Audit Trail' : '🔍 Show Audit Trail';
+}
+function closeAudit(panelId, toggleId) {
+  document.getElementById(panelId).classList.remove('open');
+  const t = document.getElementById(toggleId);
+  t.classList.remove('open');
+  t.textContent = '🔍 Show Audit Trail';
+}
+
+function copyEl(elId, btn) {
+  const el = document.getElementById(elId);
+  const text = el ? el.innerText || el.textContent : '';
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+  });
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function esc(str) {
+  return String(str||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
 </html>
