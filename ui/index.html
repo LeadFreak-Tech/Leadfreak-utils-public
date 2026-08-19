@@ -1,469 +1,514 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LinkedIn Outreach Writer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:           #FAFAF9;
-      --surface:      #FFFFFF;
-      --border:       #E5E4E0;
-      --border-focus: #4F46E5;
-      --text:         #111110;
-      --text-2:       #6B6B6B;
-      --text-3:       #9B9B99;
-      --accent:       #4F46E5;
-      --accent-lt:    #EEF2FF;
-      --accent-h:     #4338CA;
-      --green:        #16A34A;
-      --green-lt:     #F0FDF4;
-      --green-bd:     #BBF7D0;
-      --amber:        #D97706;
-      --amber-lt:     #FFFBEB;
-      --amber-bd:     #FCD34D;
-      --amber-tx:     #92400E;
-      --red:          #DC2626;
-      --red-lt:       #FEF2F2;
-      --red-bd:       #FECACA;
-      --r:            10px;
-      --r-lg:         14px;
-      --r-sm:         6px;
-      --sh:           0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-    }
-    html { font-size:16px; -webkit-font-smoothing:antialiased; }
-    body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:0 1rem 5rem; }
-    .wrap { max-width:720px; margin:0 auto; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>LinkedIn Outreach Writer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F5F5F3;--surface:#FFF;--border:#E5E4E0;--border-focus:#4F46E5;
+  --text:#111110;--text-2:#6B6B6B;--text-3:#9B9B99;
+  --accent:#4F46E5;--accent-lt:#EEF2FF;
+  --green:#16A34A;--green-lt:#F0FDF4;--green-bd:#BBF7D0;
+  --amber:#D97706;--amber-lt:#FFFBEB;--amber-bd:#FCD34D;--amber-tx:#92400E;
+  --red:#DC2626;--red-lt:#FEF2F2;--red-bd:#FECACA;
+  --blue:#1D4ED8;--blue-lt:#DBEAFE;--blue-bd:#BFDBFE;
+  --r:10px;--r-lg:14px;--r-sm:6px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh-md:0 4px 16px rgba(0,0,0,.08);
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 1rem 5rem;}
+.wrap{max-width:780px;margin:0 auto;}
 
-    /* ── Header ── */
-    .site-header { padding:3rem 0 2rem; border-bottom:1px solid var(--border); margin-bottom:2rem; }
-    .eyebrow { font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
-    h1 { font-size:1.7rem; font-weight:700; letter-spacing:-.03em; line-height:1.2; margin-bottom:.4rem; }
-    .header-sub { font-size:.88rem; color:var(--text-2); line-height:1.6; }
+/* Header */
+.site-header{padding:2.5rem 0 1.75rem;border-bottom:1px solid var(--border);margin-bottom:1.75rem;}
+.eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.4rem;}
+h1{font-size:1.65rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margin-bottom:.35rem;}
+.header-sub{font-size:.875rem;color:var(--text-2);line-height:1.6;}
 
-    /* ── Tabs ── */
-    .tab-bar { display:flex; gap:.25rem; margin-bottom:2rem; border-bottom:1px solid var(--border); padding-bottom:0; }
-    .tab-btn {
-      padding:.6rem 1.1rem; font-family:'DM Sans',sans-serif; font-size:.83rem; font-weight:600;
-      border:none; background:none; cursor:pointer; color:var(--text-2);
-      border-bottom:2px solid transparent; margin-bottom:-1px;
-      transition:color .15s,border-color .15s;
-    }
-    .tab-btn:hover { color:var(--text); }
-    .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
-    .tab-pane { display:none; }
-    .tab-pane.active { display:block; }
+/* Tabs */
+.tab-bar{display:flex;gap:.2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.tab-btn{padding:.55rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-2);border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
 
-    /* ── Field groups ── */
-    .field-group { margin-bottom:1.6rem; }
-    .field-label { display:block; font-size:.8rem; font-weight:600; letter-spacing:.02em; margin-bottom:.3rem; }
-    .field-hint  { font-size:.77rem; color:var(--text-3); margin-bottom:.5rem; line-height:1.5; }
-    .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-    @media(max-width:520px){ .row-2 { grid-template-columns:1fr; } }
+/* Field groups */
+.field-group{margin-bottom:1.5rem;}
+.field-label{display:block;font-size:.79rem;font-weight:600;letter-spacing:.02em;margin-bottom:.28rem;}
+.field-hint{font-size:.76rem;color:var(--text-3);margin-bottom:.5rem;line-height:1.5;}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:520px){.row-2{grid-template-columns:1fr;}}
 
-    /* ── Upload zone ── */
-    .upload-zone {
-      border:1.5px dashed var(--border); border-radius:var(--r); padding:1.25rem;
-      background:var(--surface); cursor:pointer; text-align:center;
-      transition:border-color .15s,background .15s;
-    }
-    .upload-zone:hover,.upload-zone.drag-over { border-color:var(--accent); background:var(--accent-lt); }
-    .upload-zone input { display:none; }
-    .upload-icon { width:28px; height:28px; margin:0 auto .5rem; color:var(--text-3); }
-    .upload-text { font-size:.82rem; color:var(--text-2); }
-    .upload-text strong { color:var(--accent); }
-    .upload-text small { display:block; margin-top:.15rem; font-size:.72rem; color:var(--text-3); }
-    .file-chip {
-      display:inline-flex; align-items:center; gap:5px;
-      background:var(--accent-lt); color:var(--accent); border:1px solid #C7D2FE;
-      border-radius:20px; padding:3px 10px; font-size:.75rem; font-weight:500; margin-top:.5rem;
-    }
-    .file-chip button { background:none; border:none; color:var(--accent); cursor:pointer; opacity:.6; font-size:.85rem; padding:0; }
-    .file-chip button:hover { opacity:1; }
+/* Upload zone */
+.upload-zone{border:1.5px dashed var(--border);border-radius:var(--r);padding:1.1rem;background:var(--surface);cursor:pointer;text-align:center;transition:border-color .15s,background .15s;}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent);background:var(--accent-lt);}
+.upload-zone input{display:none;}
+.uz-icon{width:26px;height:26px;margin:0 auto .45rem;color:var(--text-3);}
+.uz-text{font-size:.8rem;color:var(--text-2);}
+.uz-text strong{color:var(--accent);}
+.uz-text small{display:block;margin-top:.12rem;font-size:.71rem;color:var(--text-3);}
+.file-chip{display:inline-flex;align-items:center;gap:5px;background:var(--accent-lt);color:var(--accent);border:1px solid #C7D2FE;border-radius:20px;padding:3px 10px;font-size:.74rem;font-weight:500;margin-top:.45rem;}
+.file-chip button{background:none;border:none;color:var(--accent);cursor:pointer;opacity:.6;font-size:.82rem;padding:0;}
+.file-chip button:hover{opacity:1;}
 
-    /* ── Inputs ── */
-    textarea,input[type=text],input[type=url] {
-      width:100%; font-family:'DM Sans',sans-serif; font-size:.875rem; color:var(--text);
-      background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r);
-      padding:.7rem .875rem; outline:none; resize:vertical; line-height:1.6;
-      transition:border-color .15s,box-shadow .15s;
-    }
-    textarea::placeholder,input::placeholder { color:var(--text-3); }
-    textarea:focus,input:focus { border-color:var(--border-focus); box-shadow:0 0 0 3px rgba(79,70,229,.1); }
-    textarea { min-height:200px; }
+/* Inputs */
+textarea,input[type=text],input[type=url]{width:100%;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--text);background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:.65rem .875rem;outline:none;resize:vertical;line-height:1.6;transition:border-color .15s,box-shadow .15s;}
+textarea::placeholder,input::placeholder{color:var(--text-3);}
+textarea:focus,input:focus{border-color:var(--border-focus);box-shadow:0 0 0 3px rgba(79,70,229,.1);}
+textarea{min-height:180px;}
 
-    /* ── Divider ── */
-    .divider { border:none; border-top:1px solid var(--border); margin:1.75rem 0; }
+/* LinkedIn URL rows */
+.url-rows{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.6rem;}
+.url-row{display:flex;align-items:center;gap:.5rem;}
+.url-row-num{font-size:.75rem;font-weight:600;color:var(--text-3);min-width:18px;}
+.url-row input{flex:1;min-height:unset;resize:none;padding:.5rem .75rem;font-size:.83rem;}
+.url-row-del{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:1rem;padding:0 4px;transition:color .12s;}
+.url-row-del:hover{color:var(--red);}
+.add-row-btn{display:inline-flex;align-items:center;gap:5px;font-size:.79rem;font-weight:500;color:var(--accent);background:none;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:.4rem .8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .12s,border-color .12s;}
+.add-row-btn:hover{background:var(--accent-lt);border-color:#C7D2FE;}
 
-    /* ── Buttons ── */
-    .btn-primary {
-      width:100%; background:var(--text); color:#fff; border:none; border-radius:var(--r);
-      padding:.8rem 1.5rem; font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:600;
-      cursor:pointer; letter-spacing:.01em; transition:background .15s,transform .1s,box-shadow .15s;
-    }
-    .btn-primary:hover:not(:disabled) { background:#1f2937; transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,0,0,.18); }
-    .btn-primary:active:not(:disabled) { transform:translateY(0); }
-    .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
-    .btn-secondary {
-      background:var(--surface); color:var(--text-2); border:1.5px solid var(--border);
-      border-radius:var(--r-sm); padding:.5rem .9rem; font-family:'DM Sans',sans-serif;
-      font-size:.8rem; font-weight:500; cursor:pointer; transition:background .12s,border-color .12s;
-    }
-    .btn-secondary:hover { background:var(--bg); border-color:#C9C8C3; }
+/* Input mode toggle */
+.mode-toggle{display:flex;gap:.4rem;margin-bottom:1rem;}
+.mode-btn{padding:.4rem .85rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);color:var(--text-2);cursor:pointer;transition:all .15s;}
+.mode-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 
-    /* ── Progress ── */
-    .progress-wrap {
-      display:none; margin:1.25rem 0; background:var(--surface); border:1.5px solid var(--border);
-      border-radius:var(--r-lg); padding:1.1rem 1.3rem; box-shadow:var(--sh);
-    }
-    .progress-wrap.visible { display:block; }
-    .prog-header { display:flex; align-items:center; gap:8px; margin-bottom:.875rem; }
-    .spinner { width:13px; height:13px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .prog-title { font-size:.8rem; font-weight:600; }
-    .prog-stages { display:flex; flex-direction:column; gap:.45rem; }
-    .stage { display:flex; align-items:center; gap:9px; font-size:.78rem; color:var(--text-3); transition:color .3s; }
-    .stage.active { color:var(--text); }
-    .stage.done   { color:var(--green); }
-    .stage-dot { width:7px; height:7px; border-radius:50%; border:1.5px solid var(--border); background:transparent; flex-shrink:0; transition:background .3s,border-color .3s; }
-    .stage.active .stage-dot { border-color:var(--accent); background:var(--accent); box-shadow:0 0 0 3px rgba(79,70,229,.15); }
-    .stage.done   .stage-dot { border-color:var(--green); background:var(--green); }
+/* Divider */
+.divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
 
-    /* ── Validation ── */
-    .val-box { display:none; background:var(--red-lt); border:1.5px solid var(--red-bd); border-radius:var(--r); padding:.8rem 1rem; margin-bottom:1.1rem; }
-    .val-box.visible { display:block; }
-    .val-title { font-size:.8rem; font-weight:600; color:var(--red); margin-bottom:.3rem; }
-    .val-list { list-style:none; font-size:.78rem; color:#B91C1C; line-height:1.7; }
-    .val-list li::before { content:"→ "; font-weight:600; }
+/* Buttons */
+.btn-primary{width:100%;background:var(--text);color:#fff;border:none;border-radius:var(--r);padding:.78rem 1.5rem;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;letter-spacing:.01em;transition:background .15s,transform .1s,box-shadow .15s;}
+.btn-primary:hover:not(:disabled){background:#1f2937;transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.18);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-secondary{background:var(--surface);color:var(--text-2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:.45rem .85rem;font-family:'DM Sans',sans-serif;font-size:.79rem;font-weight:500;cursor:pointer;transition:background .12s,border-color .12s;}
+.btn-secondary:hover{background:var(--bg);border-color:#C9C8C3;}
+.btn-linkedin{display:inline-flex;align-items:center;gap:5px;background:var(--surface);color:var(--text-2);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:.45rem .85rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .12s;}
+.btn-linkedin:hover{background:var(--bg);border-color:#C9C8C3;}
+.btn-email{display:inline-flex;align-items:center;gap:5px;background:var(--blue);color:#fff;border:none;border-radius:var(--r-sm);padding:.45rem .85rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:background .12s;}
+.btn-email:hover{background:#1E40AF;}
 
-    /* ── Out cards ── */
-    .out-section { display:none; }
-    .out-section.visible { display:block; }
-    .out-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
-    .out-title { font-size:1rem; font-weight:700; letter-spacing:-.01em; }
-    .badge { display:inline-flex; align-items:center; gap:4px; border-radius:20px; padding:3px 10px; font-size:.73rem; font-weight:600; }
-    .badge-green { background:var(--green-lt); color:var(--green); border:1px solid var(--green-bd); }
-    .badge-amber { background:var(--amber-lt); color:var(--amber); border:1px solid var(--amber-bd); }
-    .badge-accent { background:var(--accent-lt); color:var(--accent); border:1px solid #C7D2FE; }
-    .out-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-lg); overflow:hidden; margin-bottom:.875rem; box-shadow:var(--sh); }
-    .out-card-hd { display:flex; align-items:center; justify-content:space-between; padding:.6rem 1rem; border-bottom:1px solid var(--border); background:var(--bg); }
-    .out-card-lbl { font-size:.69rem; font-weight:700; color:var(--text-3); letter-spacing:.08em; text-transform:uppercase; }
-    .copy-btn { font-size:.71rem; font-weight:500; color:var(--text-2); background:none; border:1px solid var(--border); border-radius:var(--r-sm); padding:3px 8px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background .12s; }
-    .copy-btn:hover { background:var(--bg); color:var(--text); }
-    .copy-btn.copied { color:var(--green); border-color:var(--green-bd); }
-    .out-card-body { padding:.9rem 1.1rem; }
-    .subject-text { font-size:.975rem; font-weight:600; line-height:1.4; }
-    .message-text { font-family:'DM Mono',monospace; font-size:.81rem; color:var(--text); line-height:1.9; white-space:pre-wrap; }
+/* Progress */
+.progress-wrap{display:none;margin:1.1rem 0;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:1rem 1.25rem;box-shadow:var(--sh);}
+.progress-wrap.visible{display:block;}
+.prog-header{display:flex;align-items:center;gap:7px;margin-bottom:.75rem;}
+.spinner{width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.prog-title{font-size:.79rem;font-weight:600;}
+.prog-stages{display:flex;flex-direction:column;gap:.4rem;}
+.stage{display:flex;align-items:center;gap:8px;font-size:.77rem;color:var(--text-3);transition:color .3s;}
+.stage.active{color:var(--text);}
+.stage.done{color:var(--green);}
+.stage-dot{width:6px;height:6px;border-radius:50%;border:1.5px solid var(--border);background:transparent;flex-shrink:0;transition:all .3s;}
+.stage.active .stage-dot{border-color:var(--accent);background:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.15);}
+.stage.done .stage-dot{border-color:var(--green);background:var(--green);}
 
-    /* ── Audit trail ── */
-    .audit-toggle { font-size:.78rem; font-weight:500; color:var(--text-2); background:none; border:1.5px solid var(--border); border-radius:var(--r-sm); padding:5px 10px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background .12s,border-color .12s,color .12s; }
-    .audit-toggle:hover,.audit-toggle.open { background:var(--accent-lt); border-color:#C7D2FE; color:var(--accent); }
-    .audit-panel { display:none; margin-top:.875rem; }
-    .audit-panel.open { display:block; }
-    .audit-sec { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:.8rem 1rem; margin-bottom:.55rem; box-shadow:var(--sh); }
-    .audit-lbl { font-size:.67rem; font-weight:700; color:var(--text-3); letter-spacing:.09em; text-transform:uppercase; margin-bottom:.4rem; }
-    .audit-txt { font-size:.84rem; color:var(--text-2); line-height:1.7; }
-    .ctx-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:3px; }
-    .ctx-tag { background:var(--accent-lt); color:var(--accent); border:1px solid #C7D2FE; border-radius:20px; padding:2px 9px; font-size:.73rem; font-weight:500; }
-    .proof-item { display:flex; gap:7px; font-size:.82rem; color:#166534; line-height:1.6; background:var(--green-lt); border-left:3px solid var(--green); border-radius:0 var(--r-sm) var(--r-sm) 0; padding:.45rem .7rem; margin-bottom:.35rem; }
-    .proof-check { color:var(--green); font-weight:700; flex-shrink:0; }
+/* Validation */
+.val-box{display:none;background:var(--red-lt);border:1.5px solid var(--red-bd);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:1rem;}
+.val-box.visible{display:block;}
+.val-title{font-size:.79rem;font-weight:600;color:var(--red);margin-bottom:.25rem;}
+.val-list{list-style:none;font-size:.77rem;color:#B91C1C;line-height:1.7;}
+.val-list li::before{content:"→ ";font-weight:600;}
 
-    /* ── Action row ── */
-    .action-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.25rem; }
+/* ── W1 Output ── */
+.out-section{display:none;}
+.out-section.visible{display:block;}
+.out-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem;}
+.out-title{font-size:.98rem;font-weight:700;letter-spacing:-.01em;}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:.72rem;font-weight:600;}
+.badge-green{background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);}
+.badge-amber{background:var(--amber-lt);color:var(--amber-tx);border:1px solid var(--amber-bd);}
+.badge-blue{background:var(--blue-lt);color:var(--blue);border:1px solid var(--blue-bd);}
+.badge-red{background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd);}
+.out-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:.875rem;box-shadow:var(--sh);}
+.out-card-hd{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1rem;border-bottom:1px solid var(--border);background:var(--bg);}
+.out-card-lbl{font-size:.68rem;font-weight:700;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;}
+.copy-btn{font-size:.7rem;font-weight:500;color:var(--text-2);background:none;border:1px solid var(--border);border-radius:var(--r-sm);padding:2px 7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .12s;}
+.copy-btn:hover{background:var(--bg);color:var(--text);}
+.copy-btn.copied{color:var(--green);border-color:var(--green-bd);}
+.out-card-body{padding:.875rem 1.1rem;}
+.subject-text{font-size:.95rem;font-weight:600;line-height:1.4;}
+.message-text{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--text);line-height:1.9;white-space:pre-wrap;}
+.audit-toggle{font-size:.77rem;font-weight:500;color:var(--text-2);background:none;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:4px 9px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;}
+.audit-toggle:hover,.audit-toggle.open{background:var(--accent-lt);border-color:#C7D2FE;color:var(--accent);}
+.audit-panel{display:none;margin-top:.875rem;}
+.audit-panel.open{display:block;}
+.audit-sec{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.5rem;box-shadow:var(--sh);}
+.audit-lbl{font-size:.66rem;font-weight:700;color:var(--text-3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:.35rem;}
+.audit-txt{font-size:.83rem;color:var(--text-2);line-height:1.7;}
+.ctx-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px;}
+.ctx-tag{background:var(--accent-lt);color:var(--accent);border:1px solid #C7D2FE;border-radius:20px;padding:2px 9px;font-size:.72rem;font-weight:500;}
+.proof-item{display:flex;gap:6px;font-size:.81rem;color:#166534;line-height:1.6;background:var(--green-lt);border-left:3px solid var(--green);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:.4rem .65rem;margin-bottom:.32rem;}
+.action-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.25rem;}
 
-    /* ── Human review ── */
-    .hr-card { background:var(--amber-lt); border:1.5px solid var(--amber-bd); border-radius:var(--r-lg); padding:1.4rem 1.5rem; margin-bottom:.875rem; }
-    .hr-title { font-size:.92rem; font-weight:700; color:var(--amber-tx); margin-bottom:.45rem; }
-    .hr-desc  { font-size:.84rem; color:#78350F; line-height:1.7; margin-bottom:.8rem; }
-    .hr-mono  { background:#FEF3C7; border-radius:var(--r-sm); padding:.55rem .85rem; font-family:'DM Mono',monospace; font-size:.77rem; color:var(--amber-tx); margin-bottom:.9rem; }
-    .hr-sec   { font-size:.73rem; font-weight:700; color:var(--amber-tx); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
-    .hr-list  { list-style:none; font-size:.81rem; color:#78350F; line-height:1.85; margin-bottom:.9rem; }
-    .hr-list li::before { content:"• "; font-weight:700; }
-    .hr-action { list-style:none; font-size:.81rem; color:#78350F; line-height:1.85; padding-top:.8rem; border-top:1px solid var(--amber-bd); }
-    .hr-action li::before { content:"→ "; font-weight:600; }
+/* Human review */
+.hr-card{background:var(--amber-lt);border:1.5px solid var(--amber-bd);border-radius:var(--r-lg);padding:1.35rem 1.5rem;margin-bottom:.875rem;}
+.hr-title{font-size:.9rem;font-weight:700;color:var(--amber-tx);margin-bottom:.4rem;}
+.hr-desc{font-size:.83rem;color:#78350F;line-height:1.7;margin-bottom:.75rem;}
+.hr-mono{background:#FEF3C7;border-radius:var(--r-sm);padding:.5rem .8rem;font-family:'DM Mono',monospace;font-size:.76rem;color:var(--amber-tx);margin-bottom:.875rem;}
+.hr-sec{font-size:.71rem;font-weight:700;color:var(--amber-tx);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;}
+.hr-list{list-style:none;font-size:.8rem;color:#78350F;line-height:1.85;margin-bottom:.875rem;}
+.hr-list li::before{content:"• ";font-weight:700;}
+.hr-action{list-style:none;font-size:.8rem;color:#78350F;line-height:1.85;padding-top:.75rem;border-top:1px solid var(--amber-bd);}
+.hr-action li::before{content:"→ ";font-weight:600;}
 
-    /* ── Error ── */
-    .err-section { display:none; }
-    .err-section.visible { display:block; }
-    .err-card { background:var(--red-lt); border:1.5px solid var(--red-bd); border-radius:var(--r); padding:.9rem 1rem; margin-bottom:.875rem; }
-    .err-title { font-size:.83rem; font-weight:700; color:var(--red); margin-bottom:.25rem; }
-    .err-body  { font-family:'DM Mono',monospace; font-size:.76rem; color:#B91C1C; line-height:1.6; }
+/* Error */
+.err-section{display:none;}
+.err-section.visible{display:block;}
+.err-card{background:var(--red-lt);border:1.5px solid var(--red-bd);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.875rem;}
+.err-title{font-size:.82rem;font-weight:700;color:var(--red);margin-bottom:.22rem;}
+.err-body{font-family:'DM Mono',monospace;font-size:.75rem;color:#B91C1C;line-height:1.6;}
 
-    /* ── Workflow 2 results ── */
-    .summary-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:.6rem; margin-bottom:1.5rem; }
-    .stat-chip { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r); padding:.7rem .875rem; box-shadow:var(--sh); }
-    .stat-val  { font-size:1.3rem; font-weight:700; color:var(--text); line-height:1; }
-    .stat-lbl  { font-size:.7rem; color:var(--text-3); margin-top:.2rem; font-weight:500; }
-    .prospect-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--r-lg); overflow:hidden; margin-bottom:1rem; box-shadow:var(--sh); }
-    .prospect-hd { padding:.8rem 1.1rem; background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:.5rem; flex-wrap:wrap; }
-    .prospect-name { font-size:.9rem; font-weight:700; }
-    .prospect-meta { font-size:.75rem; color:var(--text-2); margin-top:.1rem; }
-    .prospect-body { padding:1rem 1.1rem; }
-    .score-row { display:flex; align-items:center; gap:.6rem; margin-bottom:.75rem; flex-wrap:wrap; }
-    .score-pill { display:inline-flex; align-items:center; gap:4px; border-radius:20px; padding:3px 9px; font-size:.73rem; font-weight:600; border:1px solid; }
-    .score-pill.prime    { background:#F0FDF4; color:#166534; border-color:#BBF7D0; }
-    .score-pill.strong   { background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE; }
-    .score-pill.moderate { background:#FFFBEB; color:#92400E; border-color:#FCD34D; }
-    .score-pill.weak,.score-pill.skip { background:#FEF2F2; color:#991B1B; border-color:#FECACA; }
-    .subscore-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.4rem; margin-bottom:.75rem; }
-    .subscore-item { background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); padding:.4rem .6rem; }
-    .subscore-lbl { font-size:.67rem; color:var(--text-3); text-transform:uppercase; letter-spacing:.05em; }
-    .subscore-val { font-size:.85rem; font-weight:600; color:var(--text); }
-    .draft-section { margin-top:.75rem; border-top:1px solid var(--border); padding-top:.75rem; }
-    .draft-label  { font-size:.7rem; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem; }
-    .channel-badge { display:inline-flex; align-items:center; gap:4px; border-radius:20px; padding:2px 8px; font-size:.7rem; font-weight:600; background:var(--bg); color:var(--text-2); border:1px solid var(--border); margin-bottom:.4rem; }
-    .draft-body { font-family:'DM Mono',monospace; font-size:.79rem; color:var(--text); line-height:1.85; white-space:pre-wrap; }
-    .draft-subject { font-size:.85rem; font-weight:600; color:var(--text); margin-bottom:.4rem; }
-    .judge-row { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.6rem; }
-    .judge-chip { font-size:.68rem; color:var(--text-2); background:var(--bg); border:1px solid var(--border); border-radius:var(--r-sm); padding:2px 7px; }
-    .section-header { font-size:.82rem; font-weight:700; color:var(--text); margin:1.25rem 0 .75rem; display:flex; align-items:center; gap:.5rem; }
-    .failed-list { font-size:.8rem; color:var(--text-2); line-height:1.8; }
-    .failed-list li { padding:.2rem 0; }
+/* ══════════════════════════════════════
+   WORKFLOW 2 — Prospect cards
+═══════════════════════════════════════ */
 
-    /* ── Toast ── */
-    #toast { position:fixed; bottom:1.5rem; right:1.5rem; background:var(--text); color:#fff; font-size:.8rem; font-weight:500; padding:.55rem 1rem; border-radius:var(--r); opacity:0; transform:translateY(8px); transition:opacity .2s,transform .2s; pointer-events:none; z-index:999; font-family:'DM Sans',sans-serif; }
-    #toast.show { opacity:1; transform:translateY(0); }
+/* Summary stats row */
+.stats-row{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.25rem;padding:.75rem 1rem;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);}
+.stat-item{display:flex;align-items:baseline;gap:.3rem;}
+.stat-num{font-size:1.25rem;font-weight:700;color:var(--text);line-height:1;}
+.stat-lbl{font-size:.73rem;color:var(--text-2);}
 
-    @media(max-width:600px){ h1{font-size:1.35rem;} body{padding:0 .75rem 4rem;} .site-header{padding:2rem 0 1.5rem;} .action-row{flex-direction:column;} }
-    @media(prefers-reduced-motion:reduce){ .spinner{animation:none;} *{transition:none!important;} }
-  </style>
+/* Band legend */
+.band-legend{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;}
+.band-dot{display:inline-flex;align-items:center;gap:5px;font-size:.73rem;color:var(--text-2);}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot-prime{background:#16A34A;}
+.dot-strong{background:#2563EB;}
+.dot-moderate{background:#D97706;}
+.dot-weak{background:#9B9B99;}
+.dot-skip{background:#DC2626;}
+
+/* Section header */
+.section-hdr{font-size:.8rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.5rem;margin:1.5rem 0 .875rem;}
+
+/* Prospect card */
+.pcard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:1rem;box-shadow:var(--sh);}
+.pcard-hd{display:flex;align-items:flex-start;justify-content:space-between;padding:.875rem 1.1rem .6rem;gap:.75rem;}
+.pcard-rank{font-size:.72rem;font-weight:700;color:var(--text-3);min-width:24px;}
+.pcard-score{font-size:2rem;font-weight:700;line-height:1;margin-bottom:.1rem;}
+.score-prime{color:#16A34A;}
+.score-strong{color:#2563EB;}
+.score-moderate{color:#D97706;}
+.score-weak,.score-skip{color:#9B9B99;}
+.score-lbl{font-size:.65rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;}
+.pcard-name{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.4rem;}
+.pcard-pills{display:flex;flex-wrap:wrap;gap:.3rem;}
+.pill{display:inline-flex;align-items:center;border-radius:20px;padding:2px 9px;font-size:.7rem;font-weight:600;border:1.5px solid;}
+.pill-prime{background:#F0FDF4;color:#166534;border-color:#86EFAC;}
+.pill-strong{background:#DBEAFE;color:#1E40AF;border-color:#93C5FD;}
+.pill-moderate{background:#FEF3C7;color:#92400E;border-color:#FCD34D;}
+.pill-weak{background:#F3F4F6;color:#6B7280;border-color:#D1D5DB;}
+.pill-skip{background:#FEF2F2;color:#991B1B;border-color:#FCA5A5;}
+.pill-decision{background:#F8FAFC;color:#334155;border-color:#CBD5E1;}
+.pill-insider{background:#ECFDF5;color:#065F46;border-color:#6EE7B7;}
+.pill-agency{background:#EFF6FF;color:#1E40AF;border-color:#BFDBFE;}
+.pill-conf{background:#F9FAFB;color:#6B7280;border-color:#E5E7EB;}
+
+/* Subscore bars */
+.subscores{padding:.65rem 1.1rem .75rem;border-top:1px solid var(--border);}
+.subscore-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem 2rem;}
+@media(max-width:480px){.subscore-grid{grid-template-columns:1fr;}}
+.subscore-row{display:flex;align-items:center;gap:.6rem;}
+.subscore-name{font-size:.72rem;color:var(--text-2);min-width:68px;flex-shrink:0;}
+.subscore-bar-wrap{flex:1;height:6px;background:#F3F4F6;border-radius:3px;overflow:hidden;}
+.subscore-bar{height:100%;border-radius:3px;transition:width .4s ease;}
+.bar-prime{background:#16A34A;}
+.bar-strong{background:#2563EB;}
+.bar-moderate{background:#D97706;}
+.bar-weak{background:#9B9B99;}
+.subscore-val{font-size:.72rem;font-weight:600;color:var(--text);min-width:22px;text-align:right;}
+
+/* Rationale + fields */
+.pcard-body{padding:.75rem 1.1rem 0;}
+.rationale{font-size:.835rem;color:var(--text);line-height:1.75;margin-bottom:.875rem;}
+.detail-row{display:grid;grid-template-columns:80px 1fr;gap:.3rem .75rem;margin-bottom:.35rem;align-items:start;}
+.detail-lbl{font-size:.66rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;padding-top:.15rem;}
+.detail-val{font-size:.81rem;color:var(--text-2);line-height:1.6;}
+.hooks-list{list-style:none;}
+.hooks-list li{font-size:.81rem;color:var(--text-2);line-height:1.6;padding:.1rem 0;}
+.hooks-list li::before{content:"· ";color:var(--text-3);}
+.gaps-text{font-size:.79rem;color:var(--amber);line-height:1.6;}
+
+/* Draft section inside card */
+.draft-section{border-top:1px solid var(--border);margin-top:.75rem;padding:.875rem 1.1rem 1rem;}
+.draft-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+.draft-lbl{font-size:.68rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;}
+.channel-tag{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:600;color:var(--text-2);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:2px 8px;}
+.draft-subject{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.4rem;}
+.draft-body{font-family:'DM Mono',monospace;font-size:.79rem;color:var(--text);line-height:1.85;white-space:pre-wrap;}
+.judge-grid{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.6rem;}
+.judge-chip{font-size:.67rem;color:var(--text-2);background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px 6px;}
+.router-flags{font-size:.74rem;color:var(--amber);margin-top:.4rem;}
+
+/* Draft button row */
+.pcard-actions{display:flex;align-items:center;gap:.5rem;padding:.75rem 1.1rem;border-top:1px solid var(--border);flex-wrap:wrap;}
+
+/* Failed scrapes */
+.failed-list{list-style:none;font-size:.8rem;color:var(--text-2);line-height:1.8;}
+.failed-list li{padding:.15rem 0;}
+.failed-list li::before{content:"↳ ";color:var(--text-3);}
+
+/* Toast */
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--text);color:#fff;font-size:.79rem;font-weight:500;padding:.5rem .95rem;border-radius:var(--r);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:999;font-family:'DM Sans',sans-serif;}
+#toast.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:600px){h1{font-size:1.3rem;}body{padding:0 .75rem 4rem;}.site-header{padding:1.75rem 0 1.25rem;}.pcard-hd{flex-direction:column;}.subscore-grid{grid-template-columns:1fr;}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none;}*{transition:none!important;}}
+</style>
 </head>
 <body>
 <div class="wrap">
 
-  <!-- Header -->
-  <header class="site-header">
-    <p class="eyebrow">Deterministic Outreach Suite</p>
-    <h1>LinkedIn Outreach Writer</h1>
-    <p class="header-sub">Two workflows — write a single targeted InMail, or rank and draft outreach for an entire prospect list.</p>
-  </header>
+<!-- Header -->
+<header class="site-header">
+  <p class="eyebrow">Deterministic Outreach Suite</p>
+  <h1>LinkedIn Outreach Writer</h1>
+  <p class="header-sub">Single targeted InMail, or rank and draft outreach for an entire prospect list — both powered by the same deterministic workflow.</p>
+</header>
 
-  <!-- Tab bar -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('w1',this)">Single Outreach</button>
-    <button class="tab-btn" onclick="switchTab('w2',this)">Prospect Ranking &amp; Writer</button>
+<!-- Tabs -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('w1',this)">Single Outreach</button>
+  <button class="tab-btn" onclick="switchTab('w2',this)">Prospect Ranking &amp; Writer</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     WORKFLOW 1 — Single outreach
+════════════════════════════════════════════ -->
+<div id="tab-w1" class="tab-pane active">
+  <form id="form-w1" novalidate>
+    <div class="field-group">
+      <label class="field-label">Résumé</label>
+      <p class="field-hint">PDF — achievements and metrics extracted automatically.</p>
+      <div class="upload-zone" id="uz1">
+        <input type="file" id="resume1" accept=".pdf"/>
+        <svg class="uz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+        <p class="uz-text"><strong onclick="document.getElementById('resume1').click()">Click to upload</strong> or drag and drop<small>PDF · max 10 MB</small></p>
+      </div>
+      <div id="chip1"></div>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="jd1">Job Description</label>
+      <p class="field-hint">Paste the full posting — requirements and context both matter.</p>
+      <textarea id="jd1" placeholder="Paste the complete job description here…"></textarea>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="li1">Prospect LinkedIn URL <span style="font-size:.72rem;font-weight:400;color:var(--text-3);margin-left:4px">optional</span></label>
+      <p class="field-hint">The recruiter or hiring manager you're reaching out to. If provided, their profile is scraped and used to personalise the message.</p>
+      <input type="url" id="li1" placeholder="https://www.linkedin.com/in/… (leave blank to skip)"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="prior1">Prior Conversation <span style="font-size:.72rem;font-weight:400;color:var(--text-3);margin-left:4px">optional</span></label>
+      <p class="field-hint">Paste any previous email thread or LinkedIn exchange. The workflow uses this to continue the conversation naturally.</p>
+      <textarea id="prior1" style="min-height:100px" placeholder="Paste a prior message thread here if you have one…"></textarea>
+    </div>
+    <div class="val-box" id="val1"><p class="val-title">Please fix the following:</p><ul class="val-list" id="val1-list"></ul></div>
+    <hr class="divider"/>
+    <button type="submit" class="btn-primary" id="btn1">Generate Outreach Message</button>
+  </form>
+
+  <div class="progress-wrap" id="prog1">
+    <div class="prog-header"><div class="spinner"></div><span class="prog-title">Generating your message…</span></div>
+    <div class="prog-stages" id="stages1">
+      <div class="stage"><div class="stage-dot"></div><span>Extracting résumé text and achievements</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Scraping prospect LinkedIn profile</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Parsing JD requirements and inferring pain points</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Matching résumé evidence to role requirements</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Writing executive InMail draft</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Humanising and finalising message</span></div>
+    </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════════
-       WORKFLOW 1 — Single outreach
-  ═══════════════════════════════════════════════════════ -->
-  <div id="tab-w1" class="tab-pane active">
+  <div class="err-section" id="err1">
+    <div class="err-card"><p class="err-title" id="err1-title"></p><p class="err-body" id="err1-body"></p></div>
+    <button class="btn-secondary" onclick="resetW1()">← Try again</button>
+  </div>
 
-    <form id="form-w1" novalidate>
+  <div class="out-section" id="hr1">
+    <div class="hr-card">
+      <p class="hr-title">⚠️ Sent for Human Review</p>
+      <p class="hr-desc">Your résumé and the job description did not have enough matching evidence to generate a message automatically.</p>
+      <div class="hr-mono" id="hr1-reason">Similarity below automatic approval threshold (0.7).</div>
+      <p class="hr-sec">What this means</p>
+      <ul class="hr-list">
+        <li>No résumé–JD match scored above the 0.7 cosine similarity threshold</li>
+        <li>This usually means the résumé and JD are in different industries or domains</li>
+      </ul>
+      <p class="hr-sec">What you can do</p>
+      <ul class="hr-action">
+        <li>Try a job description closer to your professional background</li>
+        <li>Ensure your résumé highlights specific, measurable achievements</li>
+        <li>Make sure the PDF is text-based, not a scanned image</li>
+      </ul>
+    </div>
+    <button class="btn-secondary" onclick="resetW1()">← Try again</button>
+  </div>
 
-      <!-- Resume -->
-      <div class="field-group">
-        <label class="field-label">Résumé</label>
-        <p class="field-hint">PDF only — achievements and metrics are extracted automatically.</p>
-        <div class="upload-zone" id="uz1">
-          <input type="file" id="resume1" accept=".pdf" />
-          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-          <p class="upload-text"><strong onclick="document.getElementById('resume1').click()">Click to upload</strong> or drag and drop<small>PDF · max 10 MB</small></p>
-        </div>
-        <div id="chip1"></div>
+  <div class="out-section" id="out1">
+    <div class="out-header">
+      <span class="out-title">Generated Outreach</span>
+      <span class="badge badge-green">✓ Ready to send</span>
+    </div>
+    <div class="out-card" id="subj1-card">
+      <div class="out-card-hd"><span class="out-card-lbl">Subject Line</span><button class="copy-btn" onclick="copyEl('subj1-body',this)">Copy</button></div>
+      <div class="out-card-body"><p class="subject-text" id="subj1-body"></p></div>
+    </div>
+    <div class="out-card">
+      <div class="out-card-hd"><span class="out-card-lbl">Message</span><button class="copy-btn" onclick="copyEl('msg1-body',this)">Copy</button></div>
+      <div class="out-card-body"><p class="message-text" id="msg1-body"></p></div>
+    </div>
+    <div class="action-row">
+      <button class="audit-toggle" id="a1-toggle" onclick="toggleAudit('a1-panel','a1-toggle')">🔍 Show Audit Trail</button>
+      <button class="btn-secondary" onclick="resetW1()">🔄 Generate Again</button>
+    </div>
+    <div class="audit-panel" id="a1-panel">
+      <div style="margin:.875rem 0 .55rem"><span style="font-size:.83rem;font-weight:700">Audit Trail</span><span style="font-size:.72rem;color:var(--text-3);margin-left:7px">How the message was constructed</span></div>
+      <div class="audit-sec" id="a1-hook-w"><p class="audit-lbl">Hook Used</p><p class="audit-txt" id="a1-hook"></p></div>
+      <div class="audit-sec" id="a1-pain-w"><p class="audit-lbl">Inferred Pain (from JD)</p><p class="audit-txt" id="a1-pain"></p></div>
+      <div class="audit-sec" id="a1-ctx-w"><p class="audit-lbl">LinkedIn Context Used</p><div class="ctx-tags" id="a1-ctx"></div></div>
+      <div class="audit-sec" id="a1-proof-w"><p class="audit-lbl">Résumé Evidence Used</p><div id="a1-proof"></div></div>
+    </div>
+  </div>
+</div><!-- /tab-w1 -->
+
+
+<!-- ═══════════════════════════════════════════
+     WORKFLOW 2 — Prospect Ranking + Writer
+════════════════════════════════════════════ -->
+<div id="tab-w2" class="tab-pane">
+  <form id="form-w2" novalidate>
+
+    <!-- Résumé -->
+    <div class="field-group">
+      <label class="field-label">Résumé</label>
+      <p class="field-hint">PDF — proof points are extracted and mapped to each prospect.</p>
+      <div class="upload-zone" id="uz2">
+        <input type="file" id="resume2" accept=".pdf"/>
+        <svg class="uz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+        <p class="uz-text"><strong onclick="document.getElementById('resume2').click()">Click to upload</strong> or drag and drop<small>PDF · max 10 MB</small></p>
       </div>
+      <div id="chip2"></div>
+    </div>
 
-      <!-- JD -->
+    <!-- JD + Company -->
+    <div class="row-2">
       <div class="field-group">
-        <label class="field-label" for="jd1">Job Description</label>
-        <p class="field-hint">Paste the full posting — requirements and responsibilities all matter.</p>
-        <textarea id="jd1" placeholder="Paste the complete job description here…"></textarea>
+        <label class="field-label" for="jd2">Job Description</label>
+        <p class="field-hint">The role you are applying for.</p>
+        <textarea id="jd2" style="min-height:130px" placeholder="Paste the job description here…"></textarea>
       </div>
-
-      <!-- LinkedIn URL -->
       <div class="field-group">
-        <label class="field-label" for="li1">Prospect LinkedIn URL</label>
-        <p class="field-hint">The recruiter or hiring manager you're reaching out to.</p>
-        <input type="url" id="li1" placeholder="https://www.linkedin.com/in/…" />
-      </div>
-
-      <div class="val-box" id="val1"><p class="val-title">Please fix the following:</p><ul class="val-list" id="val1-list"></ul></div>
-      <hr class="divider" />
-      <button type="submit" class="btn-primary" id="btn1">Generate Outreach Message</button>
-    </form>
-
-    <!-- Progress W1 -->
-    <div class="progress-wrap" id="prog1">
-      <div class="prog-header"><div class="spinner"></div><span class="prog-title">Generating your message…</span></div>
-      <div class="prog-stages" id="stages1">
-        <div class="stage"><div class="stage-dot"></div><span>Extracting résumé achievements</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Scraping LinkedIn profile</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Parsing JD requirements &amp; pain points</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Matching evidence via cosine similarity</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Writing executive InMail</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Humanizing message</span></div>
+        <label class="field-label" for="co2">Company Name</label>
+        <p class="field-hint">The hiring company.</p>
+        <input type="text" id="co2" placeholder="e.g. Acme Corp" style="height:52px;resize:none;min-height:unset;"/>
       </div>
     </div>
 
-    <!-- Error W1 -->
-    <div class="err-section" id="err1">
-      <div class="err-card"><p class="err-title" id="err1-title"></p><p class="err-body" id="err1-body"></p></div>
-      <button class="btn-secondary" onclick="resetW1()">← Try again</button>
-    </div>
-
-    <!-- Human review W1 -->
-    <div class="out-section" id="hr1">
-      <div class="hr-card">
-        <p class="hr-title">⚠️ Sent for Human Review</p>
-        <p class="hr-desc">Your résumé and the job description did not have enough matching evidence to generate a message automatically.</p>
-        <div class="hr-mono" id="hr1-reason">Similarity below automatic approval threshold (0.7).</div>
-        <p class="hr-sec">What this means</p>
-        <ul class="hr-list">
-          <li>No résumé–JD match scored above the 0.7 cosine similarity threshold</li>
-          <li>This usually means the résumé and JD are in different industries or domains</li>
-        </ul>
-        <p class="hr-sec">What you can do</p>
-        <ul class="hr-action">
-          <li>Try a job description closer to your professional background</li>
-          <li>Ensure your résumé highlights specific, measurable achievements</li>
-          <li>Make sure the PDF is text-based, not a scanned image</li>
-        </ul>
-      </div>
-      <button class="btn-secondary" onclick="resetW1()">← Try again</button>
-    </div>
-
-    <!-- Output W1 -->
-    <div class="out-section" id="out1">
-      <div class="out-header">
-        <span class="out-title">Generated Outreach</span>
-        <span class="badge badge-green">✓ Ready to send</span>
-      </div>
-      <div class="out-card" id="subj1-card">
-        <div class="out-card-hd"><span class="out-card-lbl">Subject Line</span><button class="copy-btn" onclick="copyEl('subj1-body',this)">Copy</button></div>
-        <div class="out-card-body"><p class="subject-text" id="subj1-body"></p></div>
-      </div>
-      <div class="out-card">
-        <div class="out-card-hd"><span class="out-card-lbl">Message</span><button class="copy-btn" onclick="copyEl('msg1-body',this)">Copy</button></div>
-        <div class="out-card-body"><p class="message-text" id="msg1-body"></p></div>
-      </div>
-      <div class="action-row">
-        <button class="audit-toggle" id="audit1-toggle" onclick="toggleAudit('audit1-panel','audit1-toggle')">🔍 Show Audit Trail</button>
-        <button class="btn-secondary" onclick="resetW1()">🔄 Generate Again</button>
-      </div>
-      <div class="audit-panel" id="audit1-panel">
-        <div style="margin:.9rem 0 .6rem"><span style="font-size:.84rem;font-weight:700">Audit Trail</span><span style="font-size:.73rem;color:var(--text-3);margin-left:7px">How the message was constructed</span></div>
-        <div class="audit-sec" id="a1-hook-wrap"><p class="audit-lbl">Hook Used</p><p class="audit-txt" id="a1-hook"></p></div>
-        <div class="audit-sec" id="a1-pain-wrap"><p class="audit-lbl">Inferred Pain (from JD)</p><p class="audit-txt" id="a1-pain"></p></div>
-        <div class="audit-sec" id="a1-ctx-wrap"><p class="audit-lbl">LinkedIn Context Used</p><div class="ctx-tags" id="a1-ctx"></div></div>
-        <div class="audit-sec" id="a1-proof-wrap"><p class="audit-lbl">Résumé Evidence Used</p><div id="a1-proof"></div></div>
-      </div>
-    </div>
-  </div><!-- /tab-w1 -->
-
-
-  <!-- ══════════════════════════════════════════════════════
-       WORKFLOW 2 — Prospect ranking + writer
-  ═══════════════════════════════════════════════════════ -->
-  <div id="tab-w2" class="tab-pane">
-
-    <form id="form-w2" novalidate>
-
-      <!-- Resume -->
-      <div class="field-group">
-        <label class="field-label">Résumé</label>
-        <p class="field-hint">PDF — the backend extracts your proof points and maps them to each prospect.</p>
-        <div class="upload-zone" id="uz2">
-          <input type="file" id="resume2" accept=".pdf" />
-          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-          <p class="upload-text"><strong onclick="document.getElementById('resume2').click()">Click to upload</strong> or drag and drop<small>PDF · max 10 MB</small></p>
-        </div>
-        <div id="chip2"></div>
+    <!-- Prospect input: CSV or manual URLs -->
+    <div class="field-group">
+      <label class="field-label">Prospects</label>
+      <p class="field-hint">Upload a CSV of LinkedIn URLs, or add them manually one per row.</p>
+      <div class="mode-toggle">
+        <button type="button" class="mode-btn active" id="mode-csv-btn" onclick="setMode('csv')">Upload CSV</button>
+        <button type="button" class="mode-btn" id="mode-url-btn" onclick="setMode('url')">Add URLs manually</button>
       </div>
 
-      <!-- CSV -->
-      <div class="field-group">
-        <label class="field-label">Prospect List (CSV)</label>
-        <p class="field-hint">CSV with a column of LinkedIn profile URLs — one per row.</p>
+      <!-- CSV mode -->
+      <div id="mode-csv">
         <div class="upload-zone" id="uz3">
-          <input type="file" id="csv2" accept=".csv,text/csv" />
-          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0c0 .621.504 1.125 1.125 1.125h2.25"/></svg>
-          <p class="upload-text"><strong onclick="document.getElementById('csv2').click()">Click to upload</strong> or drag and drop<small>CSV · LinkedIn URLs</small></p>
+          <input type="file" id="csv2" accept=".csv,text/csv"/>
+          <svg class="uz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0c0 .621.504 1.125 1.125 1.125h2.25"/></svg>
+          <p class="uz-text"><strong onclick="document.getElementById('csv2').click()">Click to upload</strong> or drag and drop<small>CSV with LinkedIn URLs</small></p>
         </div>
         <div id="chip3"></div>
       </div>
 
-      <!-- JD + Company -->
-      <div class="row-2">
-        <div class="field-group">
-          <label class="field-label" for="jd2">Job Description</label>
-          <p class="field-hint">The role you're applying for.</p>
-          <textarea id="jd2" style="min-height:140px" placeholder="Paste the job description here…"></textarea>
-        </div>
-        <div class="field-group">
-          <label class="field-label" for="company2">Company Name</label>
-          <p class="field-hint">The hiring company.</p>
-          <input type="text" id="company2" placeholder="e.g. Acme Corp" style="height:52px;min-height:unset;resize:none;" />
-        </div>
-      </div>
-
-      <div class="val-box" id="val2"><p class="val-title">Please fix the following:</p><ul class="val-list" id="val2-list"></ul></div>
-      <hr class="divider" />
-      <button type="submit" class="btn-primary" id="btn2">Rank Prospects &amp; Generate Drafts</button>
-    </form>
-
-    <!-- Progress W2 -->
-    <div class="progress-wrap" id="prog2">
-      <div class="prog-header"><div class="spinner"></div><span class="prog-title" id="prog2-title">Processing prospects…</span></div>
-      <div class="prog-stages" id="stages2">
-        <div class="stage"><div class="stage-dot"></div><span>Extracting résumé proof points</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Scraping LinkedIn profiles</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Analysing &amp; scoring each prospect</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Selecting top candidates per bucket</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Writing &amp; linting outreach drafts</span></div>
-        <div class="stage"><div class="stage-dot"></div><span>Judge review &amp; routing</span></div>
+      <!-- Manual URL mode -->
+      <div id="mode-url" style="display:none">
+        <div class="url-rows" id="url-rows"></div>
+        <button type="button" class="add-row-btn" onclick="addUrlRow()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add row
+        </button>
       </div>
     </div>
 
-    <!-- Error W2 -->
-    <div class="err-section" id="err2">
-      <div class="err-card"><p class="err-title" id="err2-title"></p><p class="err-body" id="err2-body"></p></div>
-      <button class="btn-secondary" onclick="resetW2()">← Try again</button>
+    <div class="val-box" id="val2"><p class="val-title">Please fix the following:</p><ul class="val-list" id="val2-list"></ul></div>
+    <hr class="divider"/>
+    <button type="submit" class="btn-primary" id="btn2">Rank Prospects &amp; Generate Drafts</button>
+  </form>
+
+  <div class="progress-wrap" id="prog2">
+    <div class="prog-header"><div class="spinner"></div><span class="prog-title">Processing prospects…</span></div>
+    <div class="prog-stages" id="stages2">
+      <div class="stage"><div class="stage-dot"></div><span>Extracting résumé proof points</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Scraping LinkedIn profiles</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Analysing &amp; scoring each prospect (Stage 0 + Stage 1)</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Ranking &amp; selecting top prospects per bucket</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Writing &amp; linting outreach drafts</span></div>
+      <div class="stage"><div class="stage-dot"></div><span>Judge review &amp; routing</span></div>
+    </div>
+  </div>
+
+  <div class="err-section" id="err2">
+    <div class="err-card"><p class="err-title" id="err2-title"></p><p class="err-body" id="err2-body"></p></div>
+    <button class="btn-secondary" onclick="resetW2()">← Try again</button>
+  </div>
+
+  <!-- W2 Results -->
+  <div class="out-section" id="out2">
+    <div class="out-header">
+      <span class="out-title">Results</span>
+      <button class="btn-secondary" onclick="resetW2()">🔄 Run Again</button>
     </div>
 
-    <!-- Output W2 -->
-    <div class="out-section" id="out2">
-      <div class="out-header">
-        <span class="out-title">Results</span>
-        <button class="btn-secondary" onclick="resetW2()">🔄 Run Again</button>
-      </div>
+    <!-- Stats row -->
+    <div class="stats-row" id="w2-stats"></div>
 
-      <!-- Summary stats -->
-      <div class="summary-bar" id="w2-summary"></div>
-
-      <!-- Approved drafts -->
-      <div id="w2-approved-wrap">
-        <div class="section-header"><span class="badge badge-green">✓ Approved</span><span id="w2-approved-count"></span></div>
-        <div id="w2-approved"></div>
-      </div>
-
-      <!-- Human review drafts -->
-      <div id="w2-review-wrap">
-        <div class="section-header"><span class="badge badge-amber">⚠ Human Review</span><span id="w2-review-count"></span></div>
-        <div id="w2-review"></div>
-      </div>
-
-      <!-- Failed scrapes -->
-      <div id="w2-failed-wrap" style="display:none">
-        <div class="section-header"><span class="badge" style="background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd)">✕ Failed Scrapes</span></div>
-        <ul class="failed-list" id="w2-failed"></ul>
-      </div>
+    <!-- Band legend -->
+    <div class="band-legend">
+      <span class="band-dot"><span class="dot dot-prime"></span>Prime</span>
+      <span class="band-dot"><span class="dot dot-strong"></span>Strong</span>
+      <span class="band-dot"><span class="dot dot-moderate"></span>Moderate</span>
+      <span class="band-dot"><span class="dot dot-weak"></span>Weak</span>
+      <span class="band-dot"><span class="dot dot-skip"></span>Skip</span>
     </div>
-  </div><!-- /tab-w2 -->
+
+    <!-- Approved -->
+    <div id="w2-approved-wrap">
+      <div class="section-hdr"><span class="badge badge-green">✓ Approved</span><span id="w2-approved-count" style="font-size:.8rem;color:var(--text-2);font-weight:400"></span></div>
+      <div id="w2-approved"></div>
+    </div>
+
+    <!-- Human review -->
+    <div id="w2-review-wrap">
+      <div class="section-hdr"><span class="badge badge-amber">⚠ Human Review</span><span id="w2-review-count" style="font-size:.8rem;color:var(--text-2);font-weight:400"></span></div>
+      <div id="w2-review"></div>
+    </div>
+
+    <!-- Failed -->
+    <div id="w2-failed-wrap" style="display:none">
+      <div class="section-hdr"><span class="badge badge-red">✕ Failed Scrapes</span></div>
+      <ul class="failed-list" id="w2-failed"></ul>
+    </div>
+  </div>
+</div><!-- /tab-w2 -->
 
 </div><!-- /wrap -->
-
 <div id="toast"></div>
 
 <script>
-// ── Webhook URLs ────────────────────────────────────────────────────────────
+// ── Webhook URLs ──────────────────────────────────────────────────────────
 const W1_URL = 'https://primary-production-37efc.up.railway.app/webhook/generate-message';
 const W2_URL = 'https://primary-production-37efc.up.railway.app/webhook/outreach-targeting';
 
-// ── Tab switching ───────────────────────────────────────────────────────────
+// ── Tab switching ─────────────────────────────────────────────────────────
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -471,368 +516,273 @@ function switchTab(id, btn) {
   btn.classList.add('active');
 }
 
-// ── File state ──────────────────────────────────────────────────────────────
+// ── Input mode toggle (CSV vs manual URLs) ────────────────────────────────
+let inputMode = 'csv';
+function setMode(mode) {
+  inputMode = mode;
+  document.getElementById('mode-csv').style.display = mode === 'csv' ? '' : 'none';
+  document.getElementById('mode-url').style.display = mode === 'url' ? '' : 'none';
+  document.getElementById('mode-csv-btn').classList.toggle('active', mode === 'csv');
+  document.getElementById('mode-url-btn').classList.toggle('active', mode === 'url');
+}
+
+// ── Manual URL rows ───────────────────────────────────────────────────────
+let urlRowCount = 0;
+function addUrlRow(value) {
+  urlRowCount++;
+  const id = 'url-row-' + urlRowCount;
+  const row = document.createElement('div');
+  row.className = 'url-row'; row.id = id;
+  row.innerHTML = `
+    <span class="url-row-num">${urlRowCount}</span>
+    <input type="url" placeholder="https://www.linkedin.com/in/…" value="${esc(value||'')}"/>
+    <button type="button" class="url-row-del" onclick="removeUrlRow('${id}')" title="Remove">✕</button>`;
+  document.getElementById('url-rows').appendChild(row);
+}
+function removeUrlRow(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  // Re-number
+  document.querySelectorAll('.url-row').forEach((r, i) => {
+    r.querySelector('.url-row-num').textContent = i + 1;
+  });
+}
+function getManualUrls() {
+  return Array.from(document.querySelectorAll('.url-row input'))
+    .map(i => i.value.trim()).filter(Boolean);
+}
+// Start with 2 rows
+addUrlRow(); addUrlRow();
+
+// ── File state ────────────────────────────────────────────────────────────
 const files = { resume1: null, resume2: null, csv2: null };
 
-function setupUpload(inputId, zoneId, chipId, stateKey, accept) {
+function setupUpload(inputId, zoneId, chipId, key, accept) {
   const inp  = document.getElementById(inputId);
   const zone = document.getElementById(zoneId);
   const chip = document.getElementById(chipId);
-
-  inp.addEventListener('change', e => handleFile(e.target.files[0], stateKey, chip, accept));
+  inp.addEventListener('change', e => handleFile(e.target.files[0], key, chip, accept));
   zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
   zone.addEventListener('drop', e => {
     e.preventDefault(); zone.classList.remove('drag-over');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], stateKey, chip, accept);
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], key, chip, accept);
   });
   zone.addEventListener('click', e => { if (e.target.tagName !== 'STRONG') inp.click(); });
 }
-
 function handleFile(file, key, chipEl, accept) {
   if (!file) return;
-  if (accept === 'pdf' && file.type !== 'application/pdf') { toast('Only PDF files are accepted.'); return; }
-  if (accept === 'csv' && !file.name.endsWith('.csv'))     { toast('Only CSV files are accepted.'); return; }
+  if (accept === 'pdf' && file.type !== 'application/pdf') { toast('Only PDF files accepted.'); return; }
+  if (accept === 'csv' && !file.name.endsWith('.csv'))     { toast('Only CSV files accepted.'); return; }
   files[key] = file;
   chipEl.innerHTML = `<div class="file-chip">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     ${esc(file.name)} · ${(file.size/1024).toFixed(1)} KB
-    <button onclick="clearFile('${key}','${chipEl.id}','${document.getElementById(key)?.id || key}')">✕</button>
+    <button onclick="clearFile('${key}','${chipEl.id}','${inputId}')">✕</button>
   </div>`;
 }
-
 function clearFile(key, chipId, inputId) {
   files[key] = null;
   document.getElementById(chipId).innerHTML = '';
   const inp = document.getElementById(inputId);
   if (inp) inp.value = '';
 }
-
 setupUpload('resume1','uz1','chip1','resume1','pdf');
 setupUpload('resume2','uz2','chip2','resume2','pdf');
 setupUpload('csv2','uz3','chip3','csv2','csv');
 
-// ── Progress helpers ─────────────────────────────────────────────────────────
-const DELAYS_W1 = [0, 4000, 10000, 18000, 28000, 38000];
-const DELAYS_W2 = [0, 5000, 15000, 35000, 55000, 80000];
-
-function startProgress(wrapperId, stageParentId, delays) {
-  const wrap = document.getElementById(wrapperId);
-  wrap.classList.add('visible');
-  const stages = document.querySelectorAll('#' + stageParentId + ' .stage');
+// ── Progress ──────────────────────────────────────────────────────────────
+const D1 = [0,4000,10000,18000,28000,38000];
+const D2 = [0,5000,16000,36000,58000,85000];
+function startProgress(wrapId, stageId, delays) {
+  document.getElementById(wrapId).classList.add('visible');
+  const stages = document.querySelectorAll('#' + stageId + ' .stage');
   stages.forEach(s => s.classList.remove('active','done'));
-  delays.forEach((delay, i) => {
-    setTimeout(() => {
-      stages.forEach((s, si) => {
-        if (si < i)  { s.classList.remove('active'); s.classList.add('done'); }
-        if (si === i){ s.classList.remove('done'); s.classList.add('active'); }
-      });
-    }, delay);
-  });
+  delays.forEach((d,i) => setTimeout(() => {
+    stages.forEach((s,si) => {
+      if (si < i)  { s.classList.remove('active'); s.classList.add('done'); }
+      if (si === i){ s.classList.remove('done'); s.classList.add('active'); }
+    });
+  }, d));
+}
+function stopProgress(wrapId, stageId) {
+  document.querySelectorAll('#'+stageId+' .stage').forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+  setTimeout(() => document.getElementById(wrapId).classList.remove('visible'), 400);
 }
 
-function stopProgress(wrapperId, stageParentId) {
-  document.querySelectorAll('#' + stageParentId + ' .stage').forEach(s => {
-    s.classList.remove('active'); s.classList.add('done');
-  });
-  setTimeout(() => document.getElementById(wrapperId).classList.remove('visible'), 400);
-}
-
-// ── Workflow 1 submit ────────────────────────────────────────────────────────
+// ── Workflow 1 ────────────────────────────────────────────────────────────
 document.getElementById('form-w1').addEventListener('submit', async e => {
-  e.preventDefault();
-  hideW1();
-
+  e.preventDefault(); hideW1();
   const errs = [];
-  if (!files.resume1)                                  errs.push('Upload your résumé (PDF).');
-  if (!document.getElementById('jd1').value.trim())    errs.push('Paste the job description.');
-  if (!document.getElementById('li1').value.trim())    errs.push('Enter the prospect\'s LinkedIn URL.');
+  if (!files.resume1)                                 errs.push('Upload your résumé (PDF).');
+  if (!document.getElementById('jd1').value.trim())   errs.push('Paste the job description.');
+  // LinkedIn URL is optional — no validation required
   if (errs.length) { showVal('val1','val1-list',errs); return; }
-
   const btn = document.getElementById('btn1');
   btn.disabled = true; btn.textContent = 'Generating…';
-  startProgress('prog1','stages1', DELAYS_W1);
-
+  startProgress('prog1','stages1',D1);
   try {
     const fd = new FormData();
     fd.append('resume', files.resume1, files.resume1.name);
+    // Exact field names the webhook reads from request.body
     fd.append('job_description', document.getElementById('jd1').value.trim());
-    fd.append('prospect_linkedin_url', document.getElementById('li1').value.trim());
-
+    const liUrl = document.getElementById('li1').value.trim();
+    if (liUrl) fd.append('prospect_linkedin_url', liUrl);
+    const prior = document.getElementById('prior1').value.trim();
+    if (prior) fd.append('prior_conversation', prior);
     const res = await fetch(W1_URL, { method:'POST', body:fd });
     stopProgress('prog1','stages1');
-
     if (res.status === 500) {
       let msg = 'Similarity below automatic approval threshold (0.7).';
-      try { const j = await res.json(); if (!j.message?.includes('No item to return')) { showErrW1('Backend error (500)', j.message||res.statusText); return; } } catch(_) { showErrW1('Backend error (500)', res.statusText); return; }
+      try { const j = await res.json(); if (!j.message?.includes('No item to return')) { showErr('err1','err1-title','err1-body','Backend error (500)', j.message||res.statusText); return; } } catch(_) { showErr('err1','err1-title','err1-body','Backend error (500)', res.statusText); return; }
       showHR1(msg); return;
     }
-    if (!res.ok) { showErrW1('Request failed — ' + res.status, (await res.text()).slice(0,400)); return; }
-
+    if (!res.ok) { showErr('err1','err1-title','err1-body','Request failed — '+res.status,(await res.text()).slice(0,400)); return; }
     let raw = await res.json();
     if (Array.isArray(raw)) raw = raw[0];
     if (raw.output) raw = raw.output;
-    if (raw.status === 'HUMAN_REVIEW') { showHR1(raw.reason || 'Similarity below automatic approval threshold (0.7).'); return; }
-
-    const subject = (raw.subject||'').trim();
-    const message = (raw.message||'').trim();
-    const audit   = raw.audit || {};
-    if (!message) { showErrW1('Empty response', 'The backend returned no message. Check your n8n execution logs.'); return; }
-    renderW1(subject, message, audit);
-
-  } catch(err) {
-    stopProgress('prog1','stages1');
-    showErrW1('Connection error', err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Generate Outreach Message';
-  }
+    if (raw.status === 'HUMAN_REVIEW') { showHR1(raw.reason||'Similarity below automatic approval threshold (0.7).'); return; }
+    const subj = (raw.subject||'').trim(), msg = (raw.message||'').trim(), audit = raw.audit||{};
+    if (!msg) { showErr('err1','err1-title','err1-body','Empty response','The backend returned no message.'); return; }
+    renderW1(subj, msg, audit);
+  } catch(err) { stopProgress('prog1','stages1'); showErr('err1','err1-title','err1-body','Connection error',err.message); }
+  finally { btn.disabled=false; btn.textContent='Generate Outreach Message'; }
 });
 
-function renderW1(subject, message, audit) {
+function renderW1(subj, msg, audit) {
   const sc = document.getElementById('subj1-card');
-  if (subject) { document.getElementById('subj1-body').textContent = subject; sc.style.display=''; }
-  else sc.style.display='none';
-  document.getElementById('msg1-body').textContent = message;
-
-  const hook  = audit.hook_used || '';
-  const pain  = audit.inferred_pain_used || '';
-  const ctx   = audit.business_context_used || [];
-  const proof = audit.proof_used || [];
-
-  setAuditText('a1-hook','a1-hook-wrap', hook);
-  setAuditText('a1-pain','a1-pain-wrap', pain);
-  setAuditTags('a1-ctx','a1-ctx-wrap', ctx);
-  setAuditProof('a1-proof','a1-proof-wrap', proof);
-
+  if (subj) { document.getElementById('subj1-body').textContent = subj; sc.style.display=''; } else sc.style.display='none';
+  document.getElementById('msg1-body').textContent = msg;
+  setAuditText('a1-hook','a1-hook-w', audit.hook_used||'');
+  setAuditText('a1-pain','a1-pain-w', audit.inferred_pain_used||'');
+  setAuditTags('a1-ctx','a1-ctx-w', audit.business_context_used||[]);
+  setAuditProof('a1-proof','a1-proof-w', audit.proof_used||[]);
   document.getElementById('out1').classList.add('visible');
-  document.getElementById('out1').scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('out1').scrollIntoView({behavior:'smooth',block:'start'});
 }
-
 function showHR1(reason) {
   document.getElementById('hr1-reason').textContent = reason;
   document.getElementById('hr1').classList.add('visible');
-  document.getElementById('hr1').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-function showErrW1(title, body) {
-  document.getElementById('err1-title').textContent = title;
-  document.getElementById('err1-body').textContent  = body;
-  document.getElementById('err1').classList.add('visible');
-  document.getElementById('err1').scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('hr1').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function hideW1() {
-  ['out1','hr1','err1'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  ['out1','hr1'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  document.getElementById('err1').classList.remove('visible');
   document.getElementById('val1').classList.remove('visible');
 }
 function resetW1() {
-  hideW1();
-  closeAudit('audit1-panel','audit1-toggle');
-  document.getElementById('form-w1').scrollIntoView({ behavior:'smooth', block:'start' });
+  hideW1(); closeAudit('a1-panel','a1-toggle');
+  document.getElementById('form-w1').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-// ── Workflow 2 submit ────────────────────────────────────────────────────────
+// ── Workflow 2 ────────────────────────────────────────────────────────────
 document.getElementById('form-w2').addEventListener('submit', async e => {
-  e.preventDefault();
-  hideW2();
-
+  e.preventDefault(); hideW2();
   const errs = [];
-  if (!files.resume2)                                  errs.push('Upload your résumé (PDF).');
-  if (!files.csv2)                                     errs.push('Upload the prospect list (CSV).');
-  if (!document.getElementById('jd2').value.trim())    errs.push('Paste the job description.');
-  if (!document.getElementById('company2').value.trim()) errs.push('Enter the company name.');
+  if (!files.resume2)                                   errs.push('Upload your résumé (PDF).');
+  if (!document.getElementById('jd2').value.trim())     errs.push('Paste the job description.');
+  if (!document.getElementById('co2').value.trim())     errs.push('Enter the company name.');
+  if (inputMode === 'csv' && !files.csv2)               errs.push('Upload the prospect list (CSV).');
+  if (inputMode === 'url' && getManualUrls().length===0) errs.push('Add at least one LinkedIn URL.');
   if (errs.length) { showVal('val2','val2-list',errs); return; }
 
   const btn = document.getElementById('btn2');
   btn.disabled = true; btn.textContent = 'Processing…';
-  startProgress('prog2','stages2', DELAYS_W2);
-
+  startProgress('prog2','stages2',D2);
   try {
     const fd = new FormData();
     fd.append('resume', files.resume2, files.resume2.name);
-    fd.append('csv',    files.csv2,    files.csv2.name);
-    fd.append('jd',     document.getElementById('jd2').value.trim());
-    fd.append('company',document.getElementById('company2').value.trim());
-
+    fd.append('jd', document.getElementById('jd2').value.trim());
+    fd.append('company', document.getElementById('co2').value.trim());
+    if (inputMode === 'csv') {
+      fd.append('csv', files.csv2, files.csv2.name);
+    } else {
+      // Manual URLs: send as JSON array in body field linkedin_urls
+      const urls = getManualUrls();
+      fd.append('linkedin_urls', JSON.stringify(urls));
+    }
     const res = await fetch(W2_URL, { method:'POST', body:fd });
     stopProgress('prog2','stages2');
-
-    if (!res.ok) { showErrW2('Request failed — ' + res.status, (await res.text()).slice(0,400)); return; }
-
+    if (!res.ok) { showErr('err2','err2-title','err2-body','Request failed — '+res.status,(await res.text()).slice(0,400)); return; }
     let raw = await res.json();
     if (Array.isArray(raw)) raw = raw[0];
-    if (raw.json) raw = raw.json; // n8n sometimes wraps in {json:{...}}
-
+    if (raw.json) raw = raw.json;
     renderW2(raw);
-
-  } catch(err) {
-    stopProgress('prog2','stages2');
-    showErrW2('Connection error', err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
-  }
+  } catch(err) { stopProgress('prog2','stages2'); showErr('err2','err2-title','err2-body','Connection error',err.message); }
+  finally { btn.disabled=false; btn.textContent='Rank Prospects & Generate Drafts'; }
 });
 
+// ── Render W2 results ─────────────────────────────────────────────────────
 function renderW2(data) {
-  const summary   = data.summary || {};
-  const approved  = data.approved_drafts || [];
-  const review    = data.human_review_drafts || [];
-  const failed    = data.failed_scrapes || [];
+  const summary  = data.summary || {};
+  const approved = data.approved_drafts || [];
+  const review   = data.human_review_drafts || [];
+  const failed   = data.failed_scrapes || [];
+  const allScored= data.all_scored || [];
 
-  // Summary bar
-  const sumEl = document.getElementById('w2-summary');
-  sumEl.innerHTML = [
-    ['Scored',    summary.scored           || 0],
-    ['Selected',  summary.total_selected   || 0],
-    ['Approved',  summary.drafts_approved  || 0],
-    ['Review',    summary.drafts_review    || 0],
-    ['Failed',    summary.failed_scrapes   || 0],
-  ].map(([l,v]) => `<div class="stat-chip"><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`).join('');
+  // Build a lookup: pid → scored data (for cards without a draft)
+  const scoredMap = {};
+  allScored.forEach(s => { if (s.pid) scoredMap[s.pid] = s; });
+
+  // Stats row
+  document.getElementById('w2-stats').innerHTML = [
+    [summary.scored||0,          'scored'],
+    [summary.total_selected||0,  'selected'],
+    [summary.drafts_approved||0, 'approved'],
+    [summary.drafts_review||0,   'in review'],
+    [summary.failed_scrapes||0,  'failed'],
+  ].map(([v,l]) => `<div class="stat-item"><span class="stat-num">${v}</span><span class="stat-lbl">${l}</span></div>`).join('');
 
   // Approved drafts
-  document.getElementById('w2-approved-count').textContent = approved.length + ' draft' + (approved.length !== 1 ? 's' : '');
-  document.getElementById('w2-approved').innerHTML = approved.map(d => prospectCard(d, true)).join('') || '<p style="font-size:.82rem;color:var(--text-3)">No approved drafts.</p>';
+  const approvedEl = document.getElementById('w2-approved');
+  document.getElementById('w2-approved-count').textContent = approved.length + ' draft' + (approved.length!==1?'s':'');
+  approvedEl.innerHTML = approved.length
+    ? approved.map(d => buildProspectCard(d, scoredMap, true)).join('')
+    : '<p style="font-size:.81rem;color:var(--text-3)">No approved drafts.</p>';
 
   // Review drafts
-  document.getElementById('w2-review-count').textContent = review.length + ' draft' + (review.length !== 1 ? 's' : '');
-  document.getElementById('w2-review').innerHTML = review.map(d => prospectCard(d, false)).join('') || '<p style="font-size:.82rem;color:var(--text-3)">None.</p>';
+  const reviewEl = document.getElementById('w2-review');
+  document.getElementById('w2-review-count').textContent = review.length + ' draft' + (review.length!==1?'s':'');
+  reviewEl.innerHTML = review.length
+    ? review.map(d => buildProspectCard(d, scoredMap, false)).join('')
+    : '<p style="font-size:.81rem;color:var(--text-3)">None.</p>';
 
-  // Failed scrapes
-  const failedWrap = document.getElementById('w2-failed-wrap');
+  // Failed
+  const fw = document.getElementById('w2-failed-wrap');
   if (failed.length) {
-    failedWrap.style.display = '';
-    document.getElementById('w2-failed').innerHTML = failed.map(f => `<li>↳ ${esc(typeof f === 'string' ? f : (f.url || JSON.stringify(f)))}</li>`).join('');
-  } else {
-    failedWrap.style.display = 'none';
-  }
+    fw.style.display = '';
+    document.getElementById('w2-failed').innerHTML = failed.map(f =>
+      `<li>${esc(typeof f==='string'?f:(f.url||f.name||JSON.stringify(f)))}</li>`).join('');
+  } else fw.style.display='none';
 
   document.getElementById('out2').classList.add('visible');
-  document.getElementById('out2').scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('out2').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
-function prospectCard(d, isApproved) {
-  const name    = esc(d.name || 'Unknown Prospect');
-  const channel = esc(d.channel || '');
-  const rank    = d.rank != null ? '#' + d.rank : '';
-  const msg     = d.message || {};
+// ── Prospect card builder ─────────────────────────────────────────────────
+function buildProspectCard(draft, scoredMap, isApproved) {
+  const pid     = draft.pid || '';
+  const name    = draft.name || 'Unknown Prospect';
+  const rank    = draft.rank != null ? '#' + draft.rank : '';
+  const channel = (draft.channel || '').toLowerCase();
+  const msg     = draft.message || {};
   const subject = (msg.subject || '').trim();
   const body    = (msg.body || '').trim();
-  const scores  = d.judge_scores || {};
-  const band    = (d.band || 'WEAK').toLowerCase();
-  const overall = d.overall_score != null ? d.overall_score : '';
-  const routerReasons = (d.router && d.router.reasons) ? d.router.reasons : [];
+  const jscores = draft.judge_scores || {};
+  const router  = draft.router || {};
+  const flags   = router.reasons || [];
 
-  const scoreChip = overall !== ''
-    ? `<span class="score-pill ${band}">${overall}/100 ${(d.band||'').toUpperCase()}</span>` : '';
-
-  const judgeChips = Object.entries(scores).map(([k,v]) =>
-    `<span class="judge-chip">${k.replace(/_/g,' ')}: ${v}</span>`).join('');
-
-  const subjectHtml = subject
-    ? `<p class="draft-subject">Subject: ${esc(subject)}</p>` : '';
-
-  const copyId = 'copy-' + Math.random().toString(36).slice(2);
-
-  const reviewNote = !isApproved && routerReasons.length
-    ? `<p style="font-size:.75rem;color:var(--amber);margin-top:.5rem">Flagged: ${esc(routerReasons.slice(0,2).join(' · '))}</p>` : '';
-
-  return `
-  <div class="prospect-card">
-    <div class="prospect-hd">
-      <div>
-        <p class="prospect-name">${name}</p>
-        <p class="prospect-meta">${rank ? rank + ' · ' : ''}${channel ? channel.toUpperCase() : ''}</p>
-      </div>
-      <div style="display:flex;gap:.35rem;align-items:center;flex-wrap:wrap">
-        ${scoreChip}
-        <span class="badge ${isApproved ? 'badge-green' : 'badge-amber'}">${isApproved ? '✓ Approved' : '⚠ Review'}</span>
-      </div>
-    </div>
-    <div class="prospect-body">
-      ${body ? `
-      <div class="draft-section">
-        <p class="draft-label">Draft Message <span class="channel-badge">${esc(channel)}</span></p>
-        <div id="${copyId}">
-          ${subjectHtml}
-          <p class="draft-body">${esc(body)}</p>
-        </div>
-        <div style="display:flex;gap:.4rem;margin-top:.6rem">
-          <button class="copy-btn" onclick="copyEl('${copyId}',this)">Copy</button>
-        </div>
-        ${judgeChips ? `<div class="judge-row">${judgeChips}</div>` : ''}
-        ${reviewNote}
-      </div>` : '<p style="font-size:.8rem;color:var(--text-3)">No draft generated.</p>'}
-    </div>
-  </div>`;
-}
-
-function showErrW2(title, body) {
-  document.getElementById('err2-title').textContent = title;
-  document.getElementById('err2-body').textContent  = body;
-  document.getElementById('err2').classList.add('visible');
-  document.getElementById('err2').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-function hideW2() {
-  ['out2','err2'].forEach(id => document.getElementById(id).classList.remove('visible'));
-  document.getElementById('val2').classList.remove('visible');
-}
-function resetW2() {
-  hideW2();
-  document.getElementById('form-w2').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-// ── Shared helpers ────────────────────────────────────────────────────────────
-function showVal(boxId, listId, errs) {
-  document.getElementById(listId).innerHTML = errs.map(e => `<li>${e}</li>`).join('');
-  document.getElementById(boxId).classList.add('visible');
-}
-
-function setAuditText(elId, wrapId, text) {
-  document.getElementById(elId).textContent = text;
-  document.getElementById(wrapId).style.display = text ? '' : 'none';
-}
-function setAuditTags(elId, wrapId, items) {
-  document.getElementById(elId).innerHTML = items.map(c => `<span class="ctx-tag">${esc(c)}</span>`).join('');
-  document.getElementById(wrapId).style.display = items.length ? '' : 'none';
-}
-function setAuditProof(elId, wrapId, items) {
-  document.getElementById(elId).innerHTML = items.map(p =>
-    `<div class="proof-item"><span class="proof-check">✓</span><span>${esc(p)}</span></div>`).join('');
-  document.getElementById(wrapId).style.display = items.length ? '' : 'none';
-}
-
-function toggleAudit(panelId, toggleId) {
-  const panel  = document.getElementById(panelId);
-  const toggle = document.getElementById(toggleId);
-  const open   = panel.classList.toggle('open');
-  toggle.classList.toggle('open', open);
-  toggle.textContent = open ? '🔍 Hide Audit Trail' : '🔍 Show Audit Trail';
-}
-function closeAudit(panelId, toggleId) {
-  document.getElementById(panelId).classList.remove('open');
-  const t = document.getElementById(toggleId);
-  t.classList.remove('open');
-  t.textContent = '🔍 Show Audit Trail';
-}
-
-function copyEl(elId, btn) {
-  const el = document.getElementById(elId);
-  const text = el ? el.innerText || el.textContent : '';
-  navigator.clipboard.writeText(text).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = 'Copied!'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
-  });
-}
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
-}
-
-function esc(str) {
-  return String(str||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-</script>
-</body>
-</html>
+  // Scored data (from all_scored lookup)
+  const scored  = scoredMap[pid] || {};
+  const sd      = scored.data || {};
+  const ss      = sd.subscores || {};
+  const band    = (sd.band || 'WEAK').toLowerCase();
+  const overall = sd.overall_score != null ? sd.overall_score : (draft.overall_score||'—');
+  const decision     = sd.decision || '';
+  const relationship = sd.relationship_to_company || '';
+  const confidence   = sd.confidence || '';
+  const rationale    = sd.rationale || '';
+  const angle        = sd.outreach_angle || '';
+  const framing      = sd.recommended_message_framing || '';
+  const hooks        = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
+  const dataGaps     = Array.i... (9 KB left)
