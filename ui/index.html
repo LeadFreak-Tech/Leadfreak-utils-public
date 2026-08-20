@@ -33,7 +33,7 @@ h1{font-size:1.65rem;font-weight:700;letter-spacing:-.03em;line-height:1.2;margi
 
 /* Tabs */
 .tab-bar{display:flex;gap:.2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
-.tab-btn{padding:.55rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-2);border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:color .15s,border-color .15s;}
+.tab-btn{padding:.55rem 1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text-2);border-bottom:2.5px solid transparent;transition:color .15s,border-color .15s;position:relative;z-index:1;}
 .tab-btn:hover{color:var(--text);}
 .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
 .tab-pane{display:none;}
@@ -274,8 +274,8 @@ textarea{min-height:180px;}
 
 <!-- Tabs -->
 <div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('w1',this)">Single Outreach</button>
-  <button class="tab-btn" onclick="switchTab('w2',this)">Prospect Ranking &amp; Writer</button>
+  <button type="button" class="tab-btn active" onclick="switchTab('w1',this)">Single Outreach</button>
+  <button type="button" class="tab-btn" onclick="switchTab('w2',this)">Prospect Ranking &amp; Writer</button>
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -785,4 +785,19 @@ function buildProspectCard(draft, scoredMap, isApproved) {
   const angle        = sd.outreach_angle || '';
   const framing      = sd.recommended_message_framing || '';
   const hooks        = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
-  const dataGaps     = Array.i... (9 KB left)
+  const dataGaps     = Array.isArray(sd.data_gaps) ? sd.data_gaps : [];
+  const redFlags     = Array.isArray(sd.red_flags) ? sd.red_flags : [];
+
+  // Subscores
+  const subScores = [
+    { label:'Influence',   key:'influence_on_hire',     val: ss.influence_on_hire },
+    { label:'Engagement',  key:'engagement_likelihood', val: ss.engagement_likelihood },
+    { label:'Function',    key:'function_relevance',    val: ss.function_relevance },
+    { label:'Warmth',      key:'connection_warmth',     val: ss.connection_warmth },
+    { label:'Currency',    key:'company_currency',      val: ss.company_currency },
+    { label:'Email pri.',  key:'email_priority_score',  val: sd.email_priority_score },
+  ];
+
+  // Bar colour based on value
+  function barClass(v) {
+    const n = Numbe... (8 KB left)
