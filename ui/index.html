@@ -508,13 +508,52 @@ textarea{min-height:180px;}
 const W1_URL = 'https://primary-production-37efc.up.railway.app/webhook/generate-message';
 const W2_URL = 'https://primary-production-37efc.up.railway.app/webhook/outreach-targeting';
 
-// ── Tab switching ─────────────────────────────────────────────────────────
+// ── Tab switching — GLOBAL so onclick attributes can reach it ─────────────
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   btn.classList.add('active');
 }
+
+// ── Shared helpers — GLOBAL so inline onclick can reach them ─────────────
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function copyEl(elId, btn) {
+  const el = document.getElementById(elId);
+  const text = el ? (el.innerText||el.textContent) : '';
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent; btn.textContent='Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent=orig; btn.classList.remove('copied'); }, 1800);
+  });
+}
+function toggleAudit(panelId, toggleId) {
+  const panel = document.getElementById(panelId), toggle = document.getElementById(toggleId);
+  const open = panel.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+  toggle.textContent = open ? '🔍 Hide Audit Trail' : '🔍 Show Audit Trail';
+}
+function closeAudit(panelId, toggleId) {
+  document.getElementById(panelId).classList.remove('open');
+  const t = document.getElementById(toggleId); t.classList.remove('open');
+  t.textContent = '🔍 Show Audit Trail';
+}
+function toast(msg) {
+  const t = document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+function resetW1() {
+  hideW1(); closeAudit('a1-panel','a1-toggle');
+  document.getElementById('form-w1').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function resetW2() {
+  hideW2();
+  document.getElementById('form-w2').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── Everything DOM-dependent runs after parse completes ───────────────────
+document.addEventListener('DOMContentLoaded', function() {
 
 // ── Input mode toggle (CSV vs manual URLs) ────────────────────────────────
 let inputMode = 'csv';
@@ -649,6 +688,38 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
   finally { btn.disabled=false; btn.textContent='Generate Outreach Message'; }
 });
 
+function showVal(boxId, listId, errs) {
+  document.getElementById(listId).innerHTML = errs.map(e=>`<li>${e}</li>`).join('');
+  document.getElementById(boxId).classList.add('visible');
+}
+function showErr(secId, titleId, bodyId, title, body) {
+  document.getElementById(titleId).textContent = title;
+  document.getElementById(bodyId).textContent  = body;
+  document.getElementById(secId).classList.add('visible');
+  document.getElementById(secId).scrollIntoView({behavior:'smooth',block:'start'});
+}
+function hideW1() {
+  ['out1','hr1'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  document.getElementById('err1').classList.remove('visible');
+  document.getElementById('val1').classList.remove('visible');
+}
+function hideW2() {
+  ['out2','err2'].forEach(id => document.getElementById(id).classList.remove('visible'));
+  document.getElementById('val2').classList.remove('visible');
+}
+function setAuditText(elId, wrapId, text) {
+  document.getElementById(elId).textContent = text;
+  document.getElementById(wrapId).style.display = text ? '' : 'none';
+}
+function setAuditTags(elId, wrapId, items) {
+  document.getElementById(elId).innerHTML = items.map(c=>`<span class="ctx-tag">${esc(c)}</span>`).join('');
+  document.getElementById(wrapId).style.display = items.length?'':'none';
+}
+function setAuditProof(elId, wrapId, items) {
+  document.getElementById(elId).innerHTML = items.map(p=>`<div class="proof-item"><span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span><span>${esc(p)}</span></div>`).join('');
+  document.getElementById(wrapId).style.display = items.length?'':'none';
+}
+
 function renderW1(subj, msg, audit) {
   const sc = document.getElementById('subj1-card');
   if (subj) { document.getElementById('subj1-body').textContent = subj; sc.style.display=''; } else sc.style.display='none';
@@ -735,69 +806,4 @@ function renderW2(data) {
 
   // Approved drafts
   const approvedEl = document.getElementById('w2-approved');
-  document.getElementById('w2-approved-count').textContent = approved.length + ' draft' + (approved.length!==1?'s':'');
-  approvedEl.innerHTML = approved.length
-    ? approved.map(d => buildProspectCard(d, scoredMap, true)).join('')
-    : '<p style="font-size:.81rem;color:var(--text-3)">No approved drafts.</p>';
-
-  // Review drafts
-  const reviewEl = document.getElementById('w2-review');
-  document.getElementById('w2-review-count').textContent = review.length + ' draft' + (review.length!==1?'s':'');
-  reviewEl.innerHTML = review.length
-    ? review.map(d => buildProspectCard(d, scoredMap, false)).join('')
-    : '<p style="font-size:.81rem;color:var(--text-3)">None.</p>';
-
-  // Failed
-  const fw = document.getElementById('w2-failed-wrap');
-  if (failed.length) {
-    fw.style.display = '';
-    document.getElementById('w2-failed').innerHTML = failed.map(f =>
-      `<li>${esc(typeof f==='string'?f:(f.url||f.name||JSON.stringify(f)))}</li>`).join('');
-  } else fw.style.display='none';
-
-  document.getElementById('out2').classList.add('visible');
-  document.getElementById('out2').scrollIntoView({behavior:'smooth',block:'start'});
-}
-
-// ── Prospect card builder ─────────────────────────────────────────────────
-function buildProspectCard(draft, scoredMap, isApproved) {
-  const pid     = draft.pid || '';
-  const name    = draft.name || 'Unknown Prospect';
-  const rank    = draft.rank != null ? '#' + draft.rank : '';
-  const channel = (draft.channel || '').toLowerCase();
-  const msg     = draft.message || {};
-  const subject = (msg.subject || '').trim();
-  const body    = (msg.body || '').trim();
-  const jscores = draft.judge_scores || {};
-  const router  = draft.router || {};
-  const flags   = router.reasons || [];
-
-  // Scored data (from all_scored lookup)
-  const scored  = scoredMap[pid] || {};
-  const sd      = scored.data || {};
-  const ss      = sd.subscores || {};
-  const band    = (sd.band || 'WEAK').toLowerCase();
-  const overall = sd.overall_score != null ? sd.overall_score : (draft.overall_score||'—');
-  const decision     = sd.decision || '';
-  const relationship = sd.relationship_to_company || '';
-  const confidence   = sd.confidence || '';
-  const rationale    = sd.rationale || '';
-  const angle        = sd.outreach_angle || '';
-  const framing      = sd.recommended_message_framing || '';
-  const hooks        = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
-  const dataGaps     = Array.isArray(sd.data_gaps) ? sd.data_gaps : [];
-  const redFlags     = Array.isArray(sd.red_flags) ? sd.red_flags : [];
-
-  // Subscores
-  const subScores = [
-    { label:'Influence',   key:'influence_on_hire',     val: ss.influence_on_hire },
-    { label:'Engagement',  key:'engagement_likelihood', val: ss.engagement_likelihood },
-    { label:'Function',    key:'function_relevance',    val: ss.function_relevance },
-    { label:'Warmth',      key:'connection_warmth',     val: ss.connection_warmth },
-    { label:'Currency',    key:'company_currency',      val: ss.company_currency },
-    { label:'Email pri.',  key:'email_priority_score',  val: sd.email_priority_score },
-  ];
-
-  // Bar colour based on value
-  function barClass(v) {
-    const n = Numbe... (8 KB left)
+  docu... (8 KB left)
