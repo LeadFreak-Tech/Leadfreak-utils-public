@@ -508,7 +508,13 @@ textarea{min-height:180px;}
 const W1_URL = 'https://primary-production-37efc.up.railway.app/webhook/generate-message';
 const W2_URL = 'https://primary-production-37efc.up.railway.app/webhook/outreach-targeting';
 
-// ── Tab switching — GLOBAL so onclick attributes can reach it ─────────────
+// =========================================================================
+// ALL GLOBAL FUNCTIONS
+// Every function referenced by an onclick attribute MUST live here — outside
+// DOMContentLoaded — so the browser can find it when the user clicks.
+// =========================================================================
+
+// ── Tab switching ─────────────────────────────────────────────────────────
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -516,46 +522,71 @@ function switchTab(id, btn) {
   btn.classList.add('active');
 }
 
-// ── Shared helpers — GLOBAL so inline onclick can reach them ─────────────
+// ── Utility ───────────────────────────────────────────────────────────────
 function esc(str) {
   return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+function toast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
 function copyEl(elId, btn) {
   const el = document.getElementById(elId);
-  const text = el ? (el.innerText||el.textContent) : '';
+  const text = el ? (el.innerText || el.textContent) : '';
   navigator.clipboard.writeText(text).then(() => {
-    const orig = btn.textContent; btn.textContent='Copied!'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent=orig; btn.classList.remove('copied'); }, 1800);
-  });
+    const orig = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+  }).catch(() => toast('Could not copy — try selecting and copying manually.'));
 }
 function toggleAudit(panelId, toggleId) {
-  const panel = document.getElementById(panelId), toggle = document.getElementById(toggleId);
+  const panel = document.getElementById(panelId);
+  const toggle = document.getElementById(toggleId);
   const open = panel.classList.toggle('open');
   toggle.classList.toggle('open', open);
   toggle.textContent = open ? '🔍 Hide Audit Trail' : '🔍 Show Audit Trail';
 }
 function closeAudit(panelId, toggleId) {
   document.getElementById(panelId).classList.remove('open');
-  const t = document.getElementById(toggleId); t.classList.remove('open');
+  const t = document.getElementById(toggleId);
+  t.classList.remove('open');
   t.textContent = '🔍 Show Audit Trail';
 }
-function toast(msg) {
-  const t = document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2400);
-}
-function resetW1() {
-  hideW1(); closeAudit('a1-panel','a1-toggle');
-  document.getElementById('form-w1').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function resetW2() {
-  hideW2();
-  document.getElementById('form-w2').scrollIntoView({behavior:'smooth',block:'start'});
+
+// ── File state (global so all file functions can share it) ─────────────────
+const files = { resume1: null, resume2: null, csv2: null };
+
+// ── File upload helpers ────────────────────────────────────────────────────
+// clearFile is called from onclick attributes in dynamically-rendered chip HTML
+// so it MUST be global.
+function clearFile(key, chipId, inputId) {
+  files[key] = null;
+  const chip = document.getElementById(chipId);
+  if (chip) chip.innerHTML = '';
+  const inp = document.getElementById(inputId);
+  if (inp) inp.value = '';
 }
 
-// ── Everything DOM-dependent runs after parse completes ───────────────────
-document.addEventListener('DOMContentLoaded', function() {
+// handleFile is called from setupUpload (inside DCL) and also from the drop
+// listener. inputId is passed in explicitly so clearFile onclick has it.
+function handleFile(file, key, chipEl, accept, inputId) {
+  if (!file) return;
+  if (accept === 'pdf' && file.type !== 'application/pdf') { toast('Only PDF files accepted.'); return; }
+  if (accept === 'csv' && !file.name.toLowerCase().endsWith('.csv')) { toast('Only CSV files accepted.'); return; }
+  files[key] = file;
+  chipEl.innerHTML = `<div class="file-chip">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+    </svg>
+    ${esc(file.name)} · ${(file.size / 1024).toFixed(1)} KB
+    <button type="button" onclick="event.stopPropagation();clearFile('${key}','${chipEl.id}','${inputId}')">✕</button>
+  </div>`;
+}
 
-// ── Input mode toggle (CSV vs manual URLs) ────────────────────────────────
+// ── Input mode toggle (W2: CSV vs manual URLs) ─────────────────────────────
+// MUST be global — called from onclick="setMode(...)"
 let inputMode = 'csv';
 function setMode(mode) {
   inputMode = mode;
@@ -565,23 +596,26 @@ function setMode(mode) {
   document.getElementById('mode-url-btn').classList.toggle('active', mode === 'url');
 }
 
-// ── Manual URL rows ───────────────────────────────────────────────────────
+// ── Manual URL rows ────────────────────────────────────────────────────────
+// MUST be global — addUrlRow called from onclick="addUrlRow()"
+//                  removeUrlRow called from onclick inside dynamically-created rows
 let urlRowCount = 0;
 function addUrlRow(value) {
   urlRowCount++;
   const id = 'url-row-' + urlRowCount;
+  const n = urlRowCount;
   const row = document.createElement('div');
   row.className = 'url-row'; row.id = id;
   row.innerHTML = `
-    <span class="url-row-num">${urlRowCount}</span>
-    <input type="url" placeholder="https://www.linkedin.com/in/…" value="${esc(value||'')}"/>
+    <span class="url-row-num">${n}</span>
+    <input type="url" placeholder="https://www.linkedin.com/in/…" value="${esc(value || '')}"/>
     <button type="button" class="url-row-del" onclick="removeUrlRow('${id}')" title="Remove">✕</button>`;
-  document.getElementById('url-rows').appendChild(row);
+  const container = document.getElementById('url-rows');
+  if (container) container.appendChild(row);
 }
 function removeUrlRow(id) {
   const el = document.getElementById(id);
   if (el) el.remove();
-  // Re-number
   document.querySelectorAll('.url-row').forEach((r, i) => {
     r.querySelector('.url-row-num').textContent = i + 1;
   });
@@ -590,176 +624,219 @@ function getManualUrls() {
   return Array.from(document.querySelectorAll('.url-row input'))
     .map(i => i.value.trim()).filter(Boolean);
 }
-// Start with 2 rows
+
+// ── W1 reset / hide ────────────────────────────────────────────────────────
+function hideW1() {
+  ['out1', 'hr1', 'err1'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const v = document.getElementById('val1');
+  if (v) v.classList.remove('visible');
+}
+function resetW1() {
+  hideW1();
+  closeAudit('a1-panel', 'a1-toggle');
+  const f = document.getElementById('form-w1');
+  if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── W2 reset / hide ────────────────────────────────────────────────────────
+function hideW2() {
+  ['out2', 'err2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+  const v = document.getElementById('val2');
+  if (v) v.classList.remove('visible');
+}
+function resetW2() {
+  hideW2();
+  const f = document.getElementById('form-w2');
+  if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// =========================================================================
+// DOM-DEPENDENT CODE — runs only after full parse
+// Only event listeners and initialisation go here.
+// NO function definitions that are referenced by onclick attributes.
+// =========================================================================
+document.addEventListener('DOMContentLoaded', function () {
+
+// ── Initialise 2 manual URL rows ──────────────────────────────────────────
 addUrlRow(); addUrlRow();
 
-// ── File state ────────────────────────────────────────────────────────────
-const files = { resume1: null, resume2: null, csv2: null };
-
+// ── Upload zone wiring ────────────────────────────────────────────────────
 function setupUpload(inputId, zoneId, chipId, key, accept) {
   const inp  = document.getElementById(inputId);
   const zone = document.getElementById(zoneId);
   const chip = document.getElementById(chipId);
-  inp.addEventListener('change', e => handleFile(e.target.files[0], key, chip, accept));
+  if (!inp || !zone || !chip) return;
+
+  inp.addEventListener('change', e => {
+    if (e.target.files[0]) handleFile(e.target.files[0], key, chip, accept, inputId);
+  });
   zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
   zone.addEventListener('drop', e => {
     e.preventDefault(); zone.classList.remove('drag-over');
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], key, chip, accept);
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0], key, chip, accept, inputId);
   });
-  zone.addEventListener('click', e => { if (e.target.tagName !== 'STRONG') inp.click(); });
+  // Click-to-open: only trigger if the click is NOT on the chip's ✕ button
+  // (✕ uses stopPropagation so this never fires for it)
+  zone.addEventListener('click', e => {
+    const tag = e.target.tagName;
+    if (tag !== 'STRONG' && tag !== 'BUTTON') inp.click();
+  });
 }
-function handleFile(file, key, chipEl, accept) {
-  if (!file) return;
-  if (accept === 'pdf' && file.type !== 'application/pdf') { toast('Only PDF files accepted.'); return; }
-  if (accept === 'csv' && !file.name.endsWith('.csv'))     { toast('Only CSV files accepted.'); return; }
-  files[key] = file;
-  chipEl.innerHTML = `<div class="file-chip">
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-    ${esc(file.name)} · ${(file.size/1024).toFixed(1)} KB
-    <button onclick="clearFile('${key}','${chipEl.id}','${inputId}')">✕</button>
-  </div>`;
-}
-function clearFile(key, chipId, inputId) {
-  files[key] = null;
-  document.getElementById(chipId).innerHTML = '';
-  const inp = document.getElementById(inputId);
-  if (inp) inp.value = '';
-}
-setupUpload('resume1','uz1','chip1','resume1','pdf');
-setupUpload('resume2','uz2','chip2','resume2','pdf');
-setupUpload('csv2','uz3','chip3','csv2','csv');
+setupUpload('resume1', 'uz1', 'chip1', 'resume1', 'pdf');
+setupUpload('resume2', 'uz2', 'chip2', 'resume2', 'pdf');
+setupUpload('csv2',    'uz3', 'chip3', 'csv2',    'csv');
 
 // ── Progress ──────────────────────────────────────────────────────────────
-const D1 = [0,4000,10000,18000,28000,38000];
-const D2 = [0,5000,16000,36000,58000,85000];
+const D1 = [0, 4000, 10000, 18000, 28000, 38000];
+const D2 = [0, 5000, 16000, 36000, 58000, 85000];
 function startProgress(wrapId, stageId, delays) {
-  document.getElementById(wrapId).classList.add('visible');
+  const wrap = document.getElementById(wrapId);
+  if (wrap) wrap.classList.add('visible');
   const stages = document.querySelectorAll('#' + stageId + ' .stage');
-  stages.forEach(s => s.classList.remove('active','done'));
-  delays.forEach((d,i) => setTimeout(() => {
-    stages.forEach((s,si) => {
+  stages.forEach(s => s.classList.remove('active', 'done'));
+  delays.forEach((d, i) => setTimeout(() => {
+    stages.forEach((s, si) => {
       if (si < i)  { s.classList.remove('active'); s.classList.add('done'); }
-      if (si === i){ s.classList.remove('done'); s.classList.add('active'); }
+      if (si === i){ s.classList.remove('done');   s.classList.add('active'); }
     });
   }, d));
 }
 function stopProgress(wrapId, stageId) {
-  document.querySelectorAll('#'+stageId+' .stage').forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
-  setTimeout(() => document.getElementById(wrapId).classList.remove('visible'), 400);
+  document.querySelectorAll('#' + stageId + ' .stage').forEach(s => {
+    s.classList.remove('active'); s.classList.add('done');
+  });
+  setTimeout(() => {
+    const wrap = document.getElementById(wrapId);
+    if (wrap) wrap.classList.remove('visible');
+  }, 400);
 }
 
-// ── Workflow 1 ────────────────────────────────────────────────────────────
-document.getElementById('form-w1').addEventListener('submit', async e => {
-  e.preventDefault(); hideW1();
-  const errs = [];
-  if (!files.resume1)                                 errs.push('Upload your résumé (PDF).');
-  if (!document.getElementById('jd1').value.trim())   errs.push('Paste the job description.');
-  // LinkedIn URL is optional — no validation required
-  if (errs.length) { showVal('val1','val1-list',errs); return; }
-  const btn = document.getElementById('btn1');
-  btn.disabled = true; btn.textContent = 'Generating…';
-  startProgress('prog1','stages1',D1);
-  try {
-    const fd = new FormData();
-    fd.append('resume', files.resume1, files.resume1.name);
-    // Exact field names the webhook reads from request.body
-    fd.append('job_description', document.getElementById('jd1').value.trim());
-    const liUrl = document.getElementById('li1').value.trim();
-    if (liUrl) fd.append('prospect_linkedin_url', liUrl);
-    const prior = document.getElementById('prior1').value.trim();
-    if (prior) fd.append('prior_conversation', prior);
-    const res = await fetch(W1_URL, { method:'POST', body:fd });
-    stopProgress('prog1','stages1');
-    if (res.status === 500) {
-      let msg = 'Similarity below automatic approval threshold (0.7).';
-      try { const j = await res.json(); if (!j.message?.includes('No item to return')) { showErr('err1','err1-title','err1-body','Backend error (500)', j.message||res.statusText); return; } } catch(_) { showErr('err1','err1-title','err1-body','Backend error (500)', res.statusText); return; }
-      showHR1(msg); return;
-    }
-    if (!res.ok) { showErr('err1','err1-title','err1-body','Request failed — '+res.status,(await res.text()).slice(0,400)); return; }
-    let raw = await res.json();
-    if (Array.isArray(raw)) raw = raw[0];
-    if (raw.output) raw = raw.output;
-    if (raw.status === 'HUMAN_REVIEW') { showHR1(raw.reason||'Similarity below automatic approval threshold (0.7).'); return; }
-    const subj = (raw.subject||'').trim(), msg = (raw.message||'').trim(), audit = raw.audit||{};
-    if (!msg) { showErr('err1','err1-title','err1-body','Empty response','The backend returned no message.'); return; }
-    renderW1(subj, msg, audit);
-  } catch(err) { stopProgress('prog1','stages1'); showErr('err1','err1-title','err1-body','Connection error',err.message); }
-  finally { btn.disabled=false; btn.textContent='Generate Outreach Message'; }
-});
-
+// ── Validation / error helpers ────────────────────────────────────────────
 function showVal(boxId, listId, errs) {
-  document.getElementById(listId).innerHTML = errs.map(e=>`<li>${e}</li>`).join('');
+  document.getElementById(listId).innerHTML = errs.map(e => `<li>${e}</li>`).join('');
   document.getElementById(boxId).classList.add('visible');
 }
 function showErr(secId, titleId, bodyId, title, body) {
   document.getElementById(titleId).textContent = title;
   document.getElementById(bodyId).textContent  = body;
   document.getElementById(secId).classList.add('visible');
-  document.getElementById(secId).scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById(secId).scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-function hideW1() {
-  ['out1','hr1'].forEach(id => document.getElementById(id).classList.remove('visible'));
-  document.getElementById('err1').classList.remove('visible');
-  document.getElementById('val1').classList.remove('visible');
-}
-function hideW2() {
-  ['out2','err2'].forEach(id => document.getElementById(id).classList.remove('visible'));
-  document.getElementById('val2').classList.remove('visible');
-}
+
+// ── Audit helpers ─────────────────────────────────────────────────────────
 function setAuditText(elId, wrapId, text) {
   document.getElementById(elId).textContent = text;
   document.getElementById(wrapId).style.display = text ? '' : 'none';
 }
 function setAuditTags(elId, wrapId, items) {
-  document.getElementById(elId).innerHTML = items.map(c=>`<span class="ctx-tag">${esc(c)}</span>`).join('');
-  document.getElementById(wrapId).style.display = items.length?'':'none';
+  document.getElementById(elId).innerHTML = items.map(c => `<span class="ctx-tag">${esc(c)}</span>`).join('');
+  document.getElementById(wrapId).style.display = items.length ? '' : 'none';
 }
 function setAuditProof(elId, wrapId, items) {
-  document.getElementById(elId).innerHTML = items.map(p=>`<div class="proof-item"><span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span><span>${esc(p)}</span></div>`).join('');
-  document.getElementById(wrapId).style.display = items.length?'':'none';
+  document.getElementById(elId).innerHTML = items.map(p =>
+    `<div class="proof-item"><span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span><span>${esc(p)}</span></div>`
+  ).join('');
+  document.getElementById(wrapId).style.display = items.length ? '' : 'none';
 }
 
+// ── W1 render ─────────────────────────────────────────────────────────────
 function renderW1(subj, msg, audit) {
   const sc = document.getElementById('subj1-card');
-  if (subj) { document.getElementById('subj1-body').textContent = subj; sc.style.display=''; } else sc.style.display='none';
+  if (subj) {
+    document.getElementById('subj1-body').textContent = subj;
+    sc.style.display = '';
+  } else {
+    sc.style.display = 'none';
+  }
   document.getElementById('msg1-body').textContent = msg;
-  setAuditText('a1-hook','a1-hook-w', audit.hook_used||'');
-  setAuditText('a1-pain','a1-pain-w', audit.inferred_pain_used||'');
-  setAuditTags('a1-ctx','a1-ctx-w', audit.business_context_used||[]);
-  setAuditProof('a1-proof','a1-proof-w', audit.proof_used||[]);
+  setAuditText('a1-hook',  'a1-hook-w',  audit.hook_used || '');
+  setAuditText('a1-pain',  'a1-pain-w',  audit.inferred_pain_used || '');
+  setAuditTags('a1-ctx',   'a1-ctx-w',   audit.business_context_used || []);
+  setAuditProof('a1-proof','a1-proof-w', audit.proof_used || []);
   document.getElementById('out1').classList.add('visible');
-  document.getElementById('out1').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('out1').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function showHR1(reason) {
   document.getElementById('hr1-reason').textContent = reason;
   document.getElementById('hr1').classList.add('visible');
-  document.getElementById('hr1').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function hideW1() {
-  ['out1','hr1'].forEach(id => document.getElementById(id).classList.remove('visible'));
-  document.getElementById('err1').classList.remove('visible');
-  document.getElementById('val1').classList.remove('visible');
-}
-function resetW1() {
-  hideW1(); closeAudit('a1-panel','a1-toggle');
-  document.getElementById('form-w1').scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('hr1').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ── Workflow 2 ────────────────────────────────────────────────────────────
-document.getElementById('form-w2').addEventListener('submit', async e => {
-  e.preventDefault(); hideW2();
+// ── W1 form submit ────────────────────────────────────────────────────────
+document.getElementById('form-w1').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideW1();
   const errs = [];
-  if (!files.resume2)                                   errs.push('Upload your résumé (PDF).');
-  if (!document.getElementById('jd2').value.trim())     errs.push('Paste the job description.');
-  if (!document.getElementById('co2').value.trim())     errs.push('Enter the company name.');
-  if (inputMode === 'csv' && !files.csv2)               errs.push('Upload the prospect list (CSV).');
-  if (inputMode === 'url' && getManualUrls().length===0) errs.push('Add at least one LinkedIn URL.');
-  if (errs.length) { showVal('val2','val2-list',errs); return; }
+  if (!files.resume1)                               errs.push('Upload your résumé (PDF).');
+  if (!document.getElementById('jd1').value.trim()) errs.push('Paste the job description.');
+  if (errs.length) { showVal('val1', 'val1-list', errs); return; }
+  const btn = document.getElementById('btn1');
+  btn.disabled = true; btn.textContent = 'Generating…';
+  startProgress('prog1', 'stages1', D1);
+  try {
+    const fd = new FormData();
+    fd.append('resume', files.resume1, files.resume1.name);
+    fd.append('job_description', document.getElementById('jd1').value.trim());
+    const liUrl = document.getElementById('li1').value.trim();
+    if (liUrl) fd.append('prospect_linkedin_url', liUrl);
+    const prior = document.getElementById('prior1').value.trim();
+    if (prior) fd.append('prior_conversation', prior);
+    const res = await fetch(W1_URL, { method: 'POST', body: fd });
+    stopProgress('prog1', 'stages1');
+    if (res.status === 500) {
+      let reason = 'Similarity below automatic approval threshold (0.7).';
+      try {
+        const j = await res.json();
+        if (j.message && !j.message.includes('No item to return')) {
+          showErr('err1', 'err1-title', 'err1-body', 'Backend error (500)', j.message || res.statusText); return;
+        }
+      } catch (_) {
+        showErr('err1', 'err1-title', 'err1-body', 'Backend error (500)', res.statusText); return;
+      }
+      showHR1(reason); return;
+    }
+    if (!res.ok) {
+      showErr('err1', 'err1-title', 'err1-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400)); return;
+    }
+    let raw = await res.json();
+    if (Array.isArray(raw)) raw = raw[0];
+    if (raw && raw.output) raw = raw.output;
+    if (!raw) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no data.'); return; }
+    if (raw.status === 'HUMAN_REVIEW') { showHR1(raw.reason || 'Similarity below automatic approval threshold (0.7).'); return; }
+    const subj = (raw.subject || '').trim();
+    const msg  = (raw.message || '').trim();
+    const audit = raw.audit || {};
+    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message.'); return; }
+    renderW1(subj, msg, audit);
+  } catch (err) {
+    stopProgress('prog1', 'stages1');
+    showErr('err1', 'err1-title', 'err1-body', 'Connection error', err.message + (err.message === 'Failed to fetch' ? ' — check that CORS is enabled on the n8n webhook.' : ''));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Generate Outreach Message';
+  }
+});
 
+// ── W2 form submit ────────────────────────────────────────────────────────
+document.getElementById('form-w2').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideW2();
+  const errs = [];
+  if (!files.resume2)                                    errs.push('Upload your résumé (PDF).');
+  if (!document.getElementById('jd2').value.trim())      errs.push('Paste the job description.');
+  if (!document.getElementById('co2').value.trim())      errs.push('Enter the company name.');
+  if (inputMode === 'csv' && !files.csv2)                errs.push('Upload the prospect list (CSV).');
+  if (inputMode === 'url' && getManualUrls().length === 0) errs.push('Add at least one LinkedIn URL.');
+  if (errs.length) { showVal('val2', 'val2-list', errs); return; }
   const btn = document.getElementById('btn2');
   btn.disabled = true; btn.textContent = 'Processing…';
-  startProgress('prog2','stages2',D2);
+  startProgress('prog2', 'stages2', D2);
   try {
     const fd = new FormData();
     fd.append('resume', files.resume2, files.resume2.name);
@@ -768,42 +845,197 @@ document.getElementById('form-w2').addEventListener('submit', async e => {
     if (inputMode === 'csv') {
       fd.append('csv', files.csv2, files.csv2.name);
     } else {
-      // Manual URLs: send as JSON array in body field linkedin_urls
-      const urls = getManualUrls();
-      fd.append('linkedin_urls', JSON.stringify(urls));
+      fd.append('linkedin_urls', JSON.stringify(getManualUrls()));
     }
-    const res = await fetch(W2_URL, { method:'POST', body:fd });
-    stopProgress('prog2','stages2');
-    if (!res.ok) { showErr('err2','err2-title','err2-body','Request failed — '+res.status,(await res.text()).slice(0,400)); return; }
+    const res = await fetch(W2_URL, { method: 'POST', body: fd });
+    stopProgress('prog2', 'stages2');
+    if (!res.ok) {
+      showErr('err2', 'err2-title', 'err2-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400)); return;
+    }
     let raw = await res.json();
     if (Array.isArray(raw)) raw = raw[0];
-    if (raw.json) raw = raw.json;
+    if (raw && raw.json) raw = raw.json;
     renderW2(raw);
-  } catch(err) { stopProgress('prog2','stages2'); showErr('err2','err2-title','err2-body','Connection error',err.message); }
-  finally { btn.disabled=false; btn.textContent='Rank Prospects & Generate Drafts'; }
+  } catch (err) {
+    stopProgress('prog2', 'stages2');
+    showErr('err2', 'err2-title', 'err2-body', 'Connection error', err.message + (err.message === 'Failed to fetch' ? ' — check that CORS is enabled on the n8n webhook.' : ''));
+  } finally {
+    btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+  }
 });
 
-// ── Render W2 results ─────────────────────────────────────────────────────
+// ── W2 render ─────────────────────────────────────────────────────────────
 function renderW2(data) {
+  if (!data) { showErr('err2','err2-title','err2-body','Empty response','The backend returned no data.'); return; }
   const summary  = data.summary || {};
   const approved = data.approved_drafts || [];
   const review   = data.human_review_drafts || [];
   const failed   = data.failed_scrapes || [];
-  const allScored= data.all_scored || [];
-
-  // Build a lookup: pid → scored data (for cards without a draft)
+  const allScored = data.all_scored || [];
   const scoredMap = {};
   allScored.forEach(s => { if (s.pid) scoredMap[s.pid] = s; });
 
-  // Stats row
   document.getElementById('w2-stats').innerHTML = [
-    [summary.scored||0,          'scored'],
-    [summary.total_selected||0,  'selected'],
-    [summary.drafts_approved||0, 'approved'],
-    [summary.drafts_review||0,   'in review'],
-    [summary.failed_scrapes||0,  'failed'],
-  ].map(([v,l]) => `<div class="stat-item"><span class="stat-num">${v}</span><span class="stat-lbl">${l}</span></div>`).join('');
+    [summary.scored         || 0, 'scored'],
+    [summary.total_selected || 0, 'selected'],
+    [summary.drafts_approved|| 0, 'approved'],
+    [summary.drafts_review  || 0, 'in review'],
+    [summary.failed_scrapes || 0, 'failed'],
+  ].map(([v, l]) => `<div class="stat-item"><span class="stat-num">${v}</span><span class="stat-lbl">${l}</span></div>`).join('');
 
-  // Approved drafts
   const approvedEl = document.getElementById('w2-approved');
-  docu... (8 KB left)
+  document.getElementById('w2-approved-count').textContent = approved.length + ' draft' + (approved.length !== 1 ? 's' : '');
+  approvedEl.innerHTML = approved.length
+    ? approved.map(d => buildProspectCard(d, scoredMap, true)).join('')
+    : '<p style="font-size:.81rem;color:var(--text-3)">No approved drafts.</p>';
+
+  const reviewEl = document.getElementById('w2-review');
+  document.getElementById('w2-review-count').textContent = review.length + ' draft' + (review.length !== 1 ? 's' : '');
+  reviewEl.innerHTML = review.length
+    ? review.map(d => buildProspectCard(d, scoredMap, false)).join('')
+    : '<p style="font-size:.81rem;color:var(--text-3)">None.</p>';
+
+  const fw = document.getElementById('w2-failed-wrap');
+  if (failed.length) {
+    fw.style.display = '';
+    document.getElementById('w2-failed').innerHTML = failed.map(f =>
+      `<li>${esc(typeof f === 'string' ? f : (f.url || f.name || JSON.stringify(f)))}</li>`
+    ).join('');
+  } else {
+    fw.style.display = 'none';
+  }
+
+  document.getElementById('out2').classList.add('visible');
+  document.getElementById('out2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── Prospect card builder ─────────────────────────────────────────────────
+function buildProspectCard(draft, scoredMap, isApproved) {
+  const pid     = draft.pid || '';
+  const name    = draft.name || 'Unknown Prospect';
+  const rank    = draft.rank != null ? '#' + draft.rank : '';
+  const channel = (draft.channel || '').toLowerCase();
+  const msg     = draft.message || {};
+  const subject = (msg.subject || '').trim();
+  const body    = (msg.body    || '').trim();
+  const jscores = draft.judge_scores || {};
+  const router  = draft.router || {};
+  const flags   = router.reasons || [];
+
+  const scored   = scoredMap[pid] || {};
+  const sd       = scored.data || {};
+  const ss       = sd.subscores || {};
+  const band     = (sd.band || 'WEAK').toLowerCase();
+  const overall  = sd.overall_score != null ? sd.overall_score : (draft.overall_score || '—');
+  const decision     = sd.decision || '';
+  const relationship = sd.relationship_to_company || '';
+  const confidence   = sd.confidence || '';
+  const rationale    = sd.rationale  || '';
+  const angle        = sd.outreach_angle || '';
+  const framing      = sd.recommended_message_framing || '';
+  const hooks        = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
+  const dataGaps     = Array.isArray(sd.data_gaps)             ? sd.data_gaps             : [];
+  const redFlags     = Array.isArray(sd.red_flags)             ? sd.red_flags             : [];
+
+  const subScores = [
+    { label: 'Influence',  val: ss.influence_on_hire },
+    { label: 'Engagement', val: ss.engagement_likelihood },
+    { label: 'Function',   val: ss.function_relevance },
+    { label: 'Warmth',     val: ss.connection_warmth },
+    { label: 'Currency',   val: ss.company_currency },
+    { label: 'Email pri.', val: sd.email_priority_score },
+  ];
+
+  function barClass(v) {
+    const n = Number(v) || 0;
+    if (n >= 75) return 'bar-prime';
+    if (n >= 55) return 'bar-strong';
+    if (n >= 35) return 'bar-moderate';
+    return 'bar-weak';
+  }
+
+  const scoreClass = 'score-' + band;
+  const bandPill = `<span class="pill pill-${band}">${(sd.band || '—').toUpperCase()}</span>`;
+  const decisionPill = decision ? `<span class="pill pill-decision">${decision.replace(/_/g, ' ')}</span>` : '';
+  const relPill = relationship === 'INSIDER'
+    ? `<span class="pill pill-insider">INSIDER</span>`
+    : relationship === 'RETAINED_AGENCY'
+    ? `<span class="pill pill-agency">AGENCY</span>` : '';
+  const confPill = confidence ? `<span class="pill pill-conf">conf ${confidence}</span>` : '';
+
+  const subscoresHtml = subScores.map(s => {
+    const v = Number(s.val) || 0;
+    const pct = Math.min(100, Math.max(0, v));
+    return `<div class="subscore-row">
+      <span class="subscore-name">${esc(s.label)}</span>
+      <div class="subscore-bar-wrap"><div class="subscore-bar ${barClass(v)}" style="width:${pct}%"></div></div>
+      <span class="subscore-val">${v || '—'}</span>
+    </div>`;
+  }).join('');
+
+  const hooksHtml   = hooks.length    ? `<ul class="hooks-list">${hooks.map(h => `<li>${esc(h)}</li>`).join('')}</ul>` : '';
+  const gapsHtml    = dataGaps.length ? dataGaps.join(' · ') : '';
+  const redFlagsHtml = redFlags.length
+    ? `<div style="margin-top:.35rem">
+        <span style="font-size:.68rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;">Red Flags</span>
+        <p class="gaps-text" style="color:var(--red)">${esc(redFlags.join(' · '))}</p>
+       </div>` : '';
+
+  const judgeHtml = Object.entries(jscores)
+    .map(([k, v]) => `<span class="judge-chip">${k.replace(/_/g, ' ')}: ${v}</span>`).join('');
+
+  const draftId = 'draft-' + Math.random().toString(36).slice(2, 8);
+  const draftSection = body ? `
+    <div class="draft-section">
+      <div class="draft-hd">
+        <span class="draft-lbl">Draft Message</span>
+        <span class="channel-tag">${channel === 'email' ? '✉ Email' : '💬 LinkedIn'}</span>
+      </div>
+      <div id="${draftId}">
+        ${subject ? `<p class="draft-subject">Subject: ${esc(subject)}</p>` : ''}
+        <p class="draft-body">${esc(body)}</p>
+      </div>
+      <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap">
+        <button class="copy-btn" onclick="copyEl('${draftId}',this)">Copy</button>
+      </div>
+      ${judgeHtml ? `<div class="judge-grid">${judgeHtml}</div>` : ''}
+      ${!isApproved && flags.length ? `<p class="router-flags">Flagged: ${esc(flags.slice(0, 3).join(' · '))}</p>` : ''}
+    </div>` : '';
+
+  return `
+  <div class="pcard">
+    <div class="pcard-hd">
+      <div style="display:flex;align-items:flex-start;gap:.875rem">
+        <div style="text-align:center;min-width:48px">
+          <div class="pcard-rank">${esc(rank)}</div>
+          <div class="pcard-score ${scoreClass}">${overall}</div>
+          <div class="score-lbl">score</div>
+        </div>
+        <div>
+          <p class="pcard-name">${esc(name)}</p>
+          <div class="pcard-pills">${bandPill}${decisionPill}${relPill}${confPill}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:.35rem;align-items:center">
+        <span class="badge ${isApproved ? 'badge-green' : 'badge-amber'}">${isApproved ? '✓ Approved' : '⚠ Review'}</span>
+      </div>
+    </div>
+    <div class="subscores">
+      <div class="subscore-grid">${subscoresHtml}</div>
+    </div>
+    <div class="pcard-body">
+      ${rationale ? `<p class="rationale">${esc(rationale)}</p>` : ''}
+      ${angle     ? `<div class="detail-row"><span class="detail-lbl">Angle</span><span class="detail-val">${esc(angle)}</span></div>` : ''}
+      ${framing   ? `<div class="detail-row"><span class="detail-lbl">Framing</span><span class="detail-val">${esc(framing)}</span></div>` : ''}
+      ${hooksHtml ? `<div class="detail-row"><span class="detail-lbl">Hooks</span><div>${hooksHtml}</div></div>` : ''}
+      ${gapsHtml  ? `<div class="detail-row" style="margin-top:.35rem"><span class="detail-lbl">Data gaps</span><p class="gaps-text">${esc(gapsHtml)}</p></div>` : ''}
+      ${redFlagsHtml}
+    </div>
+    ${draftSection}
+  </div>`;
+}
+
+}); // end DOMContentLoaded
+</script>
+</body>
+</html>
