@@ -454,6 +454,7 @@ textarea{min-height:180px;}
       <div class="stage"><div class="stage-dot"></div><span>Writing &amp; linting outreach drafts</span></div>
       <div class="stage"><div class="stage-dot"></div><span>Judge review &amp; routing</span></div>
     </div>
+    <p id="poll-status" style="display:none;font-size:.78rem;color:var(--text-3);margin-top:.75rem;font-family:'DM Mono',monospace"></p>
   </div>
 
   <div class="err-section" id="err2">
@@ -507,6 +508,13 @@ textarea{min-height:180px;}
 // ── Webhook URLs ──────────────────────────────────────────────────────────
 const W1_URL = 'https://primary-production-37efc.up.railway.app/webhook/generate-message';
 const W2_URL = 'https://primary-production-37efc.up.railway.app/webhook/outreach-targeting';
+
+// ── n8n Execution API (for async polling) ────────────────────────────────
+// Replace YOUR_N8N_API_KEY with your actual key from n8n → Settings → API
+const N8N_API_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYjg1MzcyMS1hNTAxLTRmNGQtOTYzOS0zYjM4N2UwYjkwNDQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiZDNjNTAxN2UtNjY3Ni00NWI1LWE3MzctMmUxNjI5MzBlMGVlIiwiaWF0IjoxNzg3NTU0NTk3fQ.0fvndAg576YZ5U8AyQK18sEjKa19IpmK6OeMn-Knnrw';
+const N8N_BASE_URL = 'https://primary-production-37efc.up.railway.app';
+const POLL_INTERVAL_MS  = 10000;  // poll every 10 seconds
+const POLL_MAX_ATTEMPTS = 90;     // give up after 15 minutes (90 × 10s)
 
 // =========================================================================
 // ALL GLOBAL FUNCTIONS
@@ -823,20 +831,27 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
   }
 });
 
-// ── W2 form submit ────────────────────────────────────────────────────────
+// ── W2 form submit — async polling ────────────────────────────────────────
+// 1. POST inputs → get executionId instantly (webhook responds immediately)
+// 2. Poll /api/v1/executions/{id} every 10s until status === 'success'
+// 3. Extract output from Aggregate Final Output node → render
 document.getElementById('form-w2').addEventListener('submit', async e => {
   e.preventDefault();
   hideW2();
   const errs = [];
-  if (!files.resume2)                                    errs.push('Upload your résumé (PDF).');
-  if (!document.getElementById('jd2').value.trim())      errs.push('Paste the job description.');
-  if (!document.getElementById('co2').value.trim())      errs.push('Enter the company name.');
-  if (inputMode === 'csv' && !files.csv2)                errs.push('Upload the prospect list (CSV).');
+  if (!files.resume2)                                      errs.push('Upload your résumé (PDF).');
+  if (!document.getElementById('jd2').value.trim())        errs.push('Paste the job description.');
+  if (!document.getElementById('co2').value.trim())        errs.push('Enter the company name.');
+  if (inputMode === 'csv' && !files.csv2)                  errs.push('Upload the prospect list (CSV).');
   if (inputMode === 'url' && getManualUrls().length === 0) errs.push('Add at least one LinkedIn URL.');
   if (errs.length) { showVal('val2', 'val2-list', errs); return; }
+
   const btn = document.getElementById('btn2');
   btn.disabled = true; btn.textContent = 'Processing…';
   startProgress('prog2', 'stages2', D2);
+
+  // ── Step 1: POST inputs, get executionId back immediately ──────────────
+  let executionId;
   try {
     const fd = new FormData();
     fd.append('resume', files.resume2, files.resume2.name);
@@ -848,20 +863,126 @@ document.getElementById('form-w2').addEventListener('submit', async e => {
       fd.append('linkedin_urls', JSON.stringify(getManualUrls()));
     }
     const res = await fetch(W2_URL, { method: 'POST', body: fd });
-    stopProgress('prog2', 'stages2');
     if (!res.ok) {
-      showErr('err2', 'err2-title', 'err2-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400)); return;
+      stopProgress('prog2', 'stages2');
+      showErr('err2', 'err2-title', 'err2-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400));
+      btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+      return;
     }
-    let raw = await res.json();
-    if (Array.isArray(raw)) raw = raw[0];
-    if (raw && raw.json) raw = raw.json;
-    renderW2(raw);
+    const init = await res.json();
+    executionId = init.executionId || (Array.isArray(init) ? init[0].executionId : null);
+    if (!executionId) {
+      stopProgress('prog2', 'stages2');
+      showErr('err2', 'err2-title', 'err2-body', 'No execution ID returned', JSON.stringify(init).slice(0, 200));
+      btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+      return;
+    }
   } catch (err) {
     stopProgress('prog2', 'stages2');
-    showErr('err2', 'err2-title', 'err2-body', 'Connection error', err.message + (err.message === 'Failed to fetch' ? ' — check that CORS is enabled on the n8n webhook.' : ''));
-  } finally {
+    showErr('err2', 'err2-title', 'err2-body', 'Connection error', err.message + (err.message === 'Failed to fetch' ? ' — check CORS is enabled on the n8n webhook.' : ''));
     btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+    return;
   }
+
+  // ── Step 2: Poll until success, error, or max attempts ────────────────
+  const pollUrl = N8N_BASE_URL + '/api/v1/executions/' + executionId + '?includeData=true';
+  const pollHeaders = { 'X-N8N-API-KEY': N8N_API_KEY };
+  let attempt = 0;
+
+  // Update poll counter in UI
+  const pollStatus = document.getElementById('poll-status');
+  if (pollStatus) pollStatus.style.display = '';
+
+  const poll = async () => {
+    attempt++;
+    if (pollStatus) pollStatus.textContent = 'Still processing… checked ' + attempt + ' of ' + POLL_MAX_ATTEMPTS + ' times (every 10s)';
+
+    if (attempt > POLL_MAX_ATTEMPTS) {
+      stopProgress('prog2', 'stages2');
+      if (pollStatus) pollStatus.style.display = 'none';
+      showErr('err2', 'err2-title', 'err2-body', 'Timed out', 'The workflow is taking longer than 15 minutes. Check n8n for execution #' + executionId + '.');
+      btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+      return;
+    }
+
+    let exec;
+    try {
+      const res = await fetch(pollUrl, { headers: pollHeaders });
+      if (!res.ok) {
+        // API auth error or other — keep trying unless 401
+        if (res.status === 401) {
+          stopProgress('prog2', 'stages2');
+          if (pollStatus) pollStatus.style.display = 'none';
+          showErr('err2', 'err2-title', 'err2-body', 'API auth error (401)', 'Check your N8N_API_KEY in the HTML file.');
+          btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+          return;
+        }
+        setTimeout(poll, POLL_INTERVAL_MS); return;
+      }
+      exec = await res.json();
+    } catch (err) {
+      // Network blip — keep polling
+      setTimeout(poll, POLL_INTERVAL_MS); return;
+    }
+
+    const status = exec.status;
+
+    if (status === 'running' || status === 'waiting' || status === 'new') {
+      setTimeout(poll, POLL_INTERVAL_MS); return;
+    }
+
+    // Terminal states
+    stopProgress('prog2', 'stages2');
+    if (pollStatus) pollStatus.style.display = 'none';
+    btn.disabled = false; btn.textContent = 'Rank Prospects & Generate Drafts';
+
+    if (status === 'error') {
+      showErr('err2', 'err2-title', 'err2-body', 'Workflow error', 'n8n execution #' + executionId + ' failed. Check the n8n execution log for details.');
+      return;
+    }
+    if (status === 'canceled') {
+      showErr('err2', 'err2-title', 'err2-body', 'Execution cancelled', 'n8n execution #' + executionId + ' was cancelled.');
+      return;
+    }
+    if (status === 'success') {
+      // Extract output from Aggregate Final Output node
+      try {
+        const runData = exec.data && exec.data.resultData && exec.data.resultData.runData;
+        if (!runData) throw new Error('no runData in execution response');
+
+        // Try Aggregate Final Output node first, fall back to last node with data
+        let raw = null;
+        const AGG_NODE = 'Aggregate Final Output';
+        if (runData[AGG_NODE] && runData[AGG_NODE][0]) {
+          raw = runData[AGG_NODE][0].data.main[0][0].json;
+        } else {
+          // Fallback: find any node with summary/ranking data
+          for (const nodeName of Object.keys(runData).reverse()) {
+            const nodeData = runData[nodeName];
+            if (nodeData && nodeData[0] && nodeData[0].data && nodeData[0].data.main) {
+              const item = nodeData[0].data.main[0] && nodeData[0].data.main[0][0];
+              if (item && item.json && (item.json.summary || item.json.ranking || item.json.approved_drafts)) {
+                raw = item.json; break;
+              }
+            }
+          }
+        }
+        if (!raw) throw new Error('could not find output in execution data');
+        if (Array.isArray(raw)) raw = raw[0];
+        if (raw && raw.json) raw = raw.json;
+        renderW2(raw);
+      } catch (parseErr) {
+        showErr('err2', 'err2-title', 'err2-body', 'Could not parse results', parseErr.message + '. Execution #' + executionId + ' completed — check n8n for raw output.');
+      }
+      return;
+    }
+
+    // Unknown status — keep polling
+    setTimeout(poll, POLL_INTERVAL_MS);
+  };
+
+  // Start polling after a short delay (give n8n time to register the execution)
+  setTimeout(poll, 3000);
 });
 
 // ── W2 render ─────────────────────────────────────────────────────────────
