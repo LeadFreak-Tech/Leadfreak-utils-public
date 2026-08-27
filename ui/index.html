@@ -1046,16 +1046,28 @@ function renderW2(data) {
     [summary.failed_scrapes || 0, 'failed'],
   ].map(([v, l]) => `<div class="stat-item"><span class="stat-num">${v}</span><span class="stat-lbl">${l}</span></div>`).join('');
 
+  // Group drafts by pid so one prospect = one card with all their drafts
+  function groupByPid(drafts) {
+    const map = {}, order = [];
+    drafts.forEach(d => {
+      if (!map[d.pid]) { map[d.pid] = []; order.push(d.pid); }
+      map[d.pid].push(d);
+    });
+    return order.map(pid => map[pid]);
+  }
+
   const approvedEl = document.getElementById('w2-approved');
-  document.getElementById('w2-approved-count').textContent = approved.length + ' draft' + (approved.length !== 1 ? 's' : '');
-  approvedEl.innerHTML = approved.length
-    ? approved.map(d => buildProspectCard(d, scoredMap, true)).join('')
+  const approvedGroups = groupByPid(approved);
+  document.getElementById('w2-approved-count').textContent = approvedGroups.length + ' prospect' + (approvedGroups.length !== 1 ? 's' : '');
+  approvedEl.innerHTML = approvedGroups.length
+    ? approvedGroups.map(group => buildProspectCard(group, scoredMap, true)).join('')
     : '<p style="font-size:.81rem;color:var(--text-3)">No approved drafts.</p>';
 
   const reviewEl = document.getElementById('w2-review');
-  document.getElementById('w2-review-count').textContent = review.length + ' draft' + (review.length !== 1 ? 's' : '');
-  reviewEl.innerHTML = review.length
-    ? review.map(d => buildProspectCard(d, scoredMap, false)).join('')
+  const reviewGroups = groupByPid(review);
+  document.getElementById('w2-review-count').textContent = reviewGroups.length + ' prospect' + (reviewGroups.length !== 1 ? 's' : '');
+  reviewEl.innerHTML = reviewGroups.length
+    ? reviewGroups.map(group => buildProspectCard(group, scoredMap, false)).join('')
     : '<p style="font-size:.81rem;color:var(--text-3)">None.</p>';
 
   const fw = document.getElementById('w2-failed-wrap');
@@ -1073,128 +1085,150 @@ function renderW2(data) {
 }
 
 // ── Prospect card builder ─────────────────────────────────────────────────
-function buildProspectCard(draft, scoredMap, isApproved) {
-  const pid     = draft.pid || '';
-  const name    = draft.name || 'Unknown Prospect';
-  const rank    = draft.rank != null ? '#' + draft.rank : '';
-  const channel = (draft.channel || '').toLowerCase();
-  const msg     = draft.message || {};
-  const subject = (msg.subject || '').trim();
-  const body    = (msg.body    || '').trim();
-  const jscores = draft.judge_scores || {};
-  const router  = draft.router || {};
-  const flags   = router.reasons || [];
+// ── Prospect card builder ─────────────────────────────────────────────────
+// `drafts` is an ARRAY of draft items for one prospect (grouped by pid).
+// Shows ALL channels (LinkedIn + Email) in a single card.
+function buildProspectCard(drafts, scoredMap, isApproved) {
+  if (!drafts || !drafts.length) return '';
+  const first = drafts[0];
+  const pid   = first.pid || '';
+  const name  = first.name || 'Unknown Prospect';
+  const rank  = first.rank != null ? '#' + first.rank : '';
 
-  const scored   = scoredMap[pid] || {};
-  const sd       = scored.data || {};
-  const ss       = sd.subscores || {};
-  const band     = (sd.band || 'WEAK').toLowerCase();
-  const overall  = sd.overall_score != null ? sd.overall_score : (draft.overall_score || '—');
-  const decision     = sd.decision || '';
-  const relationship = sd.relationship_to_company || '';
-  const confidence   = sd.confidence || '';
-  const rationale    = sd.rationale  || '';
-  const angle        = sd.outreach_angle || '';
-  const framing      = sd.recommended_message_framing || '';
-  const hooks        = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
-  const dataGaps     = Array.isArray(sd.data_gaps)             ? sd.data_gaps             : [];
-  const redFlags     = Array.isArray(sd.red_flags)             ? sd.red_flags             : [];
+  const scored = scoredMap[pid] || {};
+  const sd     = scored.data || {};
+  const ss     = sd.subscores || {};
 
+  const overall           = sd.overall_score != null ? sd.overall_score : '—';
+  const band              = (sd.band || 'WEAK').toLowerCase();
+  const decision          = sd.decision || '';
+  const relationship      = sd.relationship_to_company || '';
+  const confidence        = sd.confidence || '';
+  const primaryArchetype  = (sd.primary_archetype || '').replace(/_/g,' ');
+  const secondaryArchetype= (sd.secondary_archetype || '').replace(/_/g,' ');
+  const rationale         = sd.rationale || '';
+  const angle             = sd.outreach_angle || '';
+  const framing           = sd.recommended_message_framing || '';
+  const hooks             = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
+  const dataGaps          = Array.isArray(sd.data_gaps) ? sd.data_gaps : [];
+  const redFlags          = Array.isArray(sd.red_flags) ? sd.red_flags : [];
+
+  // Score colour
+  const n = Number(overall) || 0;
+  const scoreColor = n>=80?'#18643A':n>=65?'#3C8C5C':n>=50?'#C2922B':n>=35?'#97A0AC':'#B0463E';
+
+  // Band colour
+  const bandColors = {prime:'#18643A',strong:'#3C8C5C',moderate:'#C2922B',weak:'#97A0AC',skip:'#B0463E'};
+  const bc = bandColors[band]||'#97A0AC';
+
+  // Pills helper
+  const pill = (text, color) => `<span style="display:inline-flex;align-items:center;font-size:.7rem;font-weight:600;letter-spacing:.04em;padding:2px 8px;border-radius:20px;white-space:nowrap;color:${color};background:${color}18;border:1px solid ${color}44">${esc(text)}</span>`;
+
+  const relColor = relationship==='INSIDER'?'#18643A':relationship==='RETAINED_AGENCY'?'#2C4A86':'#97A0AC';
+
+  const pills = [
+    sd.band          ? pill(sd.band, bc) : '',
+    decision         ? pill(decision.replace(/_/g,' '), decision.includes('PRIORITY')?'#18643A':decision==='REACH_OUT'?'#3C8C5C':'#C2922B') : '',
+    relationship     ? pill(relationship.replace(/_/g,' '), relColor) : '',
+    confidence       ? pill('conf '+confidence, '#565C66') : '',
+    primaryArchetype ? pill(primaryArchetype, '#2C4A86') : '',
+    secondaryArchetype ? pill(secondaryArchetype, '#8B919A') : '',
+  ].filter(Boolean).join(' ');
+
+  // Subscores
   const subScores = [
-    { label: 'Influence',  val: ss.influence_on_hire },
-    { label: 'Engagement', val: ss.engagement_likelihood },
-    { label: 'Function',   val: ss.function_relevance },
-    { label: 'Warmth',     val: ss.connection_warmth },
-    { label: 'Currency',   val: ss.company_currency },
-    { label: 'Email pri.', val: sd.email_priority_score },
+    {label:'Influence',  val:ss.influence_on_hire},
+    {label:'Engagement', val:ss.engagement_likelihood},
+    {label:'Function',   val:ss.function_relevance},
+    {label:'Warmth',     val:ss.connection_warmth},
+    {label:'Currency',   val:ss.company_currency},
+    {label:'Email pri.', val:sd.email_priority_score},
   ];
-
-  function barClass(v) {
-    const n = Number(v) || 0;
-    if (n >= 75) return 'bar-prime';
-    if (n >= 55) return 'bar-strong';
-    if (n >= 35) return 'bar-moderate';
-    return 'bar-weak';
-  }
-
-  const scoreClass = 'score-' + band;
-  const bandPill = `<span class="pill pill-${band}">${(sd.band || '—').toUpperCase()}</span>`;
-  const decisionPill = decision ? `<span class="pill pill-decision">${decision.replace(/_/g, ' ')}</span>` : '';
-  const relPill = relationship === 'INSIDER'
-    ? `<span class="pill pill-insider">INSIDER</span>`
-    : relationship === 'RETAINED_AGENCY'
-    ? `<span class="pill pill-agency">AGENCY</span>` : '';
-  const confPill = confidence ? `<span class="pill pill-conf">conf ${confidence}</span>` : '';
-
+  const barColor = v => { const n=Number(v)||0; return n>=75?'#18643A':n>=55?'#3C8C5C':n>=35?'#C2922B':'#97A0AC'; };
   const subscoresHtml = subScores.map(s => {
-    const v = Number(s.val) || 0;
-    const pct = Math.min(100, Math.max(0, v));
+    const v = Number(s.val)||0;
     return `<div class="subscore-row">
       <span class="subscore-name">${esc(s.label)}</span>
-      <div class="subscore-bar-wrap"><div class="subscore-bar ${barClass(v)}" style="width:${pct}%"></div></div>
-      <span class="subscore-val">${v || '—'}</span>
+      <div class="subscore-bar-wrap"><div class="subscore-bar" style="width:${Math.min(100,v)}%;background:${barColor(v)}"></div></div>
+      <span class="subscore-val">${v||'—'}</span>
     </div>`;
   }).join('');
 
-  const hooksHtml   = hooks.length    ? `<ul class="hooks-list">${hooks.map(h => `<li>${esc(h)}</li>`).join('')}</ul>` : '';
-  const gapsHtml    = dataGaps.length ? dataGaps.join(' · ') : '';
-  const redFlagsHtml = redFlags.length
-    ? `<div style="margin-top:.35rem">
-        <span style="font-size:.68rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;">Red Flags</span>
-        <p class="gaps-text" style="color:var(--red)">${esc(redFlags.join(' · '))}</p>
-       </div>` : '';
+  // Draft sections — one per channel
+  const draftSections = drafts.map(d => {
+    const ch  = (d.channel||'').toLowerCase();
+    const msg = d.message || {};
+    const subject = (msg.subject||'').trim();
+    const body    = (msg.body||'').trim();
+    if (!body) return '';
+    const dRouter   = d.router || {};
+    const dDecision = dRouter.decision || '';
+    const reasons   = (dRouter.reasons||[]).filter(Boolean);
+    const jscores   = d.judge_scores || {};
+    const approved  = dDecision === 'APPROVED';
+    const vColor    = approved ? '#18643A' : '#C2922B';
+    const draftId   = 'draft-'+Math.random().toString(36).slice(2,8);
+    const judgeChips = Object.entries(jscores)
+      .map(([k,v])=>`<span class="judge-chip">${k.replace(/_/g,' ')}: ${v}</span>`).join('');
+    return `
+      <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+          <span style="font-size:.8rem;font-weight:700;color:var(--text)">${ch==='email'?'✉ Email':'💬 LinkedIn'}</span>
+          <span style="font-size:.75rem;font-weight:600;color:${vColor}">${approved?'✓ Approved':'⚠ Human Review'}</span>
+        </div>
+        <div id="${draftId}">
+          ${subject?`<div style="font-weight:700;font-size:.85rem;margin-bottom:.4rem">Subject: ${esc(subject)}</div>`:''}
+          <p class="draft-body">${esc(body)}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;flex-wrap:wrap">
+          <button class="copy-btn" onclick="copyEl('${draftId}',this)">Copy</button>
+          ${d.corrected?`<span style="font-size:.7rem;color:var(--text-3)">corrected</span>`:''}
+        </div>
+        ${judgeChips?`<div class="judge-grid" style="margin-top:.5rem">${judgeChips}</div>`:''}
+        ${!approved&&reasons.length?`<div style="margin-top:.4rem;font-size:.75rem;color:var(--amber)">Flagged: ${esc(reasons.slice(0,3).join(' · '))}</div>`:''}
+      </div>`;
+  }).join('');
 
-  const judgeHtml = Object.entries(jscores)
-    .map(([k, v]) => `<span class="judge-chip">${k.replace(/_/g, ' ')}: ${v}</span>`).join('');
-
-  const draftId = 'draft-' + Math.random().toString(36).slice(2, 8);
-  const draftSection = body ? `
-    <div class="draft-section">
-      <div class="draft-hd">
-        <span class="draft-lbl">Draft Message</span>
-        <span class="channel-tag">${channel === 'email' ? '✉ Email' : '💬 LinkedIn'}</span>
-      </div>
-      <div id="${draftId}">
-        ${subject ? `<p class="draft-subject">Subject: ${esc(subject)}</p>` : ''}
-        <p class="draft-body">${esc(body)}</p>
-      </div>
-      <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap">
-        <button class="copy-btn" onclick="copyEl('${draftId}',this)">Copy</button>
-      </div>
-      ${judgeHtml ? `<div class="judge-grid">${judgeHtml}</div>` : ''}
-      ${!isApproved && flags.length ? `<p class="router-flags">Flagged: ${esc(flags.slice(0, 3).join(' · '))}</p>` : ''}
-    </div>` : '';
+  // Overall card verdict
+  const allApproved = drafts.every(d=>d.router&&d.router.decision==='APPROVED');
+  const anyApproved = drafts.some(d=>d.router&&d.router.decision==='APPROVED');
+  const cardBadge = allApproved
+    ? `<span class="badge badge-green">✓ Approved</span>`
+    : anyApproved
+    ? `<span class="badge badge-amber">⚠ Partial Review</span>`
+    : `<span class="badge badge-amber">⚠ Review</span>`;
 
   return `
   <div class="pcard">
     <div class="pcard-hd">
-      <div style="display:flex;align-items:flex-start;gap:.875rem">
-        <div style="text-align:center;min-width:48px">
-          <div class="pcard-rank">${esc(rank)}</div>
-          <div class="pcard-score ${scoreClass}">${overall}</div>
-          <div class="score-lbl">score</div>
+      <div style="display:flex;align-items:flex-start;gap:.875rem;flex:1;min-width:0">
+        <div style="text-align:center;min-width:52px;flex-shrink:0">
+          <div style="font-size:.72rem;color:var(--text-3);font-family:'DM Mono',monospace;margin-bottom:.1rem">${esc(rank)}</div>
+          <div style="font-size:2rem;font-weight:700;line-height:1;color:${scoreColor}">${overall}</div>
+          <div style="font-size:.62rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em">score</div>
         </div>
-        <div>
+        <div style="flex:1;min-width:0">
           <p class="pcard-name">${esc(name)}</p>
-          <div class="pcard-pills">${bandPill}${decisionPill}${relPill}${confPill}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem">${pills}</div>
         </div>
       </div>
-      <div style="display:flex;gap:.35rem;align-items:center">
-        <span class="badge ${isApproved ? 'badge-green' : 'badge-amber'}">${isApproved ? '✓ Approved' : '⚠ Review'}</span>
-      </div>
+      <div style="flex-shrink:0;margin-left:.5rem">${cardBadge}</div>
     </div>
-    <div class="subscores">
+
+    <div style="margin-top:1rem">
       <div class="subscore-grid">${subscoresHtml}</div>
     </div>
-    <div class="pcard-body">
-      ${rationale ? `<p class="rationale">${esc(rationale)}</p>` : ''}
-      ${angle     ? `<div class="detail-row"><span class="detail-lbl">Angle</span><span class="detail-val">${esc(angle)}</span></div>` : ''}
-      ${framing   ? `<div class="detail-row"><span class="detail-lbl">Framing</span><span class="detail-val">${esc(framing)}</span></div>` : ''}
-      ${hooksHtml ? `<div class="detail-row"><span class="detail-lbl">Hooks</span><div>${hooksHtml}</div></div>` : ''}
-      ${gapsHtml  ? `<div class="detail-row" style="margin-top:.35rem"><span class="detail-lbl">Data gaps</span><p class="gaps-text">${esc(gapsHtml)}</p></div>` : ''}
-      ${redFlagsHtml}
+
+    <div style="margin-top:1rem">
+      ${rationale?`<p style="font-size:.82rem;color:var(--text-2);line-height:1.55;margin-bottom:.6rem">${esc(rationale)}</p>`:''}
+      ${angle?`<div class="detail-row"><span class="detail-lbl">Angle</span><span class="detail-val">${esc(angle)}</span></div>`:''}
+      ${framing?`<div class="detail-row"><span class="detail-lbl">Framing</span><span class="detail-val">${esc(framing)}</span></div>`:''}
+      ${hooks.length?`<div class="detail-row"><span class="detail-lbl">Hooks</span><div>${hooks.map(h=>`<div style="font-size:.78rem;color:var(--text-2);margin-top:.15rem">· ${esc(h)}</div>`).join('')}</div></div>`:''}
+      ${dataGaps.length?`<div class="detail-row"><span class="detail-lbl" style="color:#C2922B">Data gaps</span><p style="font-size:.75rem;color:#C2922B;margin-top:.1rem">${esc(dataGaps.join(' · '))}</p></div>`:''}
+      ${redFlags.length?`<div class="detail-row"><span class="detail-lbl" style="color:var(--red)">Red flags</span><p style="font-size:.75rem;color:var(--red);margin-top:.1rem">${esc(redFlags.join(' · '))}</p></div>`:''}
     </div>
-    ${draftSection}
+
+    ${draftSections}
   </div>`;
 }
 
