@@ -276,6 +276,7 @@ textarea{min-height:180px;}
 <div class="tab-bar">
   <button type="button" class="tab-btn active" onclick="switchTab('w1',this)">Single Outreach</button>
   <button type="button" class="tab-btn" onclick="switchTab('w2',this)">Prospect Ranking &amp; Writer</button>
+  <button type="button" class="tab-btn" onclick="switchTab('w3',this)">Reply Handling</button>
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -501,6 +502,78 @@ textarea{min-height:180px;}
   </div>
 </div><!-- /tab-w2 -->
 
+<!-- ═══════════════════════════════════════════
+     WORKFLOW 3 — Reply Handling
+════════════════════════════════════════════ -->
+<div id="tab-w3" class="tab-pane">
+
+  <div class="field-group">
+    <label class="field-label" for="w3-message">Incoming Message</label>
+    <p class="field-hint">Paste the LinkedIn message you received and want to reply to.</p>
+    <textarea id="w3-message" style="min-height:180px" placeholder="Paste the incoming message here…"></textarea>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0">
+    <div class="field-group">
+      <label class="field-label" for="w3-name">Name <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
+      <input type="text" id="w3-name" style="height:42px" placeholder="Person's name">
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="w3-company">Company <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
+      <input type="text" id="w3-company" style="height:42px" placeholder="Company name">
+    </div>
+  </div>
+
+  <div class="field-group">
+    <label class="field-label" for="w3-position">Position <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
+    <input type="text" id="w3-position" style="height:42px" placeholder="Job position">
+  </div>
+
+  <div class="field-group">
+    <label class="field-label" for="w3-jd">Job Description <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional — paste if the message refers to a role</span></label>
+    <textarea id="w3-jd" style="min-height:160px" placeholder="Paste the job description here if the incoming message refers to the role, requirements, or anything in the JD…"></textarea>
+  </div>
+
+  <div class="field-group">
+    <label class="field-label">Attachment <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional — resume, portfolio, cover letter</span></label>
+    <div class="upload-zone" id="uz-w3">
+      <input type="file" id="w3-attachment" accept=".pdf,.doc,.docx,.txt"/>
+      <svg class="uz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+      <p class="uz-text"><strong onclick="document.getElementById('w3-attachment').click()">Click to upload</strong> or drag and drop<small>PDF, DOC, DOCX, TXT</small></p>
+    </div>
+    <div id="chip-w3"></div>
+  </div>
+
+  <div class="val-box" id="val-w3"><p class="val-title">Please fix the following:</p><ul class="val-list" id="val-w3-list"></ul></div>
+  <hr class="divider"/>
+  <button type="button" class="btn-primary" id="btn-w3" onclick="runReplyHandling()">Generate Reply</button>
+
+  <div class="err-section" id="err-w3">
+    <div class="err-card"><p class="err-title" id="err-w3-title"></p><p class="err-body" id="err-w3-body"></p></div>
+    <button class="btn-secondary" onclick="resetW3()">← Try again</button>
+  </div>
+
+  <div class="out-section" id="out-w3">
+    <div class="out-header">
+      <span class="out-title">Generated Reply</span>
+      <span class="badge badge-green">✓ Ready</span>
+    </div>
+    <div class="out-card">
+      <div class="out-card-hd">
+        <span class="out-card-lbl">Reply</span>
+        <button class="copy-btn" onclick="copyEl('w3-reply-body',this)">Copy</button>
+      </div>
+      <div class="out-card-body">
+        <p class="message-text" id="w3-reply-body"></p>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary" onclick="resetW3()">🔄 Generate Again</button>
+    </div>
+  </div>
+
+</div><!-- /tab-w3 -->
+
 </div><!-- /wrap -->
 <div id="toast"></div>
 
@@ -662,6 +735,79 @@ function resetW2() {
   hideW2();
   const f = document.getElementById('form-w2');
   if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// =========================================================================
+// ── W3 Reply Handling ─────────────────────────────────────────────────────
+const W3_URL = 'https://leadfreak-utils-backend-production.up.railway.app/api/v1/reply-handling'; // TODO: replace with production URL
+
+function resetW3() {
+  ['out-w3','err-w3','val-w3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('visible');
+  });
+}
+
+function runReplyHandling() {
+  resetW3();
+  const message  = (document.getElementById('w3-message')  || {value:''}).value.trim();
+  const name     = (document.getElementById('w3-name')      || {value:''}).value.trim();
+  const company  = (document.getElementById('w3-company')   || {value:''}).value.trim();
+  const position = (document.getElementById('w3-position')  || {value:''}).value.trim();
+  const jd       = (document.getElementById('w3-jd')        || {value:''}).value.trim();
+  const errs = [];
+  if (!message) errs.push('Paste the incoming message.');
+  if (errs.length) {
+    const vl = document.getElementById('val-w3-list');
+    if (vl) vl.innerHTML = errs.map(e=>`<li>${e}</li>`).join('');
+    const vb = document.getElementById('val-w3');
+    if (vb) vb.classList.add('visible');
+    return;
+  }
+  const btn = document.getElementById('btn-w3');
+  btn.disabled = true; btn.textContent = 'Generating…';
+  (async () => {
+    try {
+      const fd = new FormData();
+      fd.append('message', message);
+      const fieldValues = {
+        name:            name,
+        company:         company,
+        job_title:       position,
+        job_description: jd
+      };
+      fd.append('field_values', JSON.stringify(fieldValues));
+      const att = files['w3-attachment'];
+      if (att) fd.append('attachment', att, att.name);
+      const res  = await fetch(W3_URL, { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || data.message || 'Something went wrong.');
+      // Handle special statuses matching the backend contract
+      if (data.status === 'needs_clarification') {
+        throw new Error('The message needs clarification before a reply can be generated.');
+      }
+      if (data.status === 'missing_fields') {
+        const missing = (data.response && data.response.missing_fields) || [];
+        throw new Error('Missing required information: ' + (missing.length ? missing.join(', ') : 'unknown fields'));
+      }
+      if (data.status !== 'matched') throw new Error(data.message || 'Unable to generate a reply.');
+      const reply = (data.response && data.response.generated_reply) || '';
+      if (!reply) throw new Error('Backend returned no reply.');
+      const rb = document.getElementById('w3-reply-body');
+      if (rb) rb.textContent = reply;
+      const out = document.getElementById('out-w3');
+      if (out) { out.classList.add('visible'); out.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    } catch (err) {
+      const et = document.getElementById('err-w3-title');
+      const eb = document.getElementById('err-w3-body');
+      const es = document.getElementById('err-w3');
+      if (et) et.textContent = 'Error';
+      if (eb) eb.textContent = err.message;
+      if (es) es.classList.add('visible');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Generate Reply';
+    }
+  })();
 }
 
 // =========================================================================
@@ -1231,6 +1377,9 @@ function buildProspectCard(drafts, scoredMap, isApproved) {
     ${draftSections}
   </div>`;
 }
+
+// ── W3 upload zone ────────────────────────────────────────────────────────
+setupUpload('w3-attachment', 'uz-w3', 'chip-w3', 'w3-attachment', 'any');
 
 }); // end DOMContentLoaded
 </script>
