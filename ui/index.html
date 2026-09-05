@@ -513,6 +513,12 @@ textarea{min-height:180px;}
     <textarea id="w3-message" style="min-height:180px" placeholder="Paste the incoming message here…"></textarea>
   </div>
 
+  <div class="field-group">
+    <label class="field-label" for="w3-conversation">Conversation History <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
+    <p class="field-hint">Paste the previous LinkedIn conversation here. This is used only as context when generating the reply.</p>
+    <textarea id="w3-conversation" style="min-height:160px" placeholder="Paste the previous LinkedIn conversation here…"></textarea>
+  </div>
+
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0">
     <div class="field-group">
       <label class="field-label" for="w3-name">Name <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
@@ -566,6 +572,10 @@ textarea{min-height:180px;}
       <div class="out-card-body">
         <p class="message-text" id="w3-reply-body"></p>
       </div>
+    </div>
+    <div id="w3-attachment-reminder" style="display:none;background:var(--accent-lt);border:1.5px solid #C7D2FE;border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.875rem;">
+      <p style="font-size:.79rem;font-weight:700;color:var(--accent);margin-bottom:.2rem;">📎 Final Attachment</p>
+      <p id="w3-attachment-reminder-text" style="font-size:.78rem;color:var(--text-2);line-height:1.5;"></p>
     </div>
     <div class="action-row">
       <button class="btn-secondary" onclick="resetW3()">🔄 Generate Again</button>
@@ -636,7 +646,7 @@ function closeAudit(panelId, toggleId) {
 }
 
 // ── File state (global so all file functions can share it) ─────────────────
-const files = { resume1: null, resume2: null, csv2: null };
+const files = { resume1: null, resume2: null, csv2: null, 'w3-attachment': null };
 
 // ── File upload helpers ────────────────────────────────────────────────────
 // clearFile is called from onclick attributes in dynamically-rendered chip HTML
@@ -739,18 +749,23 @@ function resetW2() {
 
 // =========================================================================
 // ── W3 Reply Handling ─────────────────────────────────────────────────────
-const W3_URL = 'https://leadfreak-utils-backend-production.up.railway.app/api/v1/reply-handling'; // TODO: replace with production URL
+const W3_URL = 'https://leadfreak-utils-backend-production.up.railway.app/api/v1/reply-handling';
 
 function resetW3() {
   ['out-w3','err-w3','val-w3'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('visible');
   });
+  const reminder = document.getElementById('w3-attachment-reminder');
+  const reminderText = document.getElementById('w3-attachment-reminder-text');
+  if (reminder) reminder.style.display = 'none';
+  if (reminderText) reminderText.textContent = '';
 }
 
 function runReplyHandling() {
   resetW3();
   const message  = (document.getElementById('w3-message')  || {value:''}).value.trim();
+  const conversationHistory = (document.getElementById('w3-conversation') || {value:''}).value.trim();
   const name     = (document.getElementById('w3-name')      || {value:''}).value.trim();
   const company  = (document.getElementById('w3-company')   || {value:''}).value.trim();
   const position = (document.getElementById('w3-position')  || {value:''}).value.trim();
@@ -777,6 +792,7 @@ function runReplyHandling() {
         job_description: jd
       };
       fd.append('field_values', JSON.stringify(fieldValues));
+      fd.append('conversation_history', conversationHistory);
       const att = files['w3-attachment'];
       if (att) fd.append('attachment', att, att.name);
       const res  = await fetch(W3_URL, { method: 'POST', body: fd });
@@ -793,6 +809,25 @@ function runReplyHandling() {
       if (data.status !== 'matched') throw new Error(data.message || 'Unable to generate a reply.');
       const reply = (data.response && data.response.generated_reply) || '';
       if (!reply) throw new Error('Backend returned no reply.');
+
+      const caseId = data.classification && data.classification.case_id;
+      const attachmentReminders = {
+        positive_resume_request: 'Attach your resume before sending this reply.',
+        email_resume_to_recruiter: 'Attach your resume before sending this reply.',
+        email_resume_to_hiring_manager: 'Attach your resume before sending this reply.'
+      };
+      const reminder = document.getElementById('w3-attachment-reminder');
+      const reminderText = document.getElementById('w3-attachment-reminder-text');
+      if (reminder && reminderText) {
+        if (attachmentReminders[caseId]) {
+          reminderText.textContent = attachmentReminders[caseId];
+          reminder.style.display = '';
+        } else {
+          reminderText.textContent = '';
+          reminder.style.display = 'none';
+        }
+      }
+
       const rb = document.getElementById('w3-reply-body');
       if (rb) rb.textContent = reply;
       const out = document.getElementById('out-w3');
