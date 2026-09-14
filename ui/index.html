@@ -315,15 +315,7 @@ textarea{min-height:180px;}
   </form>
 
   <div class="progress-wrap" id="prog1">
-    <div class="prog-header"><div class="spinner"></div><span class="prog-title">Generating your message…</span></div>
-    <div class="prog-stages" id="stages1">
-      <div class="stage"><div class="stage-dot"></div><span>Extracting résumé text and achievements</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Scraping prospect LinkedIn profile</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Parsing JD requirements and inferring pain points</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Matching résumé evidence to role requirements</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Writing executive InMail draft</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Humanising and finalising message</span></div>
-    </div>
+    <div class="prog-header"><div class="spinner"></div><span class="prog-title">Generating…</span></div>
   </div>
 
   <div class="err-section" id="err1">
@@ -333,19 +325,15 @@ textarea{min-height:180px;}
 
   <div class="out-section" id="hr1">
     <div class="hr-card">
-      <p class="hr-title">⚠️ Sent for Human Review</p>
-      <p class="hr-desc">Your résumé and the job description did not have enough matching evidence to generate a message automatically.</p>
-      <div class="hr-mono" id="hr1-reason">Similarity below automatic approval threshold (0.7).</div>
-      <p class="hr-sec">What this means</p>
-      <ul class="hr-list">
-        <li>No résumé–JD match scored above the 0.7 cosine similarity threshold</li>
-        <li>This usually means the résumé and JD are in different industries or domains</li>
-      </ul>
-      <p class="hr-sec">What you can do</p>
+      <p class="hr-title">⚠️ Could not generate a message automatically</p>
+      <p class="hr-desc">The workflow wasn't able to generate an outreach message for this combination of resume and job description.</p>
+      <div class="hr-mono" id="hr1-reason"></div>
+      <p class="hr-sec">What you can try</p>
       <ul class="hr-action">
         <li>Try a job description closer to your professional background</li>
         <li>Ensure your résumé highlights specific, measurable achievements</li>
         <li>Make sure the PDF is text-based, not a scanned image</li>
+        <li>Add more context in the Prior Conversation field if you have a prior exchange</li>
       </ul>
     </div>
     <button class="btn-secondary" onclick="resetW1()">← Try again</button>
@@ -446,16 +434,8 @@ textarea{min-height:180px;}
   </form>
 
   <div class="progress-wrap" id="prog2">
-    <div class="prog-header"><div class="spinner"></div><span class="prog-title">Processing prospects…</span></div>
-    <div class="prog-stages" id="stages2">
-      <div class="stage"><div class="stage-dot"></div><span>Extracting résumé proof points</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Scraping LinkedIn profiles</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Analysing &amp; scoring each prospect (Stage 0 + Stage 1)</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Ranking &amp; selecting top prospects per bucket</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Writing &amp; linting outreach drafts</span></div>
-      <div class="stage"><div class="stage-dot"></div><span>Judge review &amp; routing</span></div>
-    </div>
-    <p id="poll-status" style="display:none;font-size:.78rem;color:var(--text-3);margin-top:.75rem;font-family:'DM Mono',monospace"></p>
+    <div class="prog-header"><div class="spinner"></div><span class="prog-title">Generating…</span></div>
+    <p id="poll-status" style="display:none;font-size:.78rem;color:var(--text-3);margin-top:.5rem;font-family:'DM Mono',monospace"></p>
   </div>
 
   <div class="err-section" id="err2">
@@ -588,7 +568,7 @@ const W2_URL = 'https://primary-production-37efc.up.railway.app/webhook/outreach
 
 // ── n8n Execution API (for async polling) ────────────────────────────────
 // Replace YOUR_N8N_API_KEY with your actual key from n8n → Settings → API
-const N8N_API_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYjg1MzcyMS1hNTAxLTRmNGQtOTYzOS0zYjM4N2UwYjkwNDQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiMGVkMTdlNjYtOTM5OC00ZDk4LWFkMWMtYjljZTExYjc3YjI1IiwiaWF0IjoxNzg5MTIzNDU1fQ.yBVYb855EjvFb9W2Q_kfF6CDYzkb3PfCRVnPZiQoCls';
+const N8N_API_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYjg1MzcyMS1hNTAxLTRmNGQtOTYzOS0zYjM4N2UwYjkwNDQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiODA2ZjJiMjgtYTZkYi00ZTJlLTk0MjktZGNlZTJjYjRlMWM0IiwiaWF0IjoxNzg3ODI1Mjc1LCJleHAiOjE3OTAzOTUyMDB9.n5ch7qj2jlGoX58Dn8E1A0EVP6WT3KSZa9gu_pDIze8';
 const N8N_BASE_URL = 'https://primary-production-37efc.up.railway.app';
 const POLL_INTERVAL_MS  = 10000;  // poll every 10 seconds
 const POLL_MAX_ATTEMPTS = 90;     // give up after 15 minutes (90 × 10s)
@@ -880,23 +860,12 @@ const D2 = [0, 5000, 16000, 36000, 58000, 85000];
 function startProgress(wrapId, stageId, delays) {
   const wrap = document.getElementById(wrapId);
   if (wrap) wrap.classList.add('visible');
-  const stages = document.querySelectorAll('#' + stageId + ' .stage');
-  stages.forEach(s => s.classList.remove('active', 'done'));
-  delays.forEach((d, i) => setTimeout(() => {
-    stages.forEach((s, si) => {
-      if (si < i)  { s.classList.remove('active'); s.classList.add('done'); }
-      if (si === i){ s.classList.remove('done');   s.classList.add('active'); }
-    });
-  }, d));
 }
 function stopProgress(wrapId, stageId) {
-  document.querySelectorAll('#' + stageId + ' .stage').forEach(s => {
-    s.classList.remove('active'); s.classList.add('done');
-  });
   setTimeout(() => {
     const wrap = document.getElementById(wrapId);
     if (wrap) wrap.classList.remove('visible');
-  }, 400);
+  }, 300);
 }
 
 // ── Validation / error helpers ────────────────────────────────────────────
@@ -985,16 +954,32 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
       showErr('err1', 'err1-title', 'err1-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400)); return;
     }
     let raw = await res.json();
-    // n8n can return: array of items, single object, or object with .output wrapper
-    if (Array.isArray(raw)) raw = raw.find(x => x && (x.status || x.subject || x.message || x.output)) || raw[0];
+    // Unwrap n8n response — handles array, single object, .output wrapper, .json wrapper
+    if (Array.isArray(raw)) {
+      // Find the item with actual content — check both top level and inside .output
+      raw = raw.find(x => {
+        if (!x) return false;
+        const inner = x.output || x.json || x;
+        return inner.status || inner.subject || inner.message;
+      }) || raw[0];
+    }
     if (raw && raw.json) raw = raw.json;
     if (raw && raw.output) raw = raw.output;
     if (!raw) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no data.'); return; }
-    if (raw.status === 'HUMAN_REVIEW') { showHR1(raw.reason || 'Similarity below automatic approval threshold (0.7).'); return; }
+    // Check for human review at any nesting level
+    const status = raw.status || (raw.output && raw.output.status) || '';
+    const reason = raw.reason || (raw.output && raw.output.reason) || 'Your profile and this role did not match closely enough to generate an outreach message automatically. Try a role closer to your background.';
+    if (status === 'HUMAN_REVIEW') { showHR1(reason); return; }
     const subj = (raw.subject || '').trim();
     const msg  = (raw.message || '').trim();
     const audit = raw.audit || {};
-    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message.'); return; }
+    if (!msg) {
+      // One more unwrap attempt — sometimes n8n nests deeper
+      const nested = raw.output || raw.data || {};
+      if (nested.status === 'HUMAN_REVIEW') { showHR1(nested.reason || reason); return; }
+      if (nested.message) { renderW1((nested.subject||'').trim(), nested.message.trim(), nested.audit||{}); return; }
+      showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message.'); return;
+    }
     renderW1(subj, msg, audit);
   } catch (err) {
     stopProgress('prog1', 'stages1');
