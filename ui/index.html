@@ -925,7 +925,6 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
   hideW1();
   const errs = [];
   if (!files.resume1)                               errs.push('Upload your résumé (PDF).');
-  if (!document.getElementById('jd1').value.trim()) errs.push('Paste the job description.');
   if (errs.length) { showVal('val1', 'val1-list', errs); return; }
   const btn = document.getElementById('btn1');
   btn.disabled = true; btn.textContent = 'Generating…';
