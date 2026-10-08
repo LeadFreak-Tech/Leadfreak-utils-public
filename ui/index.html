@@ -929,74 +929,61 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
   const btn = document.getElementById('btn1');
   btn.disabled = true; btn.textContent = 'Generating…';
   startProgress('prog1', 'stages1', D1);
-    try {
-      const fd = new FormData();
-      fd.append('resume', files.resume1, files.resume1.name);
-      fd.append('job_description', document.getElementById('jd1').value.trim());
-      fd.append('prospect_linkedin_url', document.getElementById('li1').value.trim());
-      fd.append('prior_conversation', document.getElementById('prior1').value.trim());
-      const res = await fetch(W1_URL, { method: 'POST', body: fd });
+  // Unwrap n8n response — handles array, direct object, .json wrapper, .output wrapper
+  const extractW1 = x => {
+    if (!x) return null;
+    if (x.message || x.status || x.subject) return x;
+    if (x.json && (x.json.message || x.json.status || x.json.subject)) return x.json;
+    if (x.output && (x.output.message || x.output.status || x.output.subject)) return x.output;
+    if (x.json && x.json.output && (x.json.output.message || x.json.output.status)) return x.json.output;
+    return null;
+  };
+  try {
+    const fd = new FormData();
+    fd.append('resume', files.resume1, files.resume1.name);
+    fd.append('job_description', document.getElementById('jd1').value.trim());
+    fd.append('prospect_linkedin_url', document.getElementById('li1').value.trim());
+    fd.append('prior_conversation', document.getElementById('prior1').value.trim());
+    const res = await fetch(W1_URL, { method: 'POST', body: fd });
     stopProgress('prog1', 'stages1');
-    if (res.status === 500) {
-      let reason = 'Similarity below automatic approval threshold (0.7).';
-      try {
-        const j = await res.json();
-        if (j.message && !j.message.includes('No item to return')) {
-          showErr('err1', 'err1-title', 'err1-body', 'Backend error (500)', j.message || res.statusText); return;
-        }
-      } catch (_) {
-        showErr('err1', 'err1-title', 'err1-body', 'Backend error (500)', res.statusText); return;
-      }
-      showHR1(reason); return;
-    }
     if (!res.ok) {
-      showErr('err1', 'err1-title', 'err1-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400)); return;
+      // Try to parse the body regardless of status — n8n sometimes returns
+      // HUMAN_REVIEW or a structured message inside a non-200 response.
+      let errBody = null;
+      try { errBody = await res.json(); } catch (_) {}
+      // Check for human review at every nesting level
+      const errInner = (errBody && (errBody.json || errBody.output || errBody)) || {};
+      const errStatus = errInner.status || (errBody && errBody.status) || '';
+      if (errStatus === 'HUMAN_REVIEW') {
+        showHR1(errInner.reason || errBody.reason || 'Your profile and this role did not match closely enough to generate an outreach message automatically.'); return;
+      }
+      // Check if it's a known n8n "no item to return" pseudo-error (also human review)
+      const errMsg = (errBody && (errBody.message || errBody.error || '')) || '';
+      if (errMsg.toLowerCase().includes('no item to return') || errMsg.toLowerCase().includes('human_review')) {
+        showHR1('Your profile and this role did not match closely enough to generate an outreach message automatically.'); return;
+      }
+      // Genuine error
+      showErr('err1', 'err1-title', 'err1-body',
+        'Something went wrong',
+        errMsg || (errBody ? JSON.stringify(errBody).slice(0, 200) : res.statusText) + ' — check the n8n execution log for details.'
+      ); return;
     }
     const rawResponse = await res.json();
-    console.log('[W1] raw response:', JSON.stringify(rawResponse).slice(0, 300));
-
-    // n8n responseData:allEntries returns an array of items.
-    // Each item may be: { subject, message, audit } directly,
-    // or wrapped as { json: { subject, message, audit } },
-    // or wrapped as { output: { subject, message, audit } }.
-    // Try every known shape in order until we find message or status.
-    function extractW1(x) {
-      if (!x) return null;
-      // Direct
-      if (x.message || x.status || x.subject) return x;
-      // n8n item wrapper: { json: {...} }
-      if (x.json && (x.json.message || x.json.status || x.json.subject)) return x.json;
-      // LLM chain wrapper: { output: {...} }
-      if (x.output && (x.output.message || x.output.status || x.output.subject)) return x.output;
-      // Double-wrapped: { json: { output: {...} } }
-      if (x.json && x.json.output && (x.json.output.message || x.json.output.status)) return x.json.output;
-      return null;
-    }
-
     let raw = null;
     if (Array.isArray(rawResponse)) {
-      for (const item of rawResponse) {
-        raw = extractW1(item);
-        if (raw) break;
-      }
+      for (const item of rawResponse) { raw = extractW1(item); if (raw) break; }
       if (!raw) raw = extractW1(rawResponse[0]) || rawResponse[0];
     } else {
       raw = extractW1(rawResponse) || rawResponse;
     }
-
-    console.log('[W1] extracted raw:', JSON.stringify(raw).slice(0, 200));
-
     if (!raw) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no data.'); return; }
-
     const status = (raw.status || '').trim();
     const reason = raw.reason || 'Your profile and this role did not match closely enough to generate an outreach message automatically.';
     if (status === 'HUMAN_REVIEW') { showHR1(reason); return; }
-
     const subj  = (raw.subject  || '').trim();
     const msg   = (raw.message  || '').trim();
     const audit = raw.audit || {};
-
-    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message. Check the n8n execution log.'); return; }
+    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message.'); return; }
     renderW1(subj, msg, audit);
   } catch (err) {
     stopProgress('prog1', 'stages1');
