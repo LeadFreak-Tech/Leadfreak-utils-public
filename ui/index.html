@@ -952,33 +952,51 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
     if (!res.ok) {
       showErr('err1', 'err1-title', 'err1-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400)); return;
     }
-    let raw = await res.json();
-    // Unwrap n8n response — handles array, single object, .output wrapper, .json wrapper
-    if (Array.isArray(raw)) {
-      // Find the item with actual content — check both top level and inside .output
-      raw = raw.find(x => {
-        if (!x) return false;
-        const inner = x.output || x.json || x;
-        return inner.status || inner.subject || inner.message;
-      }) || raw[0];
+    const rawResponse = await res.json();
+    console.log('[W1] raw response:', JSON.stringify(rawResponse).slice(0, 300));
+
+    // n8n responseData:allEntries returns an array of items.
+    // Each item may be: { subject, message, audit } directly,
+    // or wrapped as { json: { subject, message, audit } },
+    // or wrapped as { output: { subject, message, audit } }.
+    // Try every known shape in order until we find message or status.
+    function extractW1(x) {
+      if (!x) return null;
+      // Direct
+      if (x.message || x.status || x.subject) return x;
+      // n8n item wrapper: { json: {...} }
+      if (x.json && (x.json.message || x.json.status || x.json.subject)) return x.json;
+      // LLM chain wrapper: { output: {...} }
+      if (x.output && (x.output.message || x.output.status || x.output.subject)) return x.output;
+      // Double-wrapped: { json: { output: {...} } }
+      if (x.json && x.json.output && (x.json.output.message || x.json.output.status)) return x.json.output;
+      return null;
     }
-    if (raw && raw.json) raw = raw.json;
-    if (raw && raw.output) raw = raw.output;
+
+    let raw = null;
+    if (Array.isArray(rawResponse)) {
+      for (const item of rawResponse) {
+        raw = extractW1(item);
+        if (raw) break;
+      }
+      if (!raw) raw = extractW1(rawResponse[0]) || rawResponse[0];
+    } else {
+      raw = extractW1(rawResponse) || rawResponse;
+    }
+
+    console.log('[W1] extracted raw:', JSON.stringify(raw).slice(0, 200));
+
     if (!raw) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no data.'); return; }
-    // Check for human review at any nesting level
-    const status = raw.status || (raw.output && raw.output.status) || '';
-    const reason = raw.reason || (raw.output && raw.output.reason) || 'Your profile and this role did not match closely enough to generate an outreach message automatically. Try a role closer to your background.';
+
+    const status = (raw.status || '').trim();
+    const reason = raw.reason || 'Your profile and this role did not match closely enough to generate an outreach message automatically.';
     if (status === 'HUMAN_REVIEW') { showHR1(reason); return; }
-    const subj = (raw.subject || '').trim();
-    const msg  = (raw.message || '').trim();
+
+    const subj  = (raw.subject  || '').trim();
+    const msg   = (raw.message  || '').trim();
     const audit = raw.audit || {};
-    if (!msg) {
-      // One more unwrap attempt — sometimes n8n nests deeper
-      const nested = raw.output || raw.data || {};
-      if (nested.status === 'HUMAN_REVIEW') { showHR1(nested.reason || reason); return; }
-      if (nested.message) { renderW1((nested.subject||'').trim(), nested.message.trim(), nested.audit||{}); return; }
-      showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message.'); return;
-    }
+
+    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message. Check the n8n execution log.'); return; }
     renderW1(subj, msg, audit);
   } catch (err) {
     stopProgress('prog1', 'stages1');
