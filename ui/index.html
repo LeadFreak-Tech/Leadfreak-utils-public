@@ -510,6 +510,16 @@ textarea{min-height:180px;}
   </div>
 
   <div class="field-group">
+    <label class="field-label" for="w3-job-link">Job Requisition Link <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
+    <p class="field-hint">Provide the job posting URL if the reply needs it. Only mark it expired if you know the link has expired.</p>
+    <input type="url" id="w3-job-link" style="height:42px" placeholder="https://company.com/jobs/…">
+    <label style="display:flex;align-items:center;gap:8px;margin-top:.55rem;font-size:.8rem;color:var(--text-2)">
+      <input type="checkbox" id="w3-job-link-expired" style="width:auto">
+      The job requisition link has expired
+    </label>
+  </div>
+
+  <div class="field-group">
     <label class="field-label" for="w3-jd">Job Description <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional — paste if the conversation refers to a role</span></label>
     <textarea id="w3-jd" style="min-height:160px" placeholder="Paste the job description here if the conversation refers to the role, requirements, or anything in the JD…"></textarea>
   </div>
@@ -536,7 +546,7 @@ textarea{min-height:180px;}
   <div class="out-section" id="out-w3">
     <div class="out-header">
       <span class="out-title">Generated Reply</span>
-      <span class="badge badge-green">✓ Ready</span>
+      <span class="badge badge-green" id="w3-classification-badge">✓ Ready</span>
     </div>
     <div class="out-card">
       <div class="out-card-hd">
@@ -552,6 +562,7 @@ textarea{min-height:180px;}
       <p id="w3-attachment-reminder-text" style="font-size:.78rem;color:var(--text-2);line-height:1.5;"></p>
     </div>
     <div class="action-row">
+      <button class="btn-secondary" id="w3-followup-btn" style="display:none" type="button" onclick="runReplyHandling(window.w3LastCaseId)">↻ Generate Follow-up</button>
       <button class="btn-secondary" onclick="resetW3()">🔄 Generate Again</button>
     </div>
   </div>
@@ -568,7 +579,7 @@ const W2_URL = 'https://primary-production-37efc.up.railway.app/webhook/outreach
 
 // ── n8n Execution API (for async polling) ────────────────────────────────
 // Replace YOUR_N8N_API_KEY with your actual key from n8n → Settings → API
-const N8N_API_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYjg1MzcyMS1hNTAxLTRmNGQtOTYzOS0zYjM4N2UwYjkwNDQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiODA2ZjJiMjgtYTZkYi00ZTJlLTk0MjktZGNlZTJjYjRlMWM0IiwiaWF0IjoxNzg3ODI1Mjc1LCJleHAiOjE3OTAzOTUyMDB9.n5ch7qj2jlGoX58Dn8E1A0EVP6WT3KSZa9gu_pDIze8';
+const N8N_API_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhYjg1MzcyMS1hNTAxLTRmNGQtOTYzOS0zYjM4N2UwYjkwNDQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiZTBkMTY3NTYtNDk0OS00Y2IxLTgyMjYtMDVkZWNmNzlhZWMwIiwiaWF0IjoxNzkxNTQxMTIzfQ.BqNBDmtasQUALpwWWUevaypyEiA60IgHvtUFIDQpf3M';
 const N8N_BASE_URL = 'https://primary-production-37efc.up.railway.app';
 const POLL_INTERVAL_MS  = 10000;  // poll every 10 seconds
 const POLL_MAX_ATTEMPTS = 90;     // give up after 15 minutes (90 × 10s)
@@ -725,6 +736,69 @@ function resetW2() {
 // ── W3 Reply Handling ─────────────────────────────────────────────────────
 const W3_URL = 'https://leadfreak-utils-backend-production.up.railway.app/api/v1/reply-handling';
 
+// Only these backend cases currently define follow_up_template.
+const W3_FOLLOWUP_SUPPORTED_CASES = new Set([
+  'positive_resume_request',
+  'positive_forwarded_to_hiring_team'
+]);
+const W3_CASE_LABELS = {
+  positive_resume_request: 'Resume Requested',
+  positive_rr_id_job_link: 'Job Requisition Link Requested',
+  positive_forwarded_to_hiring_team: 'Forwarded to Hiring Team',
+  positive_recruiter_status_check: 'Recruiter Status Check',
+  positive_recruiter_willing_to_refer: 'Willing to Refer',
+  positive_referral: 'Referral Offered',
+  positive_job_opening: 'Job Opening Shared',
+  positive_interview: 'Interview Opportunity',
+  positive_resume_forwarded: 'Resume Forwarded',
+  positive_hiring_manager: 'Hiring Manager Identified',
+  redirect_another_recruiter: 'Referred to Another Recruiter',
+  redirect_contact_provided: 'Contact Information Provided',
+  redirect_already_connected: 'Already Connected',
+  redirect_follow_up: 'Follow-up Suggested',
+  polite_decline_hr_reviewing: 'HR Reviewing Application',
+  polite_decline_position_closed: 'Position Closed',
+  polite_decline_not_hiring: 'Not Hiring',
+  polite_decline_no_opening: 'No Current Opening',
+  polite_decline_parental_leave: 'Contact Unavailable',
+  polite_decline_check_hiring_manager: 'Hiring Manager Check',
+  positive_thanks: 'Positive Acknowledgement',
+  positive_interest: 'Interest Expressed',
+  positive_recruiter_response: 'Recruiter Response',
+  positive_application_update: 'Application Update',
+  positive_other: 'Positive Reply'
+};
+window.w3LastCaseId = '';
+
+function w3ClassificationDisplay(data) {
+  if (data.status === 'needs_clarification') {
+    return { label: 'Needs Clarification', tone: 'amber' };
+  }
+  const response = data.response || {};
+  if (response.category === 'jd_information') {
+    return { label: 'Job Description Information', tone: 'blue' };
+  }
+  if (response.category === 'follow_up' || response.follow_up_used === true) {
+    const base = response.case_id || (data.classification && data.classification.case_id) || '';
+    const label = W3_CASE_LABELS[base] || base.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return { label: label ? 'Follow-up — ' + label : 'Follow-up Reply', tone: 'blue' };
+  }
+  const caseId = (data.classification && data.classification.case_id) || response.case_id || '';
+  if (!caseId) return { label: 'Reply Generated', tone: 'green' };
+  return {
+    label: W3_CASE_LABELS[caseId] || caseId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+    tone: 'green'
+  };
+}
+
+function w3SetClassification(data) {
+  const badge = document.getElementById('w3-classification-badge');
+  if (!badge) return;
+  const info = w3ClassificationDisplay(data);
+  badge.textContent = info.label;
+  badge.className = 'badge ' + (info.tone === 'amber' ? 'badge-amber' : info.tone === 'blue' ? 'badge-blue' : 'badge-green');
+}
+
 function resetW3() {
   ['out-w3','err-w3','val-w3'].forEach(id => {
     const el = document.getElementById(id);
@@ -736,53 +810,80 @@ function resetW3() {
   if (reminderText) reminderText.textContent = '';
 }
 
-function runReplyHandling() {
+function runReplyHandling(followUpCaseId = '') {
   resetW3();
   const message  = (document.getElementById('w3-message')  || {value:''}).value.trim();
   const name     = (document.getElementById('w3-name')      || {value:''}).value.trim();
   const company  = (document.getElementById('w3-company')   || {value:''}).value.trim();
   const position = (document.getElementById('w3-position')  || {value:''}).value.trim();
   const jd       = (document.getElementById('w3-jd')        || {value:''}).value.trim();
+  const linkInput = document.getElementById('w3-job-link');
+  const expiredInput = document.getElementById('w3-job-link-expired');
+  const jobLink = expiredInput && expiredInput.checked ? 'expired' : ((linkInput || {value:''}).value || '').trim();
   const errs = [];
   if (!message) errs.push('Paste the LinkedIn conversation.');
   if (errs.length) {
     const vl = document.getElementById('val-w3-list');
-    if (vl) vl.innerHTML = errs.map(e=>`<li>${e}</li>`).join('');
+    if (vl) vl.innerHTML = errs.map(e=>`<li>${esc(e)}</li>`).join('');
     const vb = document.getElementById('val-w3');
     if (vb) vb.classList.add('visible');
     return;
   }
   const btn = document.getElementById('btn-w3');
-  btn.disabled = true; btn.textContent = 'Generating…';
+  const followupBtn = document.getElementById('w3-followup-btn');
+  btn.disabled = true;
+  btn.textContent = followUpCaseId ? 'Generating Follow-up…' : 'Generating…';
+  if (followupBtn) followupBtn.disabled = true;
   (async () => {
     try {
       const fd = new FormData();
       fd.append('message', message);
       const fieldValues = {
-        name:            name,
-        company:         company,
-        job_title:       position
+        name: name,
+        company: company,
+        job_title: position,
+        job_requisition_link: jobLink
       };
       fd.append('field_values', JSON.stringify(fieldValues));
       fd.append('job_description', jd);
+      if (followUpCaseId) fd.append('follow_up_case_id', followUpCaseId);
       const att = files['w3-attachment'];
       if (att) fd.append('attachment', att, att.name);
-      const res  = await fetch(W3_URL, { method: 'POST', body: fd });
+      const res = await fetch(W3_URL, { method: 'POST', body: fd });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || data.message || 'Something went wrong.');
-      // Handle special statuses matching the backend contract
-      if (data.status === 'needs_clarification') {
-        throw new Error('The message needs clarification before a reply can be generated.');
-      }
+
       if (data.status === 'missing_fields') {
         const missing = (data.response && data.response.missing_fields) || [];
-        throw new Error('Missing required information: ' + (missing.length ? missing.join(', ') : 'unknown fields'));
+        const et = document.getElementById('err-w3-title');
+        const eb = document.getElementById('err-w3-body');
+        const es = document.getElementById('err-w3');
+        if (et) et.textContent = 'Missing Required Information';
+        if (eb) eb.textContent = missing.length
+          ? 'Please provide: ' + missing.join(', ')
+          : (data.message || 'Some required information is missing.');
+        if (es) es.classList.add('visible');
+        return;
       }
+      if (data.status === 'needs_clarification') {
+        const et = document.getElementById('err-w3-title');
+        const eb = document.getElementById('err-w3-body');
+        const es = document.getElementById('err-w3');
+        if (et) et.textContent = 'Needs Clarification';
+        if (eb) eb.textContent = data.message || 'The incoming message is ambiguous. Please review the conversation and try again.';
+        if (es) es.classList.add('visible');
+        return;
+      }
+      if (!res.ok) throw new Error(data.detail || data.message || 'Something went wrong.');
       if (data.status !== 'matched') throw new Error(data.message || 'Unable to generate a reply.');
-      const reply = (data.response && data.response.generated_reply) || '';
+
+      const response = data.response || {};
+      const reply = response.generated_reply || '';
       if (!reply) throw new Error('Backend returned no reply.');
 
-      const caseId = data.classification && data.classification.case_id;
+      const caseId = (data.classification && data.classification.case_id) || response.case_id || '';
+      window.w3LastCaseId = caseId;
+      w3SetClassification(data);
+
       const attachmentReminders = {
         positive_resume_request: 'Attach your resume before sending this reply.',
         email_resume_to_recruiter: 'Attach your resume before sending this reply.',
@@ -802,6 +903,11 @@ function runReplyHandling() {
 
       const rb = document.getElementById('w3-reply-body');
       if (rb) rb.textContent = reply;
+      if (followupBtn) {
+        const canFollowUp = !followUpCaseId && W3_FOLLOWUP_SUPPORTED_CASES.has(caseId);
+        followupBtn.style.display = canFollowUp ? '' : 'none';
+        followupBtn.disabled = false;
+      }
       const out = document.getElementById('out-w3');
       if (out) { out.classList.add('visible'); out.scrollIntoView({ behavior:'smooth', block:'start' }); }
     } catch (err) {
@@ -812,7 +918,9 @@ function runReplyHandling() {
       if (eb) eb.textContent = err.message;
       if (es) es.classList.add('visible');
     } finally {
-      btn.disabled = false; btn.textContent = 'Generate Reply';
+      btn.disabled = false;
+      btn.textContent = 'Generate Reply';
+      if (followupBtn) followupBtn.disabled = false;
     }
   })();
 }
@@ -929,74 +1037,61 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
   const btn = document.getElementById('btn1');
   btn.disabled = true; btn.textContent = 'Generating…';
   startProgress('prog1', 'stages1', D1);
-    try {
-      const fd = new FormData();
-      fd.append('resume', files.resume1, files.resume1.name);
-      fd.append('job_description', document.getElementById('jd1').value.trim());
-      fd.append('prospect_linkedin_url', document.getElementById('li1').value.trim());
-      fd.append('prior_conversation', document.getElementById('prior1').value.trim());
-      const res = await fetch(W1_URL, { method: 'POST', body: fd });
+  // Unwrap n8n response — handles array, direct object, .json wrapper, .output wrapper
+  const extractW1 = x => {
+    if (!x) return null;
+    if (x.message || x.status || x.subject) return x;
+    if (x.json && (x.json.message || x.json.status || x.json.subject)) return x.json;
+    if (x.output && (x.output.message || x.output.status || x.output.subject)) return x.output;
+    if (x.json && x.json.output && (x.json.output.message || x.json.output.status)) return x.json.output;
+    return null;
+  };
+  try {
+    const fd = new FormData();
+    fd.append('resume', files.resume1, files.resume1.name);
+    fd.append('job_description', document.getElementById('jd1').value.trim());
+    fd.append('prospect_linkedin_url', document.getElementById('li1').value.trim());
+    fd.append('prior_conversation', document.getElementById('prior1').value.trim());
+    const res = await fetch(W1_URL, { method: 'POST', body: fd });
     stopProgress('prog1', 'stages1');
-    if (res.status === 500) {
-      let reason = 'Similarity below automatic approval threshold (0.7).';
-      try {
-        const j = await res.json();
-        if (j.message && !j.message.includes('No item to return')) {
-          showErr('err1', 'err1-title', 'err1-body', 'Backend error (500)', j.message || res.statusText); return;
-        }
-      } catch (_) {
-        showErr('err1', 'err1-title', 'err1-body', 'Backend error (500)', res.statusText); return;
-      }
-      showHR1(reason); return;
-    }
     if (!res.ok) {
-      showErr('err1', 'err1-title', 'err1-body', 'Request failed — ' + res.status, (await res.text()).slice(0, 400)); return;
+      // Try to parse the body regardless of status — n8n sometimes returns
+      // HUMAN_REVIEW or a structured message inside a non-200 response.
+      let errBody = null;
+      try { errBody = await res.json(); } catch (_) {}
+      // Check for human review at every nesting level
+      const errInner = (errBody && (errBody.json || errBody.output || errBody)) || {};
+      const errStatus = errInner.status || (errBody && errBody.status) || '';
+      if (errStatus === 'HUMAN_REVIEW') {
+        showHR1(errInner.reason || errBody.reason || 'Your profile and this role did not match closely enough to generate an outreach message automatically.'); return;
+      }
+      // Check if it's a known n8n "no item to return" pseudo-error (also human review)
+      const errMsg = (errBody && (errBody.message || errBody.error || '')) || '';
+      if (errMsg.toLowerCase().includes('no item to return') || errMsg.toLowerCase().includes('human_review')) {
+        showHR1('Your profile and this role did not match closely enough to generate an outreach message automatically.'); return;
+      }
+      // Genuine error
+      showErr('err1', 'err1-title', 'err1-body',
+        'Something went wrong',
+        errMsg || (errBody ? JSON.stringify(errBody).slice(0, 200) : res.statusText) + ' — check the n8n execution log for details.'
+      ); return;
     }
     const rawResponse = await res.json();
-    console.log('[W1] raw response:', JSON.stringify(rawResponse).slice(0, 300));
-
-    // n8n responseData:allEntries returns an array of items.
-    // Each item may be: { subject, message, audit } directly,
-    // or wrapped as { json: { subject, message, audit } },
-    // or wrapped as { output: { subject, message, audit } }.
-    // Try every known shape in order until we find message or status.
-    function extractW1(x) {
-      if (!x) return null;
-      // Direct
-      if (x.message || x.status || x.subject) return x;
-      // n8n item wrapper: { json: {...} }
-      if (x.json && (x.json.message || x.json.status || x.json.subject)) return x.json;
-      // LLM chain wrapper: { output: {...} }
-      if (x.output && (x.output.message || x.output.status || x.output.subject)) return x.output;
-      // Double-wrapped: { json: { output: {...} } }
-      if (x.json && x.json.output && (x.json.output.message || x.json.output.status)) return x.json.output;
-      return null;
-    }
-
     let raw = null;
     if (Array.isArray(rawResponse)) {
-      for (const item of rawResponse) {
-        raw = extractW1(item);
-        if (raw) break;
-      }
+      for (const item of rawResponse) { raw = extractW1(item); if (raw) break; }
       if (!raw) raw = extractW1(rawResponse[0]) || rawResponse[0];
     } else {
       raw = extractW1(rawResponse) || rawResponse;
     }
-
-    console.log('[W1] extracted raw:', JSON.stringify(raw).slice(0, 200));
-
     if (!raw) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no data.'); return; }
-
     const status = (raw.status || '').trim();
     const reason = raw.reason || 'Your profile and this role did not match closely enough to generate an outreach message automatically.';
     if (status === 'HUMAN_REVIEW') { showHR1(reason); return; }
-
     const subj  = (raw.subject  || '').trim();
     const msg   = (raw.message  || '').trim();
     const audit = raw.audit || {};
-
-    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message. Check the n8n execution log.'); return; }
+    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message.'); return; }
     renderW1(subj, msg, audit);
   } catch (err) {
     stopProgress('prog1', 'stages1');
@@ -1409,6 +1504,14 @@ function buildProspectCard(drafts, scoredMap, isApproved) {
 
 // ── W3 upload zone ────────────────────────────────────────────────────────
 setupUpload('w3-attachment', 'uz-w3', 'chip-w3', 'w3-attachment', 'any');
+const w3ExpiredCheckbox = document.getElementById('w3-job-link-expired');
+const w3JobLinkInput = document.getElementById('w3-job-link');
+if (w3ExpiredCheckbox && w3JobLinkInput) {
+  w3ExpiredCheckbox.addEventListener('change', () => {
+    w3JobLinkInput.disabled = w3ExpiredCheckbox.checked;
+    if (w3ExpiredCheckbox.checked) w3JobLinkInput.value = '';
+  });
+}
 
 }); // end DOMContentLoaded
 </script>
