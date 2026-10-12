@@ -258,6 +258,138 @@ textarea{min-height:180px;}
 #toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--text);color:#fff;font-size:.79rem;font-weight:500;padding:.5rem .95rem;border-radius:var(--r);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:999;font-family:'DM Sans',sans-serif;}
 #toast.show{opacity:1;transform:translateY(0);}
 
+/* ══════════════════════════════════════
+   W2 DASHBOARD REDESIGN
+═══════════════════════════════════════ */
+
+/* Summary cards */
+.dash-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-bottom:1.25rem;}
+@media(max-width:600px){.dash-summary{grid-template-columns:repeat(3,1fr);}}
+.dash-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:.65rem .75rem;text-align:center;box-shadow:var(--sh);}
+.dash-card-n{font-size:1.5rem;font-weight:700;line-height:1;color:var(--text);}
+.dash-card-n.c-green{color:var(--green);}
+.dash-card-n.c-amber{color:var(--amber);}
+.dash-card-n.c-red{color:var(--red);}
+.dash-card-l{font-size:.68rem;color:var(--text-3);margin-top:.2rem;line-height:1.3;}
+
+/* View tabs */
+.view-tabs{display:flex;gap:.3rem;margin-bottom:.875rem;border-bottom:1px solid var(--border);padding-bottom:0;}
+.view-tab{background:none;border:none;border-bottom:2px solid transparent;padding:.4rem .75rem;font-family:'DM Sans',sans-serif;font-size:.79rem;font-weight:600;color:var(--text-2);cursor:pointer;transition:color .15s,border-color .15s;margin-bottom:-1px;}
+.view-tab:hover{color:var(--text);}
+.view-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.view-tab .vt-count{display:inline-block;margin-left:4px;font-size:.68rem;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:0 5px;color:var(--text-3);font-weight:500;}
+
+/* Toolbar: search + sort + filter */
+.dash-toolbar{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap;}
+.dash-search{flex:1;min-width:160px;height:34px;padding:.3rem .7rem;font-family:'DM Sans',sans-serif;font-size:.8rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);outline:none;transition:border-color .15s;}
+.dash-search:focus{border-color:var(--border-focus);}
+.dash-select{height:34px;padding:.3rem .6rem;font-family:'DM Sans',sans-serif;font-size:.78rem;border:1.5px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text-2);cursor:pointer;outline:none;}
+
+/* Prospect table */
+.prospect-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+.prospect-table th{text-align:left;font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);padding:.45rem .6rem;border-bottom:1.5px solid var(--border);background:var(--bg);white-space:nowrap;cursor:pointer;user-select:none;}
+.prospect-table th:hover{color:var(--text);}
+.prospect-table th .sort-arrow{margin-left:3px;opacity:.4;}
+.prospect-table th.sorted .sort-arrow{opacity:1;color:var(--accent);}
+.prospect-table td{padding:.55rem .6rem;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);}
+.prospect-table tr:last-child td{border-bottom:none;}
+.prospect-table tr:hover td{background:#FAFAF9;}
+.prospect-table .td-rank{font-size:.72rem;font-weight:700;color:var(--text-3);font-family:'DM Mono',monospace;white-space:nowrap;}
+.prospect-table .td-name{font-weight:600;max-width:140px;}
+.prospect-table .td-name span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prospect-table .td-company{color:var(--text-2);font-size:.77rem;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prospect-table .td-score{font-weight:700;font-size:.9rem;white-space:nowrap;}
+.prospect-table .td-na{color:var(--text-3);font-size:.73rem;}
+
+/* Compact status badge */
+.sbadge{display:inline-flex;align-items:center;font-size:.67rem;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap;}
+.sbadge-green{background:var(--green-lt);color:#166534;border:1px solid var(--green-bd);}
+.sbadge-amber{background:var(--amber-lt);color:var(--amber-tx);border:1px solid var(--amber-bd);}
+.sbadge-red{background:var(--red-lt);color:#991B1B;border:1px solid var(--red-bd);}
+.sbadge-gray{background:var(--bg);color:var(--text-3);border:1px solid var(--border);}
+.sbadge-blue{background:var(--blue-lt);color:var(--blue);border:1px solid var(--blue-bd);}
+
+/* View details button */
+.btn-detail{background:none;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:3px 8px;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:500;color:var(--accent);cursor:pointer;transition:background .12s,border-color .12s;white-space:nowrap;}
+.btn-detail:hover{background:var(--accent-lt);border-color:#C7D2FE;}
+
+/* Channel icons in table */
+.ch-icons{display:flex;gap:3px;}
+.ch-icon{font-size:.75rem;opacity:.7;}
+
+/* Empty state */
+.dash-empty{text-align:center;padding:2rem 1rem;color:var(--text-3);font-size:.82rem;}
+
+/* ── Detail panel (drawer-style below table) ── */
+.detail-panel{display:none;margin-top:.5rem;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-md);overflow:hidden;}
+.detail-panel.open{display:block;}
+.detail-header{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1.1rem;border-bottom:1px solid var(--border);background:var(--bg);}
+.detail-header-left{display:flex;align-items:center;gap:.75rem;}
+.detail-score{font-size:1.65rem;font-weight:700;line-height:1;}
+.detail-name{font-size:.95rem;font-weight:700;}
+.detail-pills{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.3rem;}
+.detail-close{background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-3);padding:0 4px;line-height:1;}
+.detail-close:hover{color:var(--text);}
+
+/* Detail section tabs */
+.detail-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--bg);overflow-x:auto;}
+.detail-tab{background:none;border:none;border-bottom:2px solid transparent;padding:.45rem .85rem;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:600;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:color .12s,border-color .12s;margin-bottom:-1px;}
+.detail-tab:hover{color:var(--text);}
+.detail-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.detail-body{padding:1rem 1.1rem;}
+.detail-section{display:none;}
+.detail-section.active{display:block;}
+
+/* Score grid in detail */
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem .75rem;margin-top:.5rem;}
+@media(max-width:480px){.score-grid{grid-template-columns:repeat(2,1fr);}}
+.score-cell{background:var(--bg);border-radius:var(--r-sm);padding:.45rem .6rem;}
+.score-cell-lbl{font-size:.65rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.15rem;}
+.score-cell-val{font-size:1rem;font-weight:700;color:var(--text);}
+.score-bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.35rem;}
+.score-bar-lbl{font-size:.72rem;color:var(--text-2);min-width:80px;flex-shrink:0;}
+.score-bar-wrap{flex:1;height:6px;background:#F3F4F6;border-radius:3px;overflow:hidden;}
+.score-bar-fill{height:100%;border-radius:3px;}
+.score-bar-num{font-size:.72rem;font-weight:600;color:var(--text);min-width:22px;text-align:right;}
+
+/* Draft tabs in detail */
+.draft-tabs{display:flex;gap:.3rem;margin-bottom:.75rem;flex-wrap:wrap;}
+.draft-tab-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);padding:.3rem .7rem;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;color:var(--text-2);cursor:pointer;transition:all .12s;}
+.draft-tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.draft-content{display:none;}
+.draft-content.active{display:block;}
+.draft-verdict{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+.draft-msg-subject{font-size:.87rem;font-weight:700;margin-bottom:.5rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+.draft-msg-body{font-family:'DM Mono',monospace;font-size:.78rem;line-height:1.85;white-space:pre-wrap;color:var(--text);}
+.draft-meta{margin-top:.6rem;display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;}
+.flag-row{margin-top:.5rem;font-size:.75rem;color:var(--amber);line-height:1.6;}
+
+/* Quality scores in detail */
+.quality-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem .6rem;margin-top:.5rem;}
+@media(max-width:480px){.quality-grid{grid-template-columns:repeat(2,1fr);}}
+.quality-cell{background:var(--bg);border-radius:var(--r-sm);padding:.4rem .55rem;}
+.quality-lbl{font-size:.63rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;}
+.quality-val{font-size:.95rem;font-weight:700;color:var(--text);}
+
+/* Strategic fields */
+.strat-row{margin-bottom:.6rem;}
+.strat-lbl{font-size:.67rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem;}
+.strat-val{font-size:.82rem;color:var(--text-2);line-height:1.65;}
+.strat-hooks{list-style:none;margin-top:.15rem;}
+.strat-hooks li{font-size:.81rem;color:var(--text-2);line-height:1.65;}
+.strat-hooks li::before{content:"· ";color:var(--text-3);}
+
+/* Copy button */
+.copy-btn{background:none;border:1.5px solid var(--border);border-radius:var(--r-sm);padding:3px 8px;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:500;color:var(--text-2);cursor:pointer;transition:background .12s,border-color .12s;}
+.copy-btn:hover{background:var(--bg);border-color:#C9C8C3;}
+.copy-btn.copied{color:var(--green);border-color:var(--green-bd);}
+
+/* Routing section */
+.route-status{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+.route-reasons{font-size:.78rem;color:var(--amber);line-height:1.7;margin-top:.25rem;}
+.route-reasons li{list-style:none;padding:.1rem 0;}
+.route-reasons li::before{content:"⚠ ";}
+
 @media(max-width:600px){h1{font-size:1.3rem;}body{padding:0 .75rem 4rem;}.site-header{padding:1.75rem 0 1.25rem;}.pcard-hd{flex-direction:column;}.subscore-grid{grid-template-columns:1fr;}}
 @media(prefers-reduced-motion:reduce){.spinner{animation:none;}*{transition:none!important;}}
 </style>
@@ -295,8 +427,8 @@ textarea{min-height:180px;}
       <div id="chip1"></div>
     </div>
     <div class="field-group">
-      <label class="field-label" for="jd1">Job Description</label>
-      <p class="field-hint">Paste the full posting — requirements and context both matter.</p>
+      <label class="field-label" for="jd1">Job Description <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
+      <p class="field-hint">Paste the full posting if available — if omitted, the workflow derives context from the prior conversation.</p>
       <textarea id="jd1" placeholder="Paste the complete job description here…"></textarea>
     </div>
     <div class="field-group">
@@ -443,42 +575,120 @@ textarea{min-height:180px;}
     <button class="btn-secondary" onclick="resetW2()">← Try again</button>
   </div>
 
-  <!-- W2 Results -->
+  <!-- W2 Results Dashboard -->
   <div class="out-section" id="out2">
-    <div class="out-header">
-      <span class="out-title">Results</span>
+    <div class="out-header" style="margin-bottom:1rem">
+      <span class="out-title">Prospect Dashboard</span>
       <button class="btn-secondary" onclick="resetW2()">🔄 Run Again</button>
     </div>
 
-    <!-- Stats row -->
-    <div class="stats-row" id="w2-stats"></div>
+    <!-- Summary cards -->
+    <div class="dash-summary" id="w2-stats"></div>
 
-    <!-- Band legend -->
-    <div class="band-legend">
-      <span class="band-dot"><span class="dot dot-prime"></span>Prime</span>
-      <span class="band-dot"><span class="dot dot-strong"></span>Strong</span>
-      <span class="band-dot"><span class="dot dot-moderate"></span>Moderate</span>
-      <span class="band-dot"><span class="dot dot-weak"></span>Weak</span>
-      <span class="band-dot"><span class="dot dot-skip"></span>Skip</span>
+    <!-- View tabs -->
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="setDashView('all',this)">All Prospects <span class="vt-count" id="vt-all">0</span></button>
+      <button class="view-tab" onclick="setDashView('approved',this)">Approved <span class="vt-count" id="vt-approved">0</span></button>
+      <button class="view-tab" onclick="setDashView('review',this)">Human Review <span class="vt-count" id="vt-review">0</span></button>
+      <button class="view-tab" onclick="setDashView('failed',this)">Failed Scrapes <span class="vt-count" id="vt-failed">0</span></button>
     </div>
 
-    <!-- Approved -->
-    <div id="w2-approved-wrap">
-      <div class="section-hdr"><span class="badge badge-green">✓ Approved</span><span id="w2-approved-count" style="font-size:.8rem;color:var(--text-2);font-weight:400"></span></div>
-      <div id="w2-approved"></div>
+    <!-- Toolbar -->
+    <div class="dash-toolbar">
+      <input class="dash-search" id="dash-search" type="text" placeholder="Search by name, company…" oninput="filterDashTable()">
+      <select class="dash-select" id="dash-sort" onchange="sortDashTable()">
+        <option value="rank">Sort: Rank</option>
+        <option value="score">Sort: Score</option>
+        <option value="name">Sort: Name</option>
+        <option value="status">Sort: Status</option>
+      </select>
+      <select class="dash-select" id="dash-filter-status" onchange="filterDashTable()">
+        <option value="">All statuses</option>
+        <option value="approved">Approved</option>
+        <option value="review">Human Review</option>
+      </select>
     </div>
 
-    <!-- Human review -->
-    <div id="w2-review-wrap">
-      <div class="section-hdr"><span class="badge badge-amber">⚠ Human Review</span><span id="w2-review-count" style="font-size:.8rem;color:var(--text-2);font-weight:400"></span></div>
-      <div id="w2-review"></div>
+    <!-- Prospect table -->
+    <div style="overflow-x:auto;border:1.5px solid var(--border);border-radius:var(--r);background:var(--surface);box-shadow:var(--sh);">
+      <table class="prospect-table" id="dash-table">
+        <thead>
+          <tr>
+            <th onclick="sortDashBy('rank')">Rank <span class="sort-arrow">↕</span></th>
+            <th onclick="sortDashBy('name')">Prospect <span class="sort-arrow">↕</span></th>
+            <th onclick="sortDashBy('score')">Score <span class="sort-arrow">↕</span></th>
+            <th>Band</th>
+            <th>Archetype</th>
+            <th>Confidence</th>
+            <th>Relationship</th>
+            <th>Channels</th>
+            <th onclick="sortDashBy('status')">Status <span class="sort-arrow">↕</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="dash-tbody"></tbody>
+      </table>
+      <div class="dash-empty" id="dash-empty" style="display:none">No prospects match the current filter.</div>
     </div>
 
-    <!-- Failed -->
-    <div id="w2-failed-wrap" style="display:none">
+    <!-- Failed scrapes (shown in "Failed" tab) -->
+    <div id="w2-failed-wrap" style="display:none;margin-top:1rem">
       <div class="section-hdr"><span class="badge badge-red">✕ Failed Scrapes</span></div>
       <ul class="failed-list" id="w2-failed"></ul>
     </div>
+
+    <!-- Detail panel -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-header">
+        <div class="detail-header-left">
+          <div class="detail-score" id="dp-score"></div>
+          <div>
+            <div class="detail-name" id="dp-name"></div>
+            <div class="detail-pills" id="dp-pills"></div>
+          </div>
+        </div>
+        <button class="detail-close" onclick="closeDetail()" title="Close">✕</button>
+      </div>
+      <div class="detail-tabs">
+        <button class="detail-tab active" onclick="setDetailTabByName('overview',this)">Overview</button>
+        <button class="detail-tab" onclick="setDetailTabByName('scores',this)">Scores</button>
+        <button class="detail-tab" onclick="setDetailTabByName('strategy',this)">Strategy</button>
+        <button class="detail-tab" onclick="setDetailTabByName('drafts',this)">Drafts</button>
+        <button class="detail-tab" onclick="setDetailTabByName('quality',this)">Quality</button>
+        <button class="detail-tab" onclick="setDetailTabByName('routing',this)">Routing</button>
+      </div>
+      <div class="detail-body">
+        <!-- Overview -->
+        <div class="detail-section active" id="ds-overview">
+          <div id="dp-rationale" style="font-size:.85rem;color:var(--text);line-height:1.7;margin-bottom:.75rem"></div>
+          <div id="dp-meta" style="font-size:.79rem;color:var(--text-2);line-height:1.8"></div>
+        </div>
+        <!-- Scores -->
+        <div class="detail-section" id="ds-scores">
+          <div class="score-grid" id="dp-score-grid"></div>
+          <div style="margin-top:1rem" id="dp-score-bars"></div>
+        </div>
+        <!-- Strategy -->
+        <div class="detail-section" id="ds-strategy">
+          <div id="dp-strategy"></div>
+        </div>
+        <!-- Drafts -->
+        <div class="detail-section" id="ds-drafts">
+          <div class="draft-tabs" id="dp-draft-tabs"></div>
+          <div id="dp-draft-contents"></div>
+        </div>
+        <!-- Quality -->
+        <div class="detail-section" id="ds-quality">
+          <div class="quality-grid" id="dp-quality-grid"></div>
+          <div id="dp-quality-flags" style="margin-top:.75rem"></div>
+        </div>
+        <!-- Routing -->
+        <div class="detail-section" id="ds-routing">
+          <div id="dp-routing"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div><!-- /tab-w2 -->
 
@@ -510,16 +720,6 @@ textarea{min-height:180px;}
   </div>
 
   <div class="field-group">
-    <label class="field-label" for="w3-job-link">Job Requisition Link <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional</span></label>
-    <p class="field-hint">Provide the job posting URL if the reply needs it. Only mark it expired if you know the link has expired.</p>
-    <input type="url" id="w3-job-link" style="height:42px" placeholder="https://company.com/jobs/…">
-    <label style="display:flex;align-items:center;gap:8px;margin-top:.55rem;font-size:.8rem;color:var(--text-2)">
-      <input type="checkbox" id="w3-job-link-expired" style="width:auto">
-      The job requisition link has expired
-    </label>
-  </div>
-
-  <div class="field-group">
     <label class="field-label" for="w3-jd">Job Description <span style="font-size:.72rem;font-weight:400;color:var(--text-3)">optional — paste if the conversation refers to a role</span></label>
     <textarea id="w3-jd" style="min-height:160px" placeholder="Paste the job description here if the conversation refers to the role, requirements, or anything in the JD…"></textarea>
   </div>
@@ -546,7 +746,7 @@ textarea{min-height:180px;}
   <div class="out-section" id="out-w3">
     <div class="out-header">
       <span class="out-title">Generated Reply</span>
-      <span class="badge badge-green" id="w3-classification-badge">✓ Ready</span>
+      <span class="badge badge-green">✓ Ready</span>
     </div>
     <div class="out-card">
       <div class="out-card-hd">
@@ -562,7 +762,6 @@ textarea{min-height:180px;}
       <p id="w3-attachment-reminder-text" style="font-size:.78rem;color:var(--text-2);line-height:1.5;"></p>
     </div>
     <div class="action-row">
-      <button class="btn-secondary" id="w3-followup-btn" style="display:none" type="button" onclick="runReplyHandling(window.w3LastCaseId)">↻ Generate Follow-up</button>
       <button class="btn-secondary" onclick="resetW3()">🔄 Generate Again</button>
     </div>
   </div>
@@ -736,69 +935,6 @@ function resetW2() {
 // ── W3 Reply Handling ─────────────────────────────────────────────────────
 const W3_URL = 'https://leadfreak-utils-backend-production.up.railway.app/api/v1/reply-handling';
 
-// Only these backend cases currently define follow_up_template.
-const W3_FOLLOWUP_SUPPORTED_CASES = new Set([
-  'positive_resume_request',
-  'positive_forwarded_to_hiring_team'
-]);
-const W3_CASE_LABELS = {
-  positive_resume_request: 'Resume Requested',
-  positive_rr_id_job_link: 'Job Requisition Link Requested',
-  positive_forwarded_to_hiring_team: 'Forwarded to Hiring Team',
-  positive_recruiter_status_check: 'Recruiter Status Check',
-  positive_recruiter_willing_to_refer: 'Willing to Refer',
-  positive_referral: 'Referral Offered',
-  positive_job_opening: 'Job Opening Shared',
-  positive_interview: 'Interview Opportunity',
-  positive_resume_forwarded: 'Resume Forwarded',
-  positive_hiring_manager: 'Hiring Manager Identified',
-  redirect_another_recruiter: 'Referred to Another Recruiter',
-  redirect_contact_provided: 'Contact Information Provided',
-  redirect_already_connected: 'Already Connected',
-  redirect_follow_up: 'Follow-up Suggested',
-  polite_decline_hr_reviewing: 'HR Reviewing Application',
-  polite_decline_position_closed: 'Position Closed',
-  polite_decline_not_hiring: 'Not Hiring',
-  polite_decline_no_opening: 'No Current Opening',
-  polite_decline_parental_leave: 'Contact Unavailable',
-  polite_decline_check_hiring_manager: 'Hiring Manager Check',
-  positive_thanks: 'Positive Acknowledgement',
-  positive_interest: 'Interest Expressed',
-  positive_recruiter_response: 'Recruiter Response',
-  positive_application_update: 'Application Update',
-  positive_other: 'Positive Reply'
-};
-window.w3LastCaseId = '';
-
-function w3ClassificationDisplay(data) {
-  if (data.status === 'needs_clarification') {
-    return { label: 'Needs Clarification', tone: 'amber' };
-  }
-  const response = data.response || {};
-  if (response.category === 'jd_information') {
-    return { label: 'Job Description Information', tone: 'blue' };
-  }
-  if (response.category === 'follow_up' || response.follow_up_used === true) {
-    const base = response.case_id || (data.classification && data.classification.case_id) || '';
-    const label = W3_CASE_LABELS[base] || base.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    return { label: label ? 'Follow-up — ' + label : 'Follow-up Reply', tone: 'blue' };
-  }
-  const caseId = (data.classification && data.classification.case_id) || response.case_id || '';
-  if (!caseId) return { label: 'Reply Generated', tone: 'green' };
-  return {
-    label: W3_CASE_LABELS[caseId] || caseId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-    tone: 'green'
-  };
-}
-
-function w3SetClassification(data) {
-  const badge = document.getElementById('w3-classification-badge');
-  if (!badge) return;
-  const info = w3ClassificationDisplay(data);
-  badge.textContent = info.label;
-  badge.className = 'badge ' + (info.tone === 'amber' ? 'badge-amber' : info.tone === 'blue' ? 'badge-blue' : 'badge-green');
-}
-
 function resetW3() {
   ['out-w3','err-w3','val-w3'].forEach(id => {
     const el = document.getElementById(id);
@@ -810,80 +946,53 @@ function resetW3() {
   if (reminderText) reminderText.textContent = '';
 }
 
-function runReplyHandling(followUpCaseId = '') {
+function runReplyHandling() {
   resetW3();
   const message  = (document.getElementById('w3-message')  || {value:''}).value.trim();
   const name     = (document.getElementById('w3-name')      || {value:''}).value.trim();
   const company  = (document.getElementById('w3-company')   || {value:''}).value.trim();
   const position = (document.getElementById('w3-position')  || {value:''}).value.trim();
   const jd       = (document.getElementById('w3-jd')        || {value:''}).value.trim();
-  const linkInput = document.getElementById('w3-job-link');
-  const expiredInput = document.getElementById('w3-job-link-expired');
-  const jobLink = expiredInput && expiredInput.checked ? 'expired' : ((linkInput || {value:''}).value || '').trim();
   const errs = [];
   if (!message) errs.push('Paste the LinkedIn conversation.');
   if (errs.length) {
     const vl = document.getElementById('val-w3-list');
-    if (vl) vl.innerHTML = errs.map(e=>`<li>${esc(e)}</li>`).join('');
+    if (vl) vl.innerHTML = errs.map(e=>`<li>${e}</li>`).join('');
     const vb = document.getElementById('val-w3');
     if (vb) vb.classList.add('visible');
     return;
   }
   const btn = document.getElementById('btn-w3');
-  const followupBtn = document.getElementById('w3-followup-btn');
-  btn.disabled = true;
-  btn.textContent = followUpCaseId ? 'Generating Follow-up…' : 'Generating…';
-  if (followupBtn) followupBtn.disabled = true;
+  btn.disabled = true; btn.textContent = 'Generating…';
   (async () => {
     try {
       const fd = new FormData();
       fd.append('message', message);
       const fieldValues = {
-        name: name,
-        company: company,
-        job_title: position,
-        job_requisition_link: jobLink
+        name:            name,
+        company:         company,
+        job_title:       position
       };
       fd.append('field_values', JSON.stringify(fieldValues));
       fd.append('job_description', jd);
-      if (followUpCaseId) fd.append('follow_up_case_id', followUpCaseId);
       const att = files['w3-attachment'];
       if (att) fd.append('attachment', att, att.name);
-      const res = await fetch(W3_URL, { method: 'POST', body: fd });
+      const res  = await fetch(W3_URL, { method: 'POST', body: fd });
       const data = await res.json();
-
+      if (!res.ok) throw new Error(data.detail || data.message || 'Something went wrong.');
+      // Handle special statuses matching the backend contract
+      if (data.status === 'needs_clarification') {
+        throw new Error('The message needs clarification before a reply can be generated.');
+      }
       if (data.status === 'missing_fields') {
         const missing = (data.response && data.response.missing_fields) || [];
-        const et = document.getElementById('err-w3-title');
-        const eb = document.getElementById('err-w3-body');
-        const es = document.getElementById('err-w3');
-        if (et) et.textContent = 'Missing Required Information';
-        if (eb) eb.textContent = missing.length
-          ? 'Please provide: ' + missing.join(', ')
-          : (data.message || 'Some required information is missing.');
-        if (es) es.classList.add('visible');
-        return;
+        throw new Error('Missing required information: ' + (missing.length ? missing.join(', ') : 'unknown fields'));
       }
-      if (data.status === 'needs_clarification') {
-        const et = document.getElementById('err-w3-title');
-        const eb = document.getElementById('err-w3-body');
-        const es = document.getElementById('err-w3');
-        if (et) et.textContent = 'Needs Clarification';
-        if (eb) eb.textContent = data.message || 'The incoming message is ambiguous. Please review the conversation and try again.';
-        if (es) es.classList.add('visible');
-        return;
-      }
-      if (!res.ok) throw new Error(data.detail || data.message || 'Something went wrong.');
       if (data.status !== 'matched') throw new Error(data.message || 'Unable to generate a reply.');
-
-      const response = data.response || {};
-      const reply = response.generated_reply || '';
+      const reply = (data.response && data.response.generated_reply) || '';
       if (!reply) throw new Error('Backend returned no reply.');
 
-      const caseId = (data.classification && data.classification.case_id) || response.case_id || '';
-      window.w3LastCaseId = caseId;
-      w3SetClassification(data);
-
+      const caseId = data.classification && data.classification.case_id;
       const attachmentReminders = {
         positive_resume_request: 'Attach your resume before sending this reply.',
         email_resume_to_recruiter: 'Attach your resume before sending this reply.',
@@ -903,11 +1012,6 @@ function runReplyHandling(followUpCaseId = '') {
 
       const rb = document.getElementById('w3-reply-body');
       if (rb) rb.textContent = reply;
-      if (followupBtn) {
-        const canFollowUp = !followUpCaseId && W3_FOLLOWUP_SUPPORTED_CASES.has(caseId);
-        followupBtn.style.display = canFollowUp ? '' : 'none';
-        followupBtn.disabled = false;
-      }
       const out = document.getElementById('out-w3');
       if (out) { out.classList.add('visible'); out.scrollIntoView({ behavior:'smooth', block:'start' }); }
     } catch (err) {
@@ -918,9 +1022,7 @@ function runReplyHandling(followUpCaseId = '') {
       if (eb) eb.textContent = err.message;
       if (es) es.classList.add('visible');
     } finally {
-      btn.disabled = false;
-      btn.textContent = 'Generate Reply';
-      if (followupBtn) followupBtn.disabled = false;
+      btn.disabled = false; btn.textContent = 'Generate Reply';
     }
   })();
 }
@@ -930,6 +1032,352 @@ function runReplyHandling(followUpCaseId = '') {
 // Only event listeners and initialisation go here.
 // NO function definitions that are referenced by onclick attributes.
 // =========================================================================
+// ── W2 Dashboard State ────────────────────────────────────────────────────
+let dashProspects = [];   // Array of { pid, name, rank, score, sd, drafts, status }
+let dashView = 'all';
+let dashSortKey = 'rank';
+let dashSortDir = 1;
+
+// ── helpers ───────────────────────────────────────────────────────────────
+function scoreColor(n){ n=Number(n)||0; return n>=80?'#16A34A':n>=65?'#2563EB':n>=50?'#D97706':n>=35?'#9B9B99':'#DC2626'; }
+function bandColor(b){ return ({prime:'#16A34A',strong:'#2563EB',moderate:'#D97706',weak:'#9B9B99',skip:'#DC2626'}[b]||'#9B9B99'); }
+function pill(text,color){ return `<span style="display:inline-flex;align-items:center;font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:20px;white-space:nowrap;color:${color};background:${color}15;border:1px solid ${color}40">${esc(text)}</span>`; }
+
+// ── renderW2: build dashboard from response data ──────────────────────────
+function renderW2(data) {
+  if (!data) { showErr('err2','err2-title','err2-body','Empty response','The backend returned no data.'); return; }
+  const summary   = data.summary || {};
+  const approved  = data.approved_drafts || [];
+  const review    = data.human_review_drafts || [];
+  const failed    = data.failed_scrapes || [];
+  const allScored = data.all_scored || [];
+
+  // Build scoredMap
+  const scoredMap = {};
+  allScored.forEach(s => { if (s.pid) scoredMap[s.pid] = s; });
+
+  // Group all drafts by pid
+  function groupByPid(arr) {
+    const map = {}, order = [];
+    arr.forEach(d => { if (!map[d.pid]) { map[d.pid]=[]; order.push(d.pid); } map[d.pid].push(d); });
+    return order.map(pid => map[pid]);
+  }
+  const approvedGroups = groupByPid(approved);
+  const reviewGroups   = groupByPid(review);
+
+  // Build unified prospect list
+  dashProspects = [];
+  const seen = new Set();
+  function addGroup(groups, status) {
+    groups.forEach(drafts => {
+      const first = drafts[0];
+      const pid = first.pid || '';
+      if (seen.has(pid)) return; seen.add(pid);
+      const scored = scoredMap[pid] || {};
+      const sd = scored.data || {};
+      dashProspects.push({ pid, name: first.name||'Unknown', rank: first.rank, score: sd.overall_score, sd, drafts, status });
+    });
+  }
+  addGroup(approvedGroups, 'approved');
+  addGroup(reviewGroups, 'review');
+
+  // Summary cards
+  document.getElementById('w2-stats').innerHTML = [
+    { n: summary.scored||0,          l: 'Scored',    c: '' },
+    { n: summary.total_selected||0,  l: 'Selected',  c: '' },
+    { n: approvedGroups.length,       l: 'Approved',  c: 'c-green' },
+    { n: reviewGroups.length,         l: 'In Review', c: 'c-amber' },
+    { n: failed.length,               l: 'Failed',    c: failed.length?'c-red':'' },
+  ].map(({n,l,c})=>`<div class="dash-card"><div class="dash-card-n ${c}">${n}</div><div class="dash-card-l">${l}</div></div>`).join('');
+
+  // View tab counts
+  document.getElementById('vt-all').textContent      = dashProspects.length;
+  document.getElementById('vt-approved').textContent  = approvedGroups.length;
+  document.getElementById('vt-review').textContent    = reviewGroups.length;
+  document.getElementById('vt-failed').textContent    = failed.length;
+
+  // Failed scrapes
+  const fw = document.getElementById('w2-failed-wrap');
+  if (failed.length) {
+    document.getElementById('w2-failed').innerHTML = failed.map(f=>`<li>${esc(typeof f==='string'?f:(f.url||f.name||JSON.stringify(f)))}</li>`).join('');
+  }
+  fw.style.display = 'none'; // shown only in failed tab
+
+  // Initial render
+  dashSortKey = 'rank'; dashSortDir = 1; dashView = 'all';
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.view-tab').classList.add('active');
+  document.getElementById('dash-search').value = '';
+  document.getElementById('dash-filter-status').value = '';
+  closeDetail();
+  renderDashTable();
+
+  document.getElementById('out2').classList.add('visible');
+  document.getElementById('out2').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function setDashView(view, btn) {
+  dashView = view;
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const fw = document.getElementById('w2-failed-wrap');
+  fw.style.display = view==='failed' ? '' : 'none';
+  document.getElementById('dash-table').parentElement.style.display = view==='failed' ? 'none' : '';
+  document.querySelector('.dash-toolbar').style.display = view==='failed' ? 'none' : '';
+  closeDetail();
+  renderDashTable();
+}
+
+function sortDashBy(key) {
+  if (dashSortKey===key) dashSortDir*=-1; else { dashSortKey=key; dashSortDir=1; }
+  document.querySelectorAll('.prospect-table th').forEach(th=>{th.classList.remove('sorted');});
+  renderDashTable();
+}
+function sortDashTable(){ renderDashTable(); }
+function filterDashTable(){ closeDetail(); renderDashTable(); }
+
+function renderDashTable() {
+  const search = (document.getElementById('dash-search').value||'').toLowerCase();
+  const filterStatus = document.getElementById('dash-filter-status').value;
+  const sortSel = document.getElementById('dash-sort').value;
+  const sk = dashSortKey !== 'rank' ? dashSortKey : sortSel;
+
+  let rows = dashProspects.filter(p => {
+    if (dashView==='approved' && p.status!=='approved') return false;
+    if (dashView==='review'   && p.status!=='review')   return false;
+    if (dashView==='failed')  return false;
+    if (filterStatus && p.status !== filterStatus) return false;
+    if (search) {
+      const hay = (p.name + ' ' + (p.sd.role_function||'') + ' ' + (p.sd.role_team||'')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  rows = rows.slice().sort((a,b) => {
+    let av, bv;
+    if (sk==='score')  { av=Number(a.score)||0; bv=Number(b.score)||0; return dashSortDir*(bv-av); }
+    if (sk==='rank')   { av=Number(a.rank)||999; bv=Number(b.rank)||999; return dashSortDir*(av-bv); }
+    if (sk==='name')   { av=a.name.toLowerCase(); bv=b.name.toLowerCase(); return dashSortDir*(av<bv?-1:av>bv?1:0); }
+    if (sk==='status') { av=a.status; bv=b.status; return dashSortDir*(av<bv?-1:av>bv?1:0); }
+    return 0;
+  });
+
+  const tbody = document.getElementById('dash-tbody');
+  const empty = document.getElementById('dash-empty');
+
+  if (!rows.length) { tbody.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display = 'none';
+
+  const bandColors2 = {prime:'#16A34A',strong:'#2563EB',moderate:'#D97706',weak:'#9B9B99',skip:'#DC2626'};
+  tbody.innerHTML = rows.map(p => {
+    const sd = p.sd;
+    const band = (sd.band||'WEAK').toLowerCase();
+    const bc = bandColors2[band]||'#9B9B99';
+    const sc = scoreColor(p.score);
+    const hasEmail = p.drafts.some(d=>d.channel==='email');
+    const hasLI    = p.drafts.some(d=>d.channel==='linkedin');
+    const statusBadge = p.status==='approved'
+      ? '<span class="sbadge sbadge-green">✓ Approved</span>'
+      : '<span class="sbadge sbadge-amber">⚠ Review</span>';
+    const archetype = (sd.primary_archetype||'').replace(/_/g,' ');
+    const conf = sd.confidence||'';
+    const rel  = (sd.relationship_to_company||'').replace(/_/g,' ');
+    return `<tr data-pid="${esc(p.pid)}">
+      <td class="td-rank">${p.rank!=null?'#'+p.rank:'—'}</td>
+      <td class="td-name"><span title="${esc(p.name)}">${esc(p.name)}</span></td>
+      <td class="td-score" style="color:${sc}">${p.score!=null?p.score:'—'}</td>
+      <td><span style="font-size:.7rem;font-weight:700;color:${bc}">${sd.band||'—'}</span></td>
+      <td class="td-company">${archetype||'<span class="td-na">—</span>'}</td>
+      <td><span style="font-size:.75rem;color:var(--text-2)">${conf||'<span class="td-na">—</span>'}</span></td>
+      <td class="td-company">${rel||'<span class="td-na">—</span>'}</td>
+      <td><div class="ch-icons">${hasLI?'<span class="ch-icon" title="LinkedIn">💬</span>':''}${hasEmail?'<span class="ch-icon" title="Email">✉</span>':''}</div></td>
+      <td>${statusBadge}</td>
+      <td><button class="btn-detail" onclick="openDetail('${esc(p.pid)}')">View details</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Detail panel ──────────────────────────────────────────────────────────
+function openDetail(pid) {
+  const p = dashProspects.find(x=>x.pid===pid);
+  if (!p) return;
+  const sd = p.sd;
+  const ss = sd.subscores || {};
+  const panel = document.getElementById('detail-panel');
+
+  // Header
+  const sc = scoreColor(p.score);
+  document.getElementById('dp-score').textContent = p.score!=null?p.score:'—';
+  document.getElementById('dp-score').style.color = sc;
+  document.getElementById('dp-name').textContent = p.name;
+
+  // Pills
+  const band = (sd.band||'WEAK').toLowerCase();
+  const bc = bandColor(band);
+  const relColor2 = sd.relationship_to_company==='INSIDER'?'#16A34A':sd.relationship_to_company==='RETAINED_AGENCY'?'#1D4ED8':'#9B9B99';
+  const decColor = (sd.decision||'').includes('PRIORITY')?'#16A34A':sd.decision==='REACH_OUT'?'#2563EB':'#D97706';
+  document.getElementById('dp-pills').innerHTML = [
+    sd.band            ? pill(sd.band, bc) : '',
+    sd.decision        ? pill((sd.decision||'').replace(/_/g,' '), decColor) : '',
+    sd.relationship_to_company ? pill((sd.relationship_to_company||'').replace(/_/g,' '), relColor2) : '',
+    sd.confidence      ? pill('conf '+sd.confidence, '#6B6B6B') : '',
+    sd.primary_archetype ? pill((sd.primary_archetype||'').replace(/_/g,' '), '#4F46E5') : '',
+    sd.secondary_archetype ? pill((sd.secondary_archetype||'').replace(/_/g,' '), '#9B9B99') : '',
+  ].filter(Boolean).join(' ');
+
+  // Overview
+  document.getElementById('dp-rationale').textContent = sd.rationale || '—';
+  const metaRows = [
+    ['Band', sd.band],
+    ['Decision', (sd.decision||'').replace(/_/g,' ')],
+    ['Confidence', sd.confidence],
+    ['Relationship', (sd.relationship_to_company||'').replace(/_/g,' ')],
+    ['Targeting risk', sd.targeting_risk],
+    ['Email in profile', sd.email_in_profile!=null?(sd.email_in_profile?'Yes':'No'):null],
+    ['Rank', p.rank!=null?'#'+p.rank:null],
+    ['Overall score', p.score],
+  ].filter(r=>r[1]!=null&&r[1]!=='');
+  document.getElementById('dp-meta').innerHTML = metaRows.map(([l,v])=>`<div style="display:grid;grid-template-columns:120px 1fr;gap:.2rem .5rem;margin-bottom:.2rem"><span style="font-size:.68rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em">${l}</span><span style="font-size:.79rem;color:var(--text-2)">${esc(String(v))}</span></div>`).join('');
+
+  // Scores
+  const subScores = [
+    {label:'Influence on hire',     val:ss.influence_on_hire},
+    {label:'Engagement likelihood', val:ss.engagement_likelihood},
+    {label:'Function relevance',    val:ss.function_relevance},
+    {label:'Connection warmth',     val:ss.connection_warmth},
+    {label:'Company currency',      val:ss.company_currency},
+    {label:'Email priority',        val:sd.email_priority_score},
+  ];
+  document.getElementById('dp-score-grid').innerHTML = subScores.map(s=>{
+    const v=Number(s.val)||0;
+    const c=scoreColor(v);
+    return `<div class="score-cell"><div class="score-cell-lbl">${s.label}</div><div class="score-cell-val" style="color:${c}">${v||'—'}</div></div>`;
+  }).join('');
+  document.getElementById('dp-score-bars').innerHTML = subScores.map(s=>{
+    const v=Number(s.val)||0;
+    const c=scoreColor(v);
+    return `<div class="score-bar-row"><span class="score-bar-lbl">${s.label}</span><div class="score-bar-wrap"><div class="score-bar-fill" style="width:${Math.min(100,v)}%;background:${c};height:100%;border-radius:3px"></div></div><span class="score-bar-num">${v||'—'}</span></div>`;
+  }).join('');
+
+  // Strategy
+  const hooks = Array.isArray(sd.personalization_hooks)?sd.personalization_hooks:[];
+  const gaps  = Array.isArray(sd.data_gaps)?sd.data_gaps:[];
+  const flags = Array.isArray(sd.red_flags)?sd.red_flags:[];
+  document.getElementById('dp-strategy').innerHTML = [
+    sd.outreach_angle ? `<div class="strat-row"><div class="strat-lbl">Angle</div><div class="strat-val">${esc(sd.outreach_angle)}</div></div>` : '',
+    sd.recommended_message_framing ? `<div class="strat-row"><div class="strat-lbl">Framing</div><div class="strat-val">${esc(sd.recommended_message_framing)}</div></div>` : '',
+    hooks.length ? `<div class="strat-row"><div class="strat-lbl">Personalization hooks</div><ul class="strat-hooks">${hooks.map(h=>`<li>${esc(h)}</li>`).join('')}</ul></div>` : '',
+    gaps.length  ? `<div class="strat-row"><div class="strat-lbl" style="color:var(--amber)">Data gaps</div><div class="strat-val" style="color:var(--amber)">${esc(gaps.join(' · '))}</div></div>` : '',
+    flags.length ? `<div class="strat-row"><div class="strat-lbl" style="color:var(--red)">Red flags</div><div class="strat-val" style="color:var(--red)">${esc(flags.join(' · '))}</div></div>` : '',
+  ].join('') || '<div style="color:var(--text-3);font-size:.82rem">No strategic data available.</div>';
+
+  // Drafts — tabbed by channel
+  const draftsWithBody = p.drafts.filter(d=>(d.message&&d.message.body)||'');
+  const draftTabsEl    = document.getElementById('dp-draft-tabs');
+  const draftContentsEl = document.getElementById('dp-draft-contents');
+  if (!draftsWithBody.length) {
+    draftTabsEl.innerHTML = '';
+    draftContentsEl.innerHTML = '<div style="color:var(--text-3);font-size:.82rem">No drafts available.</div>';
+  } else {
+    draftTabsEl.innerHTML = draftsWithBody.map((d,i)=>{
+      const ch = (d.channel||'').toLowerCase();
+      const lbl = ch==='email'?'✉ Email':'💬 LinkedIn';
+      return `<button class="draft-tab-btn${i===0?' active':''}" onclick="setDraftTab(${i},this)">${lbl}</button>`;
+    }).join('');
+    draftContentsEl.innerHTML = draftsWithBody.map((d,i)=>{
+      const ch  = (d.channel||'').toLowerCase();
+      const msg = d.message||{};
+      const subject = (msg.subject||'').trim();
+      const body    = (msg.body||'').trim();
+      const dRouter = d.router||{};
+      const dDec    = dRouter.decision||'';
+      const reasons = (dRouter.reasons||[]).filter(Boolean);
+      const jscores = d.judge_scores||{};
+      const isApp   = dDec==='APPROVED';
+      const vColor  = isApp?'var(--green)':'var(--amber)';
+      const draftId = 'dp-draft-'+Math.random().toString(36).slice(2,8);
+      const judgeChips = Object.entries(jscores).map(([k,v])=>`<span class="judge-chip">${k.replace(/_/g,' ')}: ${v}</span>`).join('');
+      return `<div class="draft-content${i===0?' active':''}" id="ddc-${i}">
+        <div class="draft-verdict">
+          <span style="font-size:.75rem;font-weight:600;color:${vColor}">${isApp?'✓ Approved':'⚠ Human Review'}</span>
+          ${d.corrected?'<span style="font-size:.7rem;color:var(--text-3)">corrected</span>':''}
+        </div>
+        <div id="${draftId}">
+          ${subject?`<div class="draft-msg-subject">Subject: ${esc(subject)}</div>`:''}
+          <div class="draft-msg-body">${esc(body)}</div>
+        </div>
+        <div class="draft-meta">
+          <button class="copy-btn" onclick="copyEl('${draftId}',this)">Copy</button>
+        </div>
+        ${judgeChips?`<div class="judge-grid" style="margin-top:.6rem">${judgeChips}</div>`:''}
+        ${!isApp&&reasons.length?`<div class="flag-row">Flagged: ${esc(reasons.slice(0,5).join(' · '))}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  // Quality
+  const allJscores = {};
+  p.drafts.forEach(d=>{ Object.assign(allJscores, d.judge_scores||{}); });
+  const qKeys = ['tone_alignment','pain_specificity','solution_relevance','personalization_depth','cta_clarity','human_feel'];
+  document.getElementById('dp-quality-grid').innerHTML = qKeys.map(k=>{
+    const v = allJscores[k]!=null?allJscores[k]:'—';
+    const c = v!=='—'?scoreColor(v):'var(--text-3)';
+    return `<div class="quality-cell"><div class="quality-lbl">${k.replace(/_/g,' ')}</div><div class="quality-val" style="color:${c}">${v}</div></div>`;
+  }).join('');
+  // Lint flags from drafts
+  const allFlags = p.drafts.flatMap(d=>(d.lint_flags||[]));
+  document.getElementById('dp-quality-flags').innerHTML = allFlags.length
+    ? `<div style="font-size:.75rem;font-weight:700;color:var(--amber);margin-bottom:.3rem">Structural flags</div>${allFlags.map(f=>`<div style="font-size:.76rem;color:var(--amber);line-height:1.6">⚠ ${esc(f)}</div>`).join('')}`
+    : '<div style="font-size:.8rem;color:var(--green)">✓ No structural flags</div>';
+
+  // Routing
+  document.getElementById('dp-routing').innerHTML = p.drafts.map(d=>{
+    const ch = (d.channel||'').toLowerCase();
+    const r  = d.router||{};
+    const reasons = (r.reasons||[]).filter(Boolean);
+    const isApp = r.decision==='APPROVED';
+    return `<div style="margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)">
+      <div class="route-status">
+        <span style="font-size:.78rem;font-weight:700">${ch==='email'?'✉ Email':'💬 LinkedIn'}</span>
+        <span class="sbadge ${isApp?'sbadge-green':'sbadge-amber'}">${r.decision||'—'}</span>
+        ${r.weighted_overall!=null?`<span style="font-size:.73rem;color:var(--text-3)">weighted ${r.weighted_overall}</span>`:''}
+      </div>
+      ${reasons.length?`<ul class="route-reasons">${reasons.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:''}
+    </div>`;
+  }).join('') || '<div style="font-size:.82rem;color:var(--text-3)">No routing data.</div>';
+
+  // Show panel, scroll to it, reset to Overview tab
+  setDetailTab(0, document.querySelector('.detail-tab'));
+  panel.classList.add('open');
+  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function setDetailTab(idx, btn) {
+  // idx can be a number (for draft tabs) or a section name string
+  if (typeof idx === 'string') {
+    document.querySelectorAll('.detail-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.detail-section').forEach(s=>s.classList.remove('active'));
+    const sec = document.getElementById('ds-'+idx);
+    if (sec) sec.classList.add('active');
+  }
+}
+
+function setDraftTab(idx, btn) {
+  document.querySelectorAll('.draft-tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.draft-content').forEach((c,i)=>{ c.classList.toggle('active', i===idx); });
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+// Keep setDetailTab working for string-based section tabs from onclick attributes
+function setDetailTabByName(name, btn) { setDetailTab(name, btn); }
+
+
 document.addEventListener('DOMContentLoaded', function () {
 
 // ── Initialise 2 manual URL rows ──────────────────────────────────────────
@@ -1077,6 +1525,17 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
       ); return;
     }
     const rawResponse = await res.json();
+    console.log('[W1] raw response:', JSON.stringify(rawResponse).slice(0, 500));
+
+    // n8n returns [] when the last node produced no items — this is a workflow-side
+    // issue (node errored silently or produced no output). Show a clear message.
+    if (Array.isArray(rawResponse) && rawResponse.length === 0) {
+      showErr('err1', 'err1-title', 'err1-body',
+        'No output from workflow',
+        'The workflow ran but returned no data. Check the n8n execution log — the last node (Edit Fields4 or Basic LLM Chain5) may have produced 0 items.'
+      ); return;
+    }
+
     let raw = null;
     if (Array.isArray(rawResponse)) {
       for (const item of rawResponse) { raw = extractW1(item); if (raw) break; }
@@ -1084,14 +1543,15 @@ document.getElementById('form-w1').addEventListener('submit', async e => {
     } else {
       raw = extractW1(rawResponse) || rawResponse;
     }
-    if (!raw) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no data.'); return; }
+    console.log('[W1] extracted:', JSON.stringify(raw).slice(0, 300));
+    if (!raw) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'Raw: ' + JSON.stringify(rawResponse).slice(0,200)); return; }
     const status = (raw.status || '').trim();
     const reason = raw.reason || 'Your profile and this role did not match closely enough to generate an outreach message automatically.';
     if (status === 'HUMAN_REVIEW') { showHR1(reason); return; }
     const subj  = (raw.subject  || '').trim();
     const msg   = (raw.message  || '').trim();
     const audit = raw.audit || {};
-    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'Empty response', 'The backend returned no message.'); return; }
+    if (!msg) { showErr('err1', 'err1-title', 'err1-body', 'No message in response', 'Raw: ' + JSON.stringify(raw).slice(0,300)); return; }
     renderW1(subj, msg, audit);
   } catch (err) {
     stopProgress('prog1', 'stages1');
@@ -1298,220 +1758,8 @@ document.getElementById('form-w2').addEventListener('submit', async e => {
 });
 
 // ── W2 render ─────────────────────────────────────────────────────────────
-function renderW2(data) {
-  if (!data) { showErr('err2','err2-title','err2-body','Empty response','The backend returned no data.'); return; }
-  const summary  = data.summary || {};
-  const approved = data.approved_drafts || [];
-  const review   = data.human_review_drafts || [];
-  const failed   = data.failed_scrapes || [];
-  const allScored = data.all_scored || [];
-  const scoredMap = {};
-  allScored.forEach(s => { if (s.pid) scoredMap[s.pid] = s; });
-
-  document.getElementById('w2-stats').innerHTML = [
-    [summary.scored         || 0, 'scored'],
-    [summary.total_selected || 0, 'selected'],
-    [summary.drafts_approved|| 0, 'approved'],
-    [summary.drafts_review  || 0, 'in review'],
-    [summary.failed_scrapes || 0, 'failed'],
-  ].map(([v, l]) => `<div class="stat-item"><span class="stat-num">${v}</span><span class="stat-lbl">${l}</span></div>`).join('');
-
-  // Group drafts by pid so one prospect = one card with all their drafts
-  function groupByPid(drafts) {
-    const map = {}, order = [];
-    drafts.forEach(d => {
-      if (!map[d.pid]) { map[d.pid] = []; order.push(d.pid); }
-      map[d.pid].push(d);
-    });
-    return order.map(pid => map[pid]);
-  }
-
-  const approvedEl = document.getElementById('w2-approved');
-  const approvedGroups = groupByPid(approved);
-  document.getElementById('w2-approved-count').textContent = approvedGroups.length + ' prospect' + (approvedGroups.length !== 1 ? 's' : '');
-  approvedEl.innerHTML = approvedGroups.length
-    ? approvedGroups.map(group => buildProspectCard(group, scoredMap, true)).join('')
-    : '<p style="font-size:.81rem;color:var(--text-3)">No approved drafts.</p>';
-
-  const reviewEl = document.getElementById('w2-review');
-  const reviewGroups = groupByPid(review);
-  document.getElementById('w2-review-count').textContent = reviewGroups.length + ' prospect' + (reviewGroups.length !== 1 ? 's' : '');
-  reviewEl.innerHTML = reviewGroups.length
-    ? reviewGroups.map(group => buildProspectCard(group, scoredMap, false)).join('')
-    : '<p style="font-size:.81rem;color:var(--text-3)">None.</p>';
-
-  const fw = document.getElementById('w2-failed-wrap');
-  if (failed.length) {
-    fw.style.display = '';
-    document.getElementById('w2-failed').innerHTML = failed.map(f =>
-      `<li>${esc(typeof f === 'string' ? f : (f.url || f.name || JSON.stringify(f)))}</li>`
-    ).join('');
-  } else {
-    fw.style.display = 'none';
-  }
-
-  document.getElementById('out2').classList.add('visible');
-  document.getElementById('out2').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// ── Prospect card builder ─────────────────────────────────────────────────
-// ── Prospect card builder ─────────────────────────────────────────────────
-// `drafts` is an ARRAY of draft items for one prospect (grouped by pid).
-// Shows ALL channels (LinkedIn + Email) in a single card.
-function buildProspectCard(drafts, scoredMap, isApproved) {
-  if (!drafts || !drafts.length) return '';
-  const first = drafts[0];
-  const pid   = first.pid || '';
-  const name  = first.name || 'Unknown Prospect';
-  const rank  = first.rank != null ? '#' + first.rank : '';
-
-  const scored = scoredMap[pid] || {};
-  const sd     = scored.data || {};
-  const ss     = sd.subscores || {};
-
-  const overall           = sd.overall_score != null ? sd.overall_score : '—';
-  const band              = (sd.band || 'WEAK').toLowerCase();
-  const decision          = sd.decision || '';
-  const relationship      = sd.relationship_to_company || '';
-  const confidence        = sd.confidence || '';
-  const primaryArchetype  = (sd.primary_archetype || '').replace(/_/g,' ');
-  const secondaryArchetype= (sd.secondary_archetype || '').replace(/_/g,' ');
-  const rationale         = sd.rationale || '';
-  const angle             = sd.outreach_angle || '';
-  const framing           = sd.recommended_message_framing || '';
-  const hooks             = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
-  const dataGaps          = Array.isArray(sd.data_gaps) ? sd.data_gaps : [];
-  const redFlags          = Array.isArray(sd.red_flags) ? sd.red_flags : [];
-
-  // Score colour
-  const n = Number(overall) || 0;
-  const scoreColor = n>=80?'#18643A':n>=65?'#3C8C5C':n>=50?'#C2922B':n>=35?'#97A0AC':'#B0463E';
-
-  // Band colour
-  const bandColors = {prime:'#18643A',strong:'#3C8C5C',moderate:'#C2922B',weak:'#97A0AC',skip:'#B0463E'};
-  const bc = bandColors[band]||'#97A0AC';
-
-  // Pills helper
-  const pill = (text, color) => `<span style="display:inline-flex;align-items:center;font-size:.7rem;font-weight:600;letter-spacing:.04em;padding:2px 8px;border-radius:20px;white-space:nowrap;color:${color};background:${color}18;border:1px solid ${color}44">${esc(text)}</span>`;
-
-  const relColor = relationship==='INSIDER'?'#18643A':relationship==='RETAINED_AGENCY'?'#2C4A86':'#97A0AC';
-
-  const pills = [
-    sd.band          ? pill(sd.band, bc) : '',
-    decision         ? pill(decision.replace(/_/g,' '), decision.includes('PRIORITY')?'#18643A':decision==='REACH_OUT'?'#3C8C5C':'#C2922B') : '',
-    relationship     ? pill(relationship.replace(/_/g,' '), relColor) : '',
-    confidence       ? pill('conf '+confidence, '#565C66') : '',
-    primaryArchetype ? pill(primaryArchetype, '#2C4A86') : '',
-    secondaryArchetype ? pill(secondaryArchetype, '#8B919A') : '',
-  ].filter(Boolean).join(' ');
-
-  // Subscores
-  const subScores = [
-    {label:'Influence',  val:ss.influence_on_hire},
-    {label:'Engagement', val:ss.engagement_likelihood},
-    {label:'Function',   val:ss.function_relevance},
-    {label:'Warmth',     val:ss.connection_warmth},
-    {label:'Currency',   val:ss.company_currency},
-    {label:'Email pri.', val:sd.email_priority_score},
-  ];
-  const barColor = v => { const n=Number(v)||0; return n>=75?'#18643A':n>=55?'#3C8C5C':n>=35?'#C2922B':'#97A0AC'; };
-  const subscoresHtml = subScores.map(s => {
-    const v = Number(s.val)||0;
-    return `<div class="subscore-row">
-      <span class="subscore-name">${esc(s.label)}</span>
-      <div class="subscore-bar-wrap"><div class="subscore-bar" style="width:${Math.min(100,v)}%;background:${barColor(v)}"></div></div>
-      <span class="subscore-val">${v||'—'}</span>
-    </div>`;
-  }).join('');
-
-  // Draft sections — one per channel
-  const draftSections = drafts.map(d => {
-    const ch  = (d.channel||'').toLowerCase();
-    const msg = d.message || {};
-    const subject = (msg.subject||'').trim();
-    const body    = (msg.body||'').trim();
-    if (!body) return '';
-    const dRouter   = d.router || {};
-    const dDecision = dRouter.decision || '';
-    const reasons   = (dRouter.reasons||[]).filter(Boolean);
-    const jscores   = d.judge_scores || {};
-    const approved  = dDecision === 'APPROVED';
-    const vColor    = approved ? '#18643A' : '#C2922B';
-    const draftId   = 'draft-'+Math.random().toString(36).slice(2,8);
-    const judgeChips = Object.entries(jscores)
-      .map(([k,v])=>`<span class="judge-chip">${k.replace(/_/g,' ')}: ${v}</span>`).join('');
-    return `
-      <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-          <span style="font-size:.8rem;font-weight:700;color:var(--text)">${ch==='email'?'✉ Email':'💬 LinkedIn'}</span>
-          <span style="font-size:.75rem;font-weight:600;color:${vColor}">${approved?'✓ Approved':'⚠ Human Review'}</span>
-        </div>
-        <div id="${draftId}">
-          ${subject?`<div style="font-weight:700;font-size:.85rem;margin-bottom:.4rem">Subject: ${esc(subject)}</div>`:''}
-          <p class="draft-body">${esc(body)}</p>
-        </div>
-        <div style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;flex-wrap:wrap">
-          <button class="copy-btn" onclick="copyEl('${draftId}',this)">Copy</button>
-          ${d.corrected?`<span style="font-size:.7rem;color:var(--text-3)">corrected</span>`:''}
-        </div>
-        ${judgeChips?`<div class="judge-grid" style="margin-top:.5rem">${judgeChips}</div>`:''}
-        ${!approved&&reasons.length?`<div style="margin-top:.4rem;font-size:.75rem;color:var(--amber)">Flagged: ${esc(reasons.slice(0,3).join(' · '))}</div>`:''}
-      </div>`;
-  }).join('');
-
-  // Overall card verdict
-  const allApproved = drafts.every(d=>d.router&&d.router.decision==='APPROVED');
-  const anyApproved = drafts.some(d=>d.router&&d.router.decision==='APPROVED');
-  const cardBadge = allApproved
-    ? `<span class="badge badge-green">✓ Approved</span>`
-    : anyApproved
-    ? `<span class="badge badge-amber">⚠ Partial Review</span>`
-    : `<span class="badge badge-amber">⚠ Review</span>`;
-
-  return `
-  <div class="pcard">
-    <div class="pcard-hd">
-      <div style="display:flex;align-items:flex-start;gap:.875rem;flex:1;min-width:0">
-        <div style="text-align:center;min-width:52px;flex-shrink:0">
-          <div style="font-size:.72rem;color:var(--text-3);font-family:'DM Mono',monospace;margin-bottom:.1rem">${esc(rank)}</div>
-          <div style="font-size:2rem;font-weight:700;line-height:1;color:${scoreColor}">${overall}</div>
-          <div style="font-size:.62rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em">score</div>
-        </div>
-        <div style="flex:1;min-width:0">
-          <p class="pcard-name">${esc(name)}</p>
-          <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem">${pills}</div>
-        </div>
-      </div>
-      <div style="flex-shrink:0;margin-left:.5rem">${cardBadge}</div>
-    </div>
-
-    <div style="margin-top:1rem">
-      <div class="subscore-grid">${subscoresHtml}</div>
-    </div>
-
-    <div style="margin-top:1rem">
-      ${rationale?`<p style="font-size:.82rem;color:var(--text-2);line-height:1.55;margin-bottom:.6rem">${esc(rationale)}</p>`:''}
-      ${angle?`<div class="detail-row"><span class="detail-lbl">Angle</span><span class="detail-val">${esc(angle)}</span></div>`:''}
-      ${framing?`<div class="detail-row"><span class="detail-lbl">Framing</span><span class="detail-val">${esc(framing)}</span></div>`:''}
-      ${hooks.length?`<div class="detail-row"><span class="detail-lbl">Hooks</span><div>${hooks.map(h=>`<div style="font-size:.78rem;color:var(--text-2);margin-top:.15rem">· ${esc(h)}</div>`).join('')}</div></div>`:''}
-      ${dataGaps.length?`<div class="detail-row"><span class="detail-lbl" style="color:#C2922B">Data gaps</span><p style="font-size:.75rem;color:#C2922B;margin-top:.1rem">${esc(dataGaps.join(' · '))}</p></div>`:''}
-      ${redFlags.length?`<div class="detail-row"><span class="detail-lbl" style="color:var(--red)">Red flags</span><p style="font-size:.75rem;color:var(--red);margin-top:.1rem">${esc(redFlags.join(' · '))}</p></div>`:''}
-    </div>
-
-    ${draftSections}
-  </div>`;
-}
-
 // ── W3 upload zone ────────────────────────────────────────────────────────
 setupUpload('w3-attachment', 'uz-w3', 'chip-w3', 'w3-attachment', 'any');
-const w3ExpiredCheckbox = document.getElementById('w3-job-link-expired');
-const w3JobLinkInput = document.getElementById('w3-job-link');
-if (w3ExpiredCheckbox && w3JobLinkInput) {
-  w3ExpiredCheckbox.addEventListener('change', () => {
-    w3JobLinkInput.disabled = w3ExpiredCheckbox.checked;
-    if (w3ExpiredCheckbox.checked) w3JobLinkInput.value = '';
-  });
-}
 
 }); // end DOMContentLoaded
 </script>
