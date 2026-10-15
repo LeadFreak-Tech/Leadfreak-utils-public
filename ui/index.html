@@ -23,7 +23,7 @@
 }
 html{font-size:16px;-webkit-font-smoothing:antialiased;}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:0 1rem 5rem;}
-.wrap{max-width:780px;margin:0 auto;}
+.wrap{max-width:960px;margin:0 auto;}
 
 /* Header */
 .site-header{padding:2.5rem 0 1.75rem;border-bottom:1px solid var(--border);margin-bottom:1.75rem;}
@@ -188,7 +188,7 @@ textarea{min-height:180px;}
 .section-hdr{font-size:.8rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.5rem;margin:1.5rem 0 .875rem;}
 
 /* Prospect card */
-.pcard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:1rem;box-shadow:var(--sh);}
+.pcard{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:1.25rem;box-shadow:var(--sh);width:100%;box-sizing:border-box;}
 .pcard-hd{display:flex;align-items:flex-start;justify-content:space-between;padding:.875rem 1.1rem .6rem;gap:.75rem;}
 .pcard-rank{font-size:.72rem;font-weight:700;color:var(--text-3);min-width:24px;}
 .pcard-score{font-size:2rem;font-weight:700;line-height:1;margin-bottom:.1rem;}
@@ -225,7 +225,7 @@ textarea{min-height:180px;}
 .subscore-val{font-size:.72rem;font-weight:600;color:var(--text);min-width:22px;text-align:right;}
 
 /* Rationale + fields */
-.pcard-body{padding:.75rem 1.1rem 0;}
+.pcard-body{padding:.875rem 1.25rem 0;}
 .rationale{font-size:.835rem;color:var(--text);line-height:1.75;margin-bottom:.875rem;}
 .detail-row{display:grid;grid-template-columns:80px 1fr;gap:.3rem .75rem;margin-bottom:.35rem;align-items:start;}
 .detail-lbl{font-size:.66rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;padding-top:.15rem;}
@@ -587,9 +587,6 @@ textarea{min-height:180px;}
       <span class="out-title">Results</span>
       <button class="btn-secondary" onclick="resetW2()">🔄 Run Again</button>
     </div>
-
-    <!-- Summary stats -->
-    <div class="dash-summary" id="w2-stats"></div>
 
     <!-- Two result tabs -->
     <div class="view-tabs" id="w2-result-tabs" style="margin-top:.5rem">
@@ -1080,17 +1077,9 @@ function buildCard(p, isHR) {
   const gaps     = Array.isArray(sd.data_gaps) ? sd.data_gaps : [];
   const redFlags = Array.isArray(sd.red_flags) ? sd.red_flags : [];
 
-  // Overall card status badge
-  const allApp = drafts.length && drafts.every(d=>d.router&&d.router.decision==='APPROVED');
-  const anyApp = drafts.some(d=>d.router&&d.router.decision==='APPROVED');
-  const cardBadge = p.status==='not_selected'
-    ? `<span style="font-size:.7rem;font-weight:600;color:#9B9B99;background:#F5F5F3;border:1px solid #E5E4DE;padding:2px 8px;border-radius:20px">Not Ranked</span>`
-    : allApp
-    ? `<span style="font-size:.7rem;font-weight:600;color:#16A34A;background:#F0FDF4;border:1px solid #BBF7D0;padding:2px 8px;border-radius:20px">✓ Approved</span>`
-    : anyApp
-    ? `<span style="font-size:.7rem;font-weight:600;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;padding:2px 8px;border-radius:20px">⚠ Partial Review</span>`
-    : drafts.length
-    ? `<span style="font-size:.7rem;font-weight:600;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;padding:2px 8px;border-radius:20px">⚠ Human Review</span>`
+  // Card badge — only shown on HR tab cards
+  const cardBadge = isHR
+    ? `<span style="font-size:.7rem;font-weight:600;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;padding:2px 8px;border-radius:20px">Not Selected</span>`
     : '';
 
   // Not-selected reason
@@ -1104,7 +1093,7 @@ function buildCard(p, isHR) {
     return 'Ranked outside the top 5 in the ' + (d.primary_archetype||'').replace(/_/g,' ').toLowerCase() + ' bucket — higher-scoring prospects were selected.';
   })();
 
-  return `<div class="pcard" style="max-width:100%;box-sizing:border-box">
+  return `<div class="pcard" style="padding:1.25rem 1.5rem">
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.875rem;margin-bottom:1rem">
       <div style="display:flex;align-items:flex-start;gap:.875rem;flex:1;min-width:0">
@@ -1188,16 +1177,6 @@ function renderW2(data) {
   }
   addGroup(approvedGroups, 'approved');
   addGroup(reviewGroups, 'review');
-
-  // Summary cards
-  document.getElementById('w2-stats').innerHTML = [
-    { n: summary.scored||0,         l: 'Scored',     c: '' },
-    { n: summary.total_selected||0, l: 'Selected',   c: '' },
-    { n: summary.drafts_approved||0, l: 'Approved',  c: 'c-green' },
-    { n: summary.drafts_review||0,   l: 'In Review', c: 'c-amber' },
-    { n: notSelected.length,         l: 'Not Ranked', c: '' },
-    { n: failed.length,              l: 'Failed',     c: failed.length?'c-red':'' },
-  ].map(({n,l,c})=>`<div class="dash-card"><div class="dash-card-n ${c}">${n}</div><div class="dash-card-l">${l}</div></div>`).join('');
 
   // ── TAB 1: RANKED ─────────────────────────────────────────────────────
   // Build prospect objects from drafts (approved + human_review) grouped by pid
