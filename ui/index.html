@@ -1094,8 +1094,8 @@ function buildCard(p) {
 function renderW2(data) {
   if (!data) { showErr('err2','err2-title','err2-body','Empty response','The backend returned no data.'); return; }
   const summary   = data.summary || {};
-  const approved  = data.approved_drafts || [];
-  const review    = data.human_review_drafts || [];
+  const approved    = data.approved_drafts || [];
+  const humanReview = data.human_review_drafts || [];
   const failed    = data.failed_scrapes || [];
   const allScored = data.all_scored || [];
 
@@ -1110,7 +1110,7 @@ function renderW2(data) {
     return order.map(pid => map[pid]);
   }
   const approvedGroups = groupByPid(approved);
-  const reviewGroups   = groupByPid(review);
+  const reviewGroups   = groupByPid(humanReview);
 
   // not_selected — scored but didn't make the top-15 cut
   const notSelected = data.not_selected || [];
