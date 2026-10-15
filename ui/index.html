@@ -575,120 +575,27 @@ textarea{min-height:180px;}
     <button class="btn-secondary" onclick="resetW2()">← Try again</button>
   </div>
 
-  <!-- W2 Results Dashboard -->
+  <!-- W2 Results -->
   <div class="out-section" id="out2">
     <div class="out-header" style="margin-bottom:1rem">
-      <span class="out-title">Prospect Dashboard</span>
+      <span class="out-title">Results</span>
       <button class="btn-secondary" onclick="resetW2()">🔄 Run Again</button>
     </div>
 
-    <!-- Summary cards -->
+    <!-- Summary stats -->
     <div class="dash-summary" id="w2-stats"></div>
 
-    <!-- View tabs -->
-    <div class="view-tabs">
-      <button class="view-tab active" onclick="setDashView('all',this)">All Prospects <span class="vt-count" id="vt-all">0</span></button>
-      <button class="view-tab" onclick="setDashView('approved',this)">Approved <span class="vt-count" id="vt-approved">0</span></button>
-      <button class="view-tab" onclick="setDashView('review',this)">Human Review <span class="vt-count" id="vt-review">0</span></button>
-      <button class="view-tab" onclick="setDashView('failed',this)">Failed Scrapes <span class="vt-count" id="vt-failed">0</span></button>
-    </div>
+    <!-- Bucket sections: Recruiters / Peers / Seniors / Not Ranked / Failed -->
+    <div id="w2-bucket-recruiters"></div>
+    <div id="w2-bucket-peers"></div>
+    <div id="w2-bucket-seniors"></div>
+    <div id="w2-bucket-not-ranked" style="display:none"></div>
 
-    <!-- Toolbar -->
-    <div class="dash-toolbar">
-      <input class="dash-search" id="dash-search" type="text" placeholder="Search by name, company…" oninput="filterDashTable()">
-      <select class="dash-select" id="dash-sort" onchange="sortDashTable()">
-        <option value="rank">Sort: Rank</option>
-        <option value="score">Sort: Score</option>
-        <option value="name">Sort: Name</option>
-        <option value="status">Sort: Status</option>
-      </select>
-      <select class="dash-select" id="dash-filter-status" onchange="filterDashTable()">
-        <option value="">All statuses</option>
-        <option value="approved">Approved</option>
-        <option value="review">Human Review</option>
-      </select>
-    </div>
-
-    <!-- Prospect table -->
-    <div style="overflow-x:auto;border:1.5px solid var(--border);border-radius:var(--r);background:var(--surface);box-shadow:var(--sh);">
-      <table class="prospect-table" id="dash-table">
-        <thead>
-          <tr>
-            <th onclick="sortDashBy('rank')">Rank <span class="sort-arrow">↕</span></th>
-            <th onclick="sortDashBy('name')">Prospect <span class="sort-arrow">↕</span></th>
-            <th onclick="sortDashBy('score')">Score <span class="sort-arrow">↕</span></th>
-            <th>Band</th>
-            <th>Archetype</th>
-            <th>Confidence</th>
-            <th>Relationship</th>
-            <th>Channels</th>
-            <th onclick="sortDashBy('status')">Status <span class="sort-arrow">↕</span></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="dash-tbody"></tbody>
-      </table>
-      <div class="dash-empty" id="dash-empty" style="display:none">No prospects match the current filter.</div>
-    </div>
-
-    <!-- Failed scrapes (shown in "Failed" tab) -->
-    <div id="w2-failed-wrap" style="display:none;margin-top:1rem">
+    <!-- Failed scrapes -->
+    <div id="w2-failed-wrap" style="display:none;margin-top:1.5rem">
       <div class="section-hdr"><span class="badge badge-red">✕ Failed Scrapes</span></div>
       <ul class="failed-list" id="w2-failed"></ul>
     </div>
-
-    <!-- Detail panel -->
-    <div class="detail-panel" id="detail-panel">
-      <div class="detail-header">
-        <div class="detail-header-left">
-          <div class="detail-score" id="dp-score"></div>
-          <div>
-            <div class="detail-name" id="dp-name"></div>
-            <div class="detail-pills" id="dp-pills"></div>
-          </div>
-        </div>
-        <button class="detail-close" onclick="closeDetail()" title="Close">✕</button>
-      </div>
-      <div class="detail-tabs">
-        <button class="detail-tab active" onclick="setDetailTabByName('overview',this)">Overview</button>
-        <button class="detail-tab" onclick="setDetailTabByName('scores',this)">Scores</button>
-        <button class="detail-tab" onclick="setDetailTabByName('strategy',this)">Strategy</button>
-        <button class="detail-tab" onclick="setDetailTabByName('drafts',this)">Drafts</button>
-        <button class="detail-tab" onclick="setDetailTabByName('quality',this)">Quality</button>
-        <button class="detail-tab" onclick="setDetailTabByName('routing',this)">Routing</button>
-      </div>
-      <div class="detail-body">
-        <!-- Overview -->
-        <div class="detail-section active" id="ds-overview">
-          <div id="dp-rationale" style="font-size:.85rem;color:var(--text);line-height:1.7;margin-bottom:.75rem"></div>
-          <div id="dp-meta" style="font-size:.79rem;color:var(--text-2);line-height:1.8"></div>
-        </div>
-        <!-- Scores -->
-        <div class="detail-section" id="ds-scores">
-          <div class="score-grid" id="dp-score-grid"></div>
-          <div style="margin-top:1rem" id="dp-score-bars"></div>
-        </div>
-        <!-- Strategy -->
-        <div class="detail-section" id="ds-strategy">
-          <div id="dp-strategy"></div>
-        </div>
-        <!-- Drafts -->
-        <div class="detail-section" id="ds-drafts">
-          <div class="draft-tabs" id="dp-draft-tabs"></div>
-          <div id="dp-draft-contents"></div>
-        </div>
-        <!-- Quality -->
-        <div class="detail-section" id="ds-quality">
-          <div class="quality-grid" id="dp-quality-grid"></div>
-          <div id="dp-quality-flags" style="margin-top:.75rem"></div>
-        </div>
-        <!-- Routing -->
-        <div class="detail-section" id="ds-routing">
-          <div id="dp-routing"></div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </div><!-- /tab-w2 -->
 
@@ -746,7 +653,7 @@ textarea{min-height:180px;}
   <div class="out-section" id="out-w3">
     <div class="out-header">
       <span class="out-title">Generated Reply</span>
-      <span class="badge badge-green" id="w3-classification-badge">✓ Ready</span>
+      <span class="badge badge-green">✓ Ready</span>
     </div>
     <div class="out-card">
       <div class="out-card-hd">
@@ -935,34 +842,6 @@ function resetW2() {
 // ── W3 Reply Handling ─────────────────────────────────────────────────────
 const W3_URL = 'https://leadfreak-utils-backend-production.up.railway.app/api/v1/reply-handling';
 
-// W3 labels are derived from the case_id returned by the backend, so every
-// current and future backend case can be displayed without a duplicate case list.
-function w3SetClassification(data) {
-  const badge = document.getElementById('w3-classification-badge');
-  if (!badge) return;
-
-  const classification = data && data.classification;
-  const caseId = classification && classification.case_id;
-  if (!caseId || typeof caseId !== 'string') {
-    badge.textContent = 'Reply Generated';
-    badge.className = 'badge badge-green';
-    return;
-  }
-
-  const label = caseId
-    .replace(/^(positive|polite_decline|redirect|email)_/, '')
-    .replace(/_/g, ' ')
-    .replace(/\\b\\w/g, char => char.toUpperCase());
-
-  const category = (classification.category || '').toLowerCase();
-  badge.textContent = label || 'Reply Generated';
-  badge.className = category === 'positive'
-    ? 'badge badge-green'
-    : category === 'polite_decline' || category === 'redirect'
-      ? 'badge badge-amber'
-      : 'badge badge-blue';
-}
-
 function resetW3() {
   ['out-w3','err-w3','val-w3'].forEach(id => {
     const el = document.getElementById(id);
@@ -1020,7 +899,6 @@ function runReplyHandling() {
       const reply = (data.response && data.response.generated_reply) || '';
       if (!reply) throw new Error('Backend returned no reply.');
 
-      w3SetClassification(data);
       const caseId = data.classification && data.classification.case_id;
       const attachmentReminders = {
         positive_resume_request: 'Attach your resume before sending this reply.',
@@ -1061,18 +939,158 @@ function runReplyHandling() {
 // Only event listeners and initialisation go here.
 // NO function definitions that are referenced by onclick attributes.
 // =========================================================================
-// ── W2 Dashboard State ────────────────────────────────────────────────────
-let dashProspects = [];   // Array of { pid, name, rank, score, sd, drafts, status }
-let dashView = 'all';
-let dashSortKey = 'rank';
-let dashSortDir = 1;
-
-// ── helpers ───────────────────────────────────────────────────────────────
+// ── W2 helpers ────────────────────────────────────────────────────────────
 function scoreColor(n){ n=Number(n)||0; return n>=80?'#16A34A':n>=65?'#2563EB':n>=50?'#D97706':n>=35?'#9B9B99':'#DC2626'; }
 function bandColor(b){ return ({prime:'#16A34A',strong:'#2563EB',moderate:'#D97706',weak:'#9B9B99',skip:'#DC2626'}[b]||'#9B9B99'); }
-function pill(text,color){ return `<span style="display:inline-flex;align-items:center;font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:20px;white-space:nowrap;color:${color};background:${color}15;border:1px solid ${color}40">${esc(text)}</span>`; }
+function pill(text,color){ return `<span style="display:inline-flex;align-items:center;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap;color:${color};background:${color}15;border:1px solid ${color}40">${esc(text)}</span>`; }
 
-// ── renderW2: build dashboard from response data ──────────────────────────
+// ── W2 prospect card ─────────────────────────────────────────────────────
+function buildCard(p) {
+  const sd = p.sd || {};
+  const ss = sd.subscores || {};
+  const band = (sd.band||'WEAK').toLowerCase();
+  const bc = bandColor(band);
+  const sc = scoreColor(p.score);
+  const overall = p.score != null ? p.score : '—';
+
+  // Pills
+  const relColor = sd.relationship_to_company==='INSIDER'?'#16A34A':sd.relationship_to_company==='RETAINED_AGENCY'?'#1D4ED8':'#9B9B99';
+  const decColor = (sd.decision||'').includes('PRIORITY')?'#16A34A':sd.decision==='REACH_OUT'?'#2563EB':'#D97706';
+  const pills = [
+    sd.band                ? pill(sd.band, bc) : '',
+    sd.decision            ? pill((sd.decision||'').replace(/_/g,' '), decColor) : '',
+    sd.relationship_to_company ? pill((sd.relationship_to_company||'').replace(/_/g,' '), relColor) : '',
+    sd.confidence          ? pill('conf '+sd.confidence, '#6B6B6B') : '',
+    sd.primary_archetype   ? pill((sd.primary_archetype||'').replace(/_/g,' '), '#4F46E5') : '',
+    sd.secondary_archetype ? pill((sd.secondary_archetype||'').replace(/_/g,' '), '#9B9B99') : '',
+  ].filter(Boolean).join(' ');
+
+  // Subscores
+  const subScores = [
+    {l:'Influence',  v:ss.influence_on_hire},
+    {l:'Engagement', v:ss.engagement_likelihood},
+    {l:'Function',   v:ss.function_relevance},
+    {l:'Warmth',     v:ss.connection_warmth},
+    {l:'Currency',   v:ss.company_currency},
+    {l:'Email pri.', v:sd.email_priority_score},
+  ];
+  const barsHtml = subScores.map(s=>{
+    const v = Number(s.v)||0;
+    const c = scoreColor(v);
+    return `<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+      <span style="font-size:.7rem;color:var(--text-3);min-width:68px;flex-shrink:0">${s.l}</span>
+      <div style="flex:1;height:5px;background:#F0EFE9;border-radius:3px;overflow:hidden">
+        <div style="width:${Math.min(100,v)}%;height:100%;background:${c};border-radius:3px"></div>
+      </div>
+      <span style="font-size:.7rem;font-weight:600;color:${c};min-width:22px;text-align:right">${v||'—'}</span>
+    </div>`;
+  }).join('');
+
+  // Drafts — one block per channel, always shown
+  const drafts = p.drafts || [];
+  const draftsHtml = drafts.map(d => {
+    const ch  = (d.channel||'').toLowerCase();
+    const msg = d.message || {};
+    const subject = (msg.subject||'').trim();
+    const body    = (msg.body||'').trim();
+    if (!body) return '';
+    const router  = d.router || {};
+    const isApp   = router.decision === 'APPROVED';
+    const reasons = (router.reasons||[]).filter(Boolean);
+    const jscores = d.judge_scores || {};
+    const vColor  = isApp ? '#16A34A' : '#D97706';
+    const chLabel = ch==='email' ? '✉ Email' : '💬 LinkedIn';
+    const draftId = 'dr-'+Math.random().toString(36).slice(2,9);
+    const judgeChips = Object.entries(jscores)
+      .map(([k,v])=>`<span class="judge-chip">${k.replace(/_/g,' ')}: ${v}</span>`).join('');
+    return `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <span style="font-size:.78rem;font-weight:700;color:var(--text)">${chLabel}</span>
+        <span style="font-size:.72rem;font-weight:600;color:${vColor}">${isApp?'✓ Approved':'⚠ Human Review'}</span>
+      </div>
+      <div id="${draftId}">
+        ${subject?`<div style="font-size:.82rem;font-weight:700;margin-bottom:.4rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)">Subject: ${esc(subject)}</div>`:''}
+        <p style="font-family:'DM Mono',monospace;font-size:.76rem;line-height:1.9;white-space:pre-wrap;color:var(--text)">${esc(body)}</p>
+      </div>
+      <div style="display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap;align-items:center">
+        <button class="copy-btn" onclick="copyEl('${draftId}',this)">Copy</button>
+        ${d.corrected?`<span style="font-size:.68rem;color:var(--text-3)">rewritten</span>`:''}
+      </div>
+      ${judgeChips?`<div class="judge-grid" style="margin-top:.5rem">${judgeChips}</div>`:''}
+      ${!isApp&&reasons.length?`<div style="margin-top:.4rem;font-size:.73rem;color:var(--amber);line-height:1.6">Flagged: ${esc(reasons.slice(0,4).join(' · '))}</div>`:''}
+    </div>`;
+  }).filter(Boolean).join('');
+
+  // Strategy / details
+  const hooks    = Array.isArray(sd.personalization_hooks) ? sd.personalization_hooks : [];
+  const gaps     = Array.isArray(sd.data_gaps) ? sd.data_gaps : [];
+  const redFlags = Array.isArray(sd.red_flags) ? sd.red_flags : [];
+
+  // Overall card status badge
+  const allApp = drafts.length && drafts.every(d=>d.router&&d.router.decision==='APPROVED');
+  const anyApp = drafts.some(d=>d.router&&d.router.decision==='APPROVED');
+  const cardBadge = p.status==='not_selected'
+    ? `<span style="font-size:.7rem;font-weight:600;color:#9B9B99;background:#F5F5F3;border:1px solid #E5E4DE;padding:2px 8px;border-radius:20px">Not Ranked</span>`
+    : allApp
+    ? `<span style="font-size:.7rem;font-weight:600;color:#16A34A;background:#F0FDF4;border:1px solid #BBF7D0;padding:2px 8px;border-radius:20px">✓ Approved</span>`
+    : anyApp
+    ? `<span style="font-size:.7rem;font-weight:600;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;padding:2px 8px;border-radius:20px">⚠ Partial Review</span>`
+    : drafts.length
+    ? `<span style="font-size:.7rem;font-weight:600;color:#D97706;background:#FFFBEB;border:1px solid #FDE68A;padding:2px 8px;border-radius:20px">⚠ Human Review</span>`
+    : '';
+
+  return `<div class="pcard">
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.875rem">
+      <div style="display:flex;align-items:flex-start;gap:.75rem;flex:1;min-width:0">
+        <div style="text-align:center;flex-shrink:0;min-width:48px">
+          <div style="font-size:.68rem;color:var(--text-3);font-family:'DM Mono',monospace">${p.rank!=null?'#'+p.rank:''}</div>
+          <div style="font-size:1.9rem;font-weight:700;line-height:1;color:${sc}">${overall}</div>
+          <div style="font-size:.6rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em">score</div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.35rem;word-break:break-word">${esc(p.name)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.25rem">${pills}</div>
+        </div>
+      </div>
+      <div style="flex-shrink:0">${cardBadge}</div>
+    </div>
+
+    <!-- Subscores -->
+    <div style="margin-bottom:.875rem">${barsHtml}</div>
+
+    <!-- Rationale -->
+    ${sd.rationale?`<p style="font-size:.81rem;color:var(--text-2);line-height:1.6;margin-bottom:.75rem">${esc(sd.rationale)}</p>`:''}
+
+    <!-- Strategy section -->
+    ${(sd.outreach_angle||sd.recommended_message_framing||hooks.length||gaps.length||redFlags.length)?`
+    <div style="background:var(--bg);border-radius:var(--r-sm);padding:.65rem .75rem;margin-bottom:.875rem">
+      ${sd.outreach_angle?`<div style="margin-bottom:.4rem"><span style="font-size:.65rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.15rem">Angle</span><span style="font-size:.8rem;color:var(--text-2)">${esc(sd.outreach_angle)}</span></div>`:''}
+      ${sd.recommended_message_framing?`<div style="margin-bottom:.4rem"><span style="font-size:.65rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.15rem">Framing</span><span style="font-size:.8rem;color:var(--text-2)">${esc(sd.recommended_message_framing)}</span></div>`:''}
+      ${hooks.length?`<div style="margin-bottom:.4rem"><span style="font-size:.65rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.15rem">Personalization hooks</span>${hooks.map(h=>`<div style="font-size:.78rem;color:var(--text-2);line-height:1.6">· ${esc(h)}</div>`).join('')}</div>`:''}
+      ${gaps.length?`<div style="margin-bottom:.3rem"><span style="font-size:.65rem;font-weight:700;color:#D97706;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.1rem">Data gaps</span><span style="font-size:.76rem;color:#D97706">${esc(gaps.join(' · '))}</span></div>`:''}
+      ${redFlags.length?`<div><span style="font-size:.65rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.1rem">Red flags</span><span style="font-size:.76rem;color:var(--red)">${esc(redFlags.join(' · '))}</span></div>`:''}
+    </div>`:''}
+
+    <!-- Not ranked reason -->
+    ${p.status==='not_selected'?`<div style="margin-top:.75rem;padding:.6rem .75rem;background:#FFF9F0;border:1px solid #FDE68A;border-radius:var(--r-sm)">
+      <span style="font-size:.68rem;font-weight:700;color:#92400E;text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:.25rem">Why not selected</span>
+      <span style="font-size:.78rem;color:#92400E">${(() => {
+        const d = p.sd;
+        if (d.decision==='SKIP') return 'Scored as SKIP — insufficient influence or relevance for this role.';
+        if (d.relationship_to_company==='THIRD_PARTY') return 'Third-party relationship — no direct connection to the hiring company.';
+        if (String(d.currently_at_company)==='false' && d.relationship_to_company!=='RETAINED_AGENCY') return 'No longer at the company — profile indicates past employment only.';
+        if (!['REQ_OWNER_RECRUITER','PEER','HIRING_MANAGER','SENIOR_LEADER','FOUNDER_EXEC'].includes(d.primary_archetype||'')) return 'Archetype not mappable to a bucket (' + (d.primary_archetype||'unknown') + ').';
+        return 'Ranked outside the top 5 in the ' + (d.primary_archetype||'').replace(/_/g,' ').toLowerCase() + ' bucket — higher-scoring prospects were selected.';
+      })()}</span>
+    </div>`:''}
+
+    <!-- Draft messages -->
+    ${draftsHtml}
+  </div>`;
+}
+
+// ── renderW2: build bucket card layout ───────────────────────────────────
 function renderW2(data) {
   if (!data) { showErr('err2','err2-title','err2-body','Empty response','The backend returned no data.'); return; }
   const summary   = data.summary || {};
@@ -1094,6 +1112,9 @@ function renderW2(data) {
   const approvedGroups = groupByPid(approved);
   const reviewGroups   = groupByPid(review);
 
+  // not_selected — scored but didn't make the top-15 cut
+  const notSelected = data.not_selected || [];
+
   // Build unified prospect list
   dashProspects = [];
   const seen = new Set();
@@ -1110,301 +1131,98 @@ function renderW2(data) {
   addGroup(approvedGroups, 'approved');
   addGroup(reviewGroups, 'review');
 
+  // Build scoredMap for not_selected cards
+  const scoredMapNS = {};
+  allScored.forEach(s => { if (s.pid) scoredMapNS[s.pid] = s; });
+
   // Summary cards
   document.getElementById('w2-stats').innerHTML = [
-    { n: summary.scored||0,          l: 'Scored',    c: '' },
-    { n: summary.total_selected||0,  l: 'Selected',  c: '' },
-    { n: approvedGroups.length,       l: 'Approved',  c: 'c-green' },
-    { n: reviewGroups.length,         l: 'In Review', c: 'c-amber' },
-    { n: failed.length,               l: 'Failed',    c: failed.length?'c-red':'' },
+    { n: summary.scored||0,         l: 'Scored',     c: '' },
+    { n: summary.total_selected||0, l: 'Selected',   c: '' },
+    { n: approved.length,            l: 'Approved',   c: 'c-green' },
+    { n: humanReview.length,         l: 'In Review',  c: 'c-amber' },
+    { n: notSelected.length,         l: 'Not Ranked', c: '' },
+    { n: failed.length,              l: 'Failed',     c: failed.length?'c-red':'' },
   ].map(({n,l,c})=>`<div class="dash-card"><div class="dash-card-n ${c}">${n}</div><div class="dash-card-l">${l}</div></div>`).join('');
 
-  // View tab counts
-  document.getElementById('vt-all').textContent      = dashProspects.length;
-  document.getElementById('vt-approved').textContent  = approvedGroups.length;
-  document.getElementById('vt-review').textContent    = reviewGroups.length;
-  document.getElementById('vt-failed').textContent    = failed.length;
+  // Helper: render a bucket section
+  function renderBucket(elId, title, prospects) {
+    const el = document.getElementById(elId);
+    if (!prospects.length) { el.style.display='none'; return; }
+    el.style.display = '';
+    el.innerHTML = `<div class="section-hdr" style="margin-top:1.5rem;margin-bottom:.75rem">
+      <span style="font-size:.85rem;font-weight:700;color:var(--text)">${title}</span>
+      <span style="font-size:.75rem;color:var(--text-3);margin-left:.5rem">${prospects.length} prospect${prospects.length!==1?'s':''}</span>
+    </div>
+    ${prospects.map(p => buildCard(p)).join('')}`;
+  }
+
+  // Group selected prospects into buckets by archetype
+  function getBucket(p) {
+    const arch = (p.sd.primary_archetype||'').toUpperCase();
+    if (['REQ_OWNER_RECRUITER'].includes(arch)) return 'recruiter';
+    if (['PEER'].includes(arch)) return 'peer';
+    if (['HIRING_MANAGER','SENIOR_LEADER','FOUNDER_EXEC'].includes(arch)) return 'senior';
+    return 'peer'; // default
+  }
+
+  // Build prospect objects for selected (approved + review combined per pid)
+  const pidMap = {};
+  const draftSources = [...approved, ...humanReview];
+  draftSources.forEach(d => {
+    if (!pidMap[d.pid]) {
+      const scored = scoredMap[d.pid] || {};
+      const sd = scored.data || {};
+      pidMap[d.pid] = { pid: d.pid, name: d.name, rank: d.rank, score: sd.overall_score, sd, drafts: [], status: '' };
+    }
+    pidMap[d.pid].drafts.push(d);
+  });
+  // Determine per-prospect status
+  Object.values(pidMap).forEach(p => {
+    const allApp = p.drafts.every(d=>d.router&&d.router.decision==='APPROVED');
+    p.status = allApp ? 'approved' : 'review';
+  });
+  const selectedProspects = Object.values(pidMap).sort((a,b)=>(Number(a.rank)||999)-(Number(b.rank)||999));
+
+  const recruiters = selectedProspects.filter(p=>getBucket(p)==='recruiter');
+  const peers      = selectedProspects.filter(p=>getBucket(p)==='peer');
+  const seniors    = selectedProspects.filter(p=>getBucket(p)==='senior');
+
+  renderBucket('w2-bucket-recruiters', '👥 Recruiters', recruiters);
+  renderBucket('w2-bucket-peers',      '🤝 Peers',      peers);
+  renderBucket('w2-bucket-seniors',    '🎯 Senior Leaders', seniors);
+
+  // Not Ranked bucket
+  const notRankedEl = document.getElementById('w2-bucket-not-ranked');
+  if (notSelected.length) {
+    const nsProspects = notSelected.map(p => {
+      const sd = p.data || {};
+      return { pid: p.pid, name: p.name||'Unknown', rank: null, score: sd.overall_score, sd, drafts: [], status: 'not_selected' };
+    });
+    notRankedEl.style.display = '';
+    notRankedEl.innerHTML = `<div class="section-hdr" style="margin-top:1.5rem;margin-bottom:.75rem">
+      <span style="font-size:.85rem;font-weight:700;color:var(--text)">⚠ Human Review — Not Selected</span>
+      <span style="font-size:.75rem;color:var(--text-3);margin-left:.5rem">${nsProspects.length} scored but did not make the top 15</span>
+    </div>
+    ${nsProspects.map(p=>buildCard(p)).join('')}`;
+  } else {
+    notRankedEl.style.display = 'none';
+  }
 
   // Failed scrapes
   const fw = document.getElementById('w2-failed-wrap');
   if (failed.length) {
+    fw.style.display = '';
     document.getElementById('w2-failed').innerHTML = failed.map(f=>`<li>${esc(typeof f==='string'?f:(f.url||f.name||JSON.stringify(f)))}</li>`).join('');
+  } else {
+    fw.style.display = 'none';
   }
-  fw.style.display = 'none'; // shown only in failed tab
-
-  // Initial render
-  dashSortKey = 'rank'; dashSortDir = 1; dashView = 'all';
-  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelector('.view-tab').classList.add('active');
-  document.getElementById('dash-search').value = '';
-  document.getElementById('dash-filter-status').value = '';
-  closeDetail();
-  renderDashTable();
 
   document.getElementById('out2').classList.add('visible');
   document.getElementById('out2').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-function setDashView(view, btn) {
-  dashView = view;
-  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  const fw = document.getElementById('w2-failed-wrap');
-  fw.style.display = view==='failed' ? '' : 'none';
-  document.getElementById('dash-table').parentElement.style.display = view==='failed' ? 'none' : '';
-  document.querySelector('.dash-toolbar').style.display = view==='failed' ? 'none' : '';
-  closeDetail();
-  renderDashTable();
-}
-
-function sortDashBy(key) {
-  if (dashSortKey===key) dashSortDir*=-1; else { dashSortKey=key; dashSortDir=1; }
-  document.querySelectorAll('.prospect-table th').forEach(th=>{th.classList.remove('sorted');});
-  renderDashTable();
-}
-function sortDashTable(){ renderDashTable(); }
-function filterDashTable(){ closeDetail(); renderDashTable(); }
-
-function renderDashTable() {
-  const search = (document.getElementById('dash-search').value||'').toLowerCase();
-  const filterStatus = document.getElementById('dash-filter-status').value;
-  const sortSel = document.getElementById('dash-sort').value;
-  const sk = dashSortKey !== 'rank' ? dashSortKey : sortSel;
-
-  let rows = dashProspects.filter(p => {
-    if (dashView==='approved' && p.status!=='approved') return false;
-    if (dashView==='review'   && p.status!=='review')   return false;
-    if (dashView==='failed')  return false;
-    if (filterStatus && p.status !== filterStatus) return false;
-    if (search) {
-      const hay = (p.name + ' ' + (p.sd.role_function||'') + ' ' + (p.sd.role_team||'')).toLowerCase();
-      if (!hay.includes(search)) return false;
-    }
-    return true;
-  });
-
-  rows = rows.slice().sort((a,b) => {
-    let av, bv;
-    if (sk==='score')  { av=Number(a.score)||0; bv=Number(b.score)||0; return dashSortDir*(bv-av); }
-    if (sk==='rank')   { av=Number(a.rank)||999; bv=Number(b.rank)||999; return dashSortDir*(av-bv); }
-    if (sk==='name')   { av=a.name.toLowerCase(); bv=b.name.toLowerCase(); return dashSortDir*(av<bv?-1:av>bv?1:0); }
-    if (sk==='status') { av=a.status; bv=b.status; return dashSortDir*(av<bv?-1:av>bv?1:0); }
-    return 0;
-  });
-
-  const tbody = document.getElementById('dash-tbody');
-  const empty = document.getElementById('dash-empty');
-
-  if (!rows.length) { tbody.innerHTML=''; empty.style.display=''; return; }
-  empty.style.display = 'none';
-
-  const bandColors2 = {prime:'#16A34A',strong:'#2563EB',moderate:'#D97706',weak:'#9B9B99',skip:'#DC2626'};
-  tbody.innerHTML = rows.map(p => {
-    const sd = p.sd;
-    const band = (sd.band||'WEAK').toLowerCase();
-    const bc = bandColors2[band]||'#9B9B99';
-    const sc = scoreColor(p.score);
-    const hasEmail = p.drafts.some(d=>d.channel==='email');
-    const hasLI    = p.drafts.some(d=>d.channel==='linkedin');
-    const statusBadge = p.status==='approved'
-      ? '<span class="sbadge sbadge-green">✓ Approved</span>'
-      : '<span class="sbadge sbadge-amber">⚠ Review</span>';
-    const archetype = (sd.primary_archetype||'').replace(/_/g,' ');
-    const conf = sd.confidence||'';
-    const rel  = (sd.relationship_to_company||'').replace(/_/g,' ');
-    return `<tr data-pid="${esc(p.pid)}">
-      <td class="td-rank">${p.rank!=null?'#'+p.rank:'—'}</td>
-      <td class="td-name"><span title="${esc(p.name)}">${esc(p.name)}</span></td>
-      <td class="td-score" style="color:${sc}">${p.score!=null?p.score:'—'}</td>
-      <td><span style="font-size:.7rem;font-weight:700;color:${bc}">${sd.band||'—'}</span></td>
-      <td class="td-company">${archetype||'<span class="td-na">—</span>'}</td>
-      <td><span style="font-size:.75rem;color:var(--text-2)">${conf||'<span class="td-na">—</span>'}</span></td>
-      <td class="td-company">${rel||'<span class="td-na">—</span>'}</td>
-      <td><div class="ch-icons">${hasLI?'<span class="ch-icon" title="LinkedIn">💬</span>':''}${hasEmail?'<span class="ch-icon" title="Email">✉</span>':''}</div></td>
-      <td>${statusBadge}</td>
-      <td><button class="btn-detail" onclick="openDetail('${esc(p.pid)}')">View details</button></td>
-    </tr>`;
-  }).join('');
-}
-
-// ── Detail panel ──────────────────────────────────────────────────────────
-function openDetail(pid) {
-  const p = dashProspects.find(x=>x.pid===pid);
-  if (!p) return;
-  const sd = p.sd;
-  const ss = sd.subscores || {};
-  const panel = document.getElementById('detail-panel');
-
-  // Header
-  const sc = scoreColor(p.score);
-  document.getElementById('dp-score').textContent = p.score!=null?p.score:'—';
-  document.getElementById('dp-score').style.color = sc;
-  document.getElementById('dp-name').textContent = p.name;
-
-  // Pills
-  const band = (sd.band||'WEAK').toLowerCase();
-  const bc = bandColor(band);
-  const relColor2 = sd.relationship_to_company==='INSIDER'?'#16A34A':sd.relationship_to_company==='RETAINED_AGENCY'?'#1D4ED8':'#9B9B99';
-  const decColor = (sd.decision||'').includes('PRIORITY')?'#16A34A':sd.decision==='REACH_OUT'?'#2563EB':'#D97706';
-  document.getElementById('dp-pills').innerHTML = [
-    sd.band            ? pill(sd.band, bc) : '',
-    sd.decision        ? pill((sd.decision||'').replace(/_/g,' '), decColor) : '',
-    sd.relationship_to_company ? pill((sd.relationship_to_company||'').replace(/_/g,' '), relColor2) : '',
-    sd.confidence      ? pill('conf '+sd.confidence, '#6B6B6B') : '',
-    sd.primary_archetype ? pill((sd.primary_archetype||'').replace(/_/g,' '), '#4F46E5') : '',
-    sd.secondary_archetype ? pill((sd.secondary_archetype||'').replace(/_/g,' '), '#9B9B99') : '',
-  ].filter(Boolean).join(' ');
-
-  // Overview
-  document.getElementById('dp-rationale').textContent = sd.rationale || '—';
-  const metaRows = [
-    ['Band', sd.band],
-    ['Decision', (sd.decision||'').replace(/_/g,' ')],
-    ['Confidence', sd.confidence],
-    ['Relationship', (sd.relationship_to_company||'').replace(/_/g,' ')],
-    ['Targeting risk', sd.targeting_risk],
-    ['Email in profile', sd.email_in_profile!=null?(sd.email_in_profile?'Yes':'No'):null],
-    ['Rank', p.rank!=null?'#'+p.rank:null],
-    ['Overall score', p.score],
-  ].filter(r=>r[1]!=null&&r[1]!=='');
-  document.getElementById('dp-meta').innerHTML = metaRows.map(([l,v])=>`<div style="display:grid;grid-template-columns:120px 1fr;gap:.2rem .5rem;margin-bottom:.2rem"><span style="font-size:.68rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em">${l}</span><span style="font-size:.79rem;color:var(--text-2)">${esc(String(v))}</span></div>`).join('');
-
-  // Scores
-  const subScores = [
-    {label:'Influence on hire',     val:ss.influence_on_hire},
-    {label:'Engagement likelihood', val:ss.engagement_likelihood},
-    {label:'Function relevance',    val:ss.function_relevance},
-    {label:'Connection warmth',     val:ss.connection_warmth},
-    {label:'Company currency',      val:ss.company_currency},
-    {label:'Email priority',        val:sd.email_priority_score},
-  ];
-  document.getElementById('dp-score-grid').innerHTML = subScores.map(s=>{
-    const v=Number(s.val)||0;
-    const c=scoreColor(v);
-    return `<div class="score-cell"><div class="score-cell-lbl">${s.label}</div><div class="score-cell-val" style="color:${c}">${v||'—'}</div></div>`;
-  }).join('');
-  document.getElementById('dp-score-bars').innerHTML = subScores.map(s=>{
-    const v=Number(s.val)||0;
-    const c=scoreColor(v);
-    return `<div class="score-bar-row"><span class="score-bar-lbl">${s.label}</span><div class="score-bar-wrap"><div class="score-bar-fill" style="width:${Math.min(100,v)}%;background:${c};height:100%;border-radius:3px"></div></div><span class="score-bar-num">${v||'—'}</span></div>`;
-  }).join('');
-
-  // Strategy
-  const hooks = Array.isArray(sd.personalization_hooks)?sd.personalization_hooks:[];
-  const gaps  = Array.isArray(sd.data_gaps)?sd.data_gaps:[];
-  const flags = Array.isArray(sd.red_flags)?sd.red_flags:[];
-  document.getElementById('dp-strategy').innerHTML = [
-    sd.outreach_angle ? `<div class="strat-row"><div class="strat-lbl">Angle</div><div class="strat-val">${esc(sd.outreach_angle)}</div></div>` : '',
-    sd.recommended_message_framing ? `<div class="strat-row"><div class="strat-lbl">Framing</div><div class="strat-val">${esc(sd.recommended_message_framing)}</div></div>` : '',
-    hooks.length ? `<div class="strat-row"><div class="strat-lbl">Personalization hooks</div><ul class="strat-hooks">${hooks.map(h=>`<li>${esc(h)}</li>`).join('')}</ul></div>` : '',
-    gaps.length  ? `<div class="strat-row"><div class="strat-lbl" style="color:var(--amber)">Data gaps</div><div class="strat-val" style="color:var(--amber)">${esc(gaps.join(' · '))}</div></div>` : '',
-    flags.length ? `<div class="strat-row"><div class="strat-lbl" style="color:var(--red)">Red flags</div><div class="strat-val" style="color:var(--red)">${esc(flags.join(' · '))}</div></div>` : '',
-  ].join('') || '<div style="color:var(--text-3);font-size:.82rem">No strategic data available.</div>';
-
-  // Drafts — tabbed by channel
-  const draftsWithBody = p.drafts.filter(d=>(d.message&&d.message.body)||'');
-  const draftTabsEl    = document.getElementById('dp-draft-tabs');
-  const draftContentsEl = document.getElementById('dp-draft-contents');
-  if (!draftsWithBody.length) {
-    draftTabsEl.innerHTML = '';
-    draftContentsEl.innerHTML = '<div style="color:var(--text-3);font-size:.82rem">No drafts available.</div>';
-  } else {
-    draftTabsEl.innerHTML = draftsWithBody.map((d,i)=>{
-      const ch = (d.channel||'').toLowerCase();
-      const lbl = ch==='email'?'✉ Email':'💬 LinkedIn';
-      return `<button class="draft-tab-btn${i===0?' active':''}" onclick="setDraftTab(${i},this)">${lbl}</button>`;
-    }).join('');
-    draftContentsEl.innerHTML = draftsWithBody.map((d,i)=>{
-      const ch  = (d.channel||'').toLowerCase();
-      const msg = d.message||{};
-      const subject = (msg.subject||'').trim();
-      const body    = (msg.body||'').trim();
-      const dRouter = d.router||{};
-      const dDec    = dRouter.decision||'';
-      const reasons = (dRouter.reasons||[]).filter(Boolean);
-      const jscores = d.judge_scores||{};
-      const isApp   = dDec==='APPROVED';
-      const vColor  = isApp?'var(--green)':'var(--amber)';
-      const draftId = 'dp-draft-'+Math.random().toString(36).slice(2,8);
-      const judgeChips = Object.entries(jscores).map(([k,v])=>`<span class="judge-chip">${k.replace(/_/g,' ')}: ${v}</span>`).join('');
-      return `<div class="draft-content${i===0?' active':''}" id="ddc-${i}">
-        <div class="draft-verdict">
-          <span style="font-size:.75rem;font-weight:600;color:${vColor}">${isApp?'✓ Approved':'⚠ Human Review'}</span>
-          ${d.corrected?'<span style="font-size:.7rem;color:var(--text-3)">corrected</span>':''}
-        </div>
-        <div id="${draftId}">
-          ${subject?`<div class="draft-msg-subject">Subject: ${esc(subject)}</div>`:''}
-          <div class="draft-msg-body">${esc(body)}</div>
-        </div>
-        <div class="draft-meta">
-          <button class="copy-btn" onclick="copyEl('${draftId}',this)">Copy</button>
-        </div>
-        ${judgeChips?`<div class="judge-grid" style="margin-top:.6rem">${judgeChips}</div>`:''}
-        ${!isApp&&reasons.length?`<div class="flag-row">Flagged: ${esc(reasons.slice(0,5).join(' · '))}</div>`:''}
-      </div>`;
-    }).join('');
-  }
-
-  // Quality
-  const allJscores = {};
-  p.drafts.forEach(d=>{ Object.assign(allJscores, d.judge_scores||{}); });
-  const qKeys = ['tone_alignment','pain_specificity','solution_relevance','personalization_depth','cta_clarity','human_feel'];
-  document.getElementById('dp-quality-grid').innerHTML = qKeys.map(k=>{
-    const v = allJscores[k]!=null?allJscores[k]:'—';
-    const c = v!=='—'?scoreColor(v):'var(--text-3)';
-    return `<div class="quality-cell"><div class="quality-lbl">${k.replace(/_/g,' ')}</div><div class="quality-val" style="color:${c}">${v}</div></div>`;
-  }).join('');
-  // Lint flags from drafts
-  const allFlags = p.drafts.flatMap(d=>(d.lint_flags||[]));
-  document.getElementById('dp-quality-flags').innerHTML = allFlags.length
-    ? `<div style="font-size:.75rem;font-weight:700;color:var(--amber);margin-bottom:.3rem">Structural flags</div>${allFlags.map(f=>`<div style="font-size:.76rem;color:var(--amber);line-height:1.6">⚠ ${esc(f)}</div>`).join('')}`
-    : '<div style="font-size:.8rem;color:var(--green)">✓ No structural flags</div>';
-
-  // Routing
-  document.getElementById('dp-routing').innerHTML = p.drafts.map(d=>{
-    const ch = (d.channel||'').toLowerCase();
-    const r  = d.router||{};
-    const reasons = (r.reasons||[]).filter(Boolean);
-    const isApp = r.decision==='APPROVED';
-    return `<div style="margin-bottom:.75rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)">
-      <div class="route-status">
-        <span style="font-size:.78rem;font-weight:700">${ch==='email'?'✉ Email':'💬 LinkedIn'}</span>
-        <span class="sbadge ${isApp?'sbadge-green':'sbadge-amber'}">${r.decision||'—'}</span>
-        ${r.weighted_overall!=null?`<span style="font-size:.73rem;color:var(--text-3)">weighted ${r.weighted_overall}</span>`:''}
-      </div>
-      ${reasons.length?`<ul class="route-reasons">${reasons.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:''}
-    </div>`;
-  }).join('') || '<div style="font-size:.82rem;color:var(--text-3)">No routing data.</div>';
-
-  // Show panel, scroll to it, reset to Overview tab
-  setDetailTab(0, document.querySelector('.detail-tab'));
-  panel.classList.add('open');
-  panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
-function setDetailTab(idx, btn) {
-  // idx can be a number (for draft tabs) or a section name string
-  if (typeof idx === 'string') {
-    document.querySelectorAll('.detail-tab').forEach(t=>t.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.detail-section').forEach(s=>s.classList.remove('active'));
-    const sec = document.getElementById('ds-'+idx);
-    if (sec) sec.classList.add('active');
-  }
-}
-
-function setDraftTab(idx, btn) {
-  document.querySelectorAll('.draft-tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.draft-content').forEach((c,i)=>{ c.classList.toggle('active', i===idx); });
-}
-
-function closeDetail() {
-  document.getElementById('detail-panel').classList.remove('open');
-}
-
-// Keep setDetailTab working for string-based section tabs from onclick attributes
-function setDetailTabByName(name, btn) { setDetailTab(name, btn); }
+// (old dashboard table/detail functions removed — cards are rendered inline)
 
 
 document.addEventListener('DOMContentLoaded', function () {
